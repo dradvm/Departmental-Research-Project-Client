@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Account } from "../types/account";
+import { Account } from "types/account";
 
 interface InforListProps {
   setSelectedItem: (account: Account) => void;

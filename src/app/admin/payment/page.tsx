@@ -1,8 +1,8 @@
 "use client";
 
-import { payments } from "@/app/data";
+import { payments } from "app/data";
 import { useState } from "react";
-import { PaymentType } from "@/app/types/payment";
+import { PaymentType } from "types/payment";
 export default function Payment() {
   const [selectedItem, setSelectedItem] = useState<number>();
   const [selectedPayment, setSelectedPayment] = useState<PaymentType>();

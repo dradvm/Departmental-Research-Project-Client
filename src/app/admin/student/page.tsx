@@ -1,4 +1,4 @@
-import AccountManagement from "@/app/components/AccountManagement";
+import AccountManagement from "components/AdminUtils/AccountManagement";
 
 export default function Student() {
   return (

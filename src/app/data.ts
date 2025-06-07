@@ -1,7 +1,7 @@
-import { Account } from "./types/account";
-import { ReportType } from "./types/report";
-import { PaymentType } from "./types/payment";
-import { PostType } from "./types/post";
+import { Account } from "types/account";
+import { ReportType } from "types/report";
+import { PaymentType } from "types/payment";
+import { PostType } from "types/post";
 
 export const teachers: Array<Account> = [
     {

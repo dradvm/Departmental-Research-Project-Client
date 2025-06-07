@@ -1,4 +1,4 @@
-import { Account } from "../types/account";
+import { Account } from "types/account";
 
 export default function InforForm({
   account,
