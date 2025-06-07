@@ -1,4 +1,4 @@
-import MyChart from "../components/charts/MyChart";
+import MyChart from "components/AdminUtils/charts/MyChart";
 
 export default function Admin() {
   return (

@@ -1,7 +1,7 @@
 "use client";
-import { PostType } from "@/app/types/post";
+import { PostType } from "types/post";
 import { useState } from "react";
-import { posts } from "@/app/data";
+import { posts } from "app/data";
 export default function Post() {
   const [selectedItem, setSelectedItem] = useState<number>();
   const [selectedPost, setSelectedPost] = useState<PostType>();

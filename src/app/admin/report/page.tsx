@@ -1,8 +1,8 @@
 "use client";
 
-import { reports } from "@/app/data";
+import { reports } from "app/data";
 import { useState } from "react";
-import { ReportType } from "@/app/types/report";
+import { ReportType } from "types/report";
 
 export default function Report() {
   const [selectedItem, setSelectedItem] = useState<number>();

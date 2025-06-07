@@ -1,10 +1,10 @@
 "use client";
 
-import InforList from "@/app/components/InforList";
-import InforForm from "@/app/components/InforForm";
+import InforList from "./InforList";
+import InforForm from "./InforForm";
 import { useState } from "react";
-import { Account } from "@/app/types/account";
-import { students, teachers } from "../data";
+import { Account } from "types/account";
+import { students, teachers } from "app/data";
 
 export default function AccountManagement({
   type,
