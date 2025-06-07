@@ -7,6 +7,7 @@ import TabPanel from "@mui/lab/TabPanel";
 import { Search } from "lucide-react";
 import CourseOverview from "./CourseOverview";
 import CourseReviews from "./CourseReviews";
+import CourseQA from "./CourseQA";
 
 export default function CourseDetails() {
   const [value, setValue] = React.useState("1");
@@ -58,7 +59,9 @@ export default function CourseDetails() {
         <TabPanel value="2">
           <CourseOverview />
         </TabPanel>
-        <TabPanel value="3">Item Three</TabPanel>
+        <TabPanel value="3">
+          <CourseQA />
+        </TabPanel>
         <TabPanel value="4">Item One</TabPanel>
         <TabPanel value="5">Item Two</TabPanel>
         <TabPanel value="6">

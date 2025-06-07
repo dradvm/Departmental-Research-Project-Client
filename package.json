@@ -27,6 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.14.0",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.511.0",
     "next": "15.1.8",
     "next-auth": "^4.24.11",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/lodash": "^4.17.17",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
