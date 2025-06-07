@@ -50,7 +50,7 @@ export default function CourseDetails() {
             <Tab label="Tổng quan" value="2" />
             <Tab label="Q&A" value="3" />
             <Tab label="Ghi chú" value="4" />
-            <Tab label="Thông báo" value="5" />
+            {/* <Tab label="Thông báo" value="5" /> */}
             <Tab label="Đánh giá" value="6" />
             <Tab label="Công cụ học" value="7" />
           </TabList>
@@ -63,7 +63,7 @@ export default function CourseDetails() {
           <CourseQA />
         </TabPanel>
         <TabPanel value="4">Item One</TabPanel>
-        <TabPanel value="5">Item Two</TabPanel>
+        {/* <TabPanel value="5">Item Two</TabPanel> */}
         <TabPanel value="6">
           <CourseReviews />
         </TabPanel>
