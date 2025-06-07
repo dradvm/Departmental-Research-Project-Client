@@ -11,9 +11,10 @@ import {
   Settings,
   Volume,
 } from "lucide-react";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import formatTime from "utils/time";
 import throttle from "lodash/throttle";
+import screenfull from "screenfull";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 type ReactPlayerRef = {
   seekTo: (amount: number, type?: "seconds" | "fraction") => void;
@@ -33,7 +34,7 @@ interface VideoPlayerProps {
 export default function VideoPlayer({
   url,
   width = "100%",
-  height = "450px",
+  height = "100%",
   controls = false,
   loop = false,
 }: VideoPlayerProps) {
@@ -50,13 +51,47 @@ export default function VideoPlayer({
   const progressRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
+  const playerWrapperRef = useRef(null);
 
+  const handleFullScreen = () => {
+    if (playerWrapperRef.current && screenfull.isEnabled) {
+      if (screenfull.isFullscreen) {
+        screenfull.exit();
+      } else {
+        screenfull.request(playerWrapperRef.current);
+      }
+    }
+  };
   const handleProgress = useCallback(
     throttle((progress: { playedSeconds: number }) => {
       setCurrentTime(progress.playedSeconds);
       setProgress((progress.playedSeconds / duration) * 100);
     }, 500),
     [duration]
+  );
+
+  const seekBy = useCallback(
+    (second: number) => {
+      if (currentTime + second >= 0 && currentTime + second <= duration) {
+        playerRef.current?.seekTo(currentTime + second);
+        setProgress(((currentTime + second) / duration) * 100);
+        setCurrentTime(currentTime + second);
+        return;
+      }
+      if (currentTime + second < 0) {
+        playerRef.current?.seekTo(0);
+        setProgress(0);
+        setCurrentTime(0);
+        return;
+      }
+      if (currentTime + second > duration) {
+        playerRef.current?.seekTo(duration);
+        setProgress(100);
+        setCurrentTime(duration);
+        return;
+      }
+    },
+    [currentTime, duration]
   );
 
   const handleSetProgress = (e: { clientX: number }) => {
@@ -80,7 +115,7 @@ export default function VideoPlayer({
     setFirstTimeAccess(false);
   };
 
-  const togglePlay = () => {
+  const togglePlay = useCallback(() => {
     setPlaying((prev) => !prev);
     setShowOverlay(true);
     if (firstTimeAccess) {
@@ -94,9 +129,9 @@ export default function VideoPlayer({
         setShowOverlay(false);
       }, 500);
     }
-  };
+  }, [firstTimeAccess]);
 
-  const handleVolumeChange = (event: Event, newValue: number) => {
+  const handleVolumeChange = (e: Event, newValue: number) => {
     setVolume(newValue);
   };
 
@@ -116,9 +151,32 @@ export default function VideoPlayer({
   const handleMouseLeaveVolume = () => {
     setShowVolumeSlider(false);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: { code: string; preventDefault: () => void }) => {
+      e.preventDefault();
+      if (e.code === "Space") {
+        togglePlay();
+      }
+      if (e.code === "ArrowLeft") {
+        console.log("aaa");
+        seekBy(-5);
+      }
+      if (e.code === "ArrowRight") {
+        seekBy(5);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [seekBy, togglePlay]);
+
   return (
-    <div className="w-full h-full flex items-center justify-center relative">
-      <div className="flex items-center justify-center">
+    <div
+      ref={playerWrapperRef}
+      className="w-full h-full flex items-center justify-center relative"
+    >
+      <div className="flex items-center justify-center w-full h-full abc">
         <ReactPlayer
           ref={playerRef}
           url={url}
@@ -130,17 +188,19 @@ export default function VideoPlayer({
           loop={loop}
           onDuration={(duration) => setDuration(duration)}
           onProgress={handleProgress}
-          onPlay={() => console.log("A")}
-          onSeek={() => console.log("B")}
         />
       </div>
       <div
         className="w-full h-full absolute top-0 left-0 flex flex-col"
         onMouseMove={handleMouseEnterShowControls}
       >
-        <div className="flex-grow" onClick={togglePlay}></div>
+        <div
+          className="flex-grow"
+          onClick={togglePlay}
+          onDoubleClick={handleFullScreen}
+        ></div>
         <AnimatePresence>
-          {showControls && (
+          {(showControls || true) && (
             <motion.div
               initial={{ opacity: 0, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
@@ -165,7 +225,7 @@ export default function VideoPlayer({
                         height: 12,
                       },
                       "& .MuiLinearProgress-bar": {
-                        transition: "none !important", // đảm bảo ghi đè transition mặc định
+                        transition: "none !important",
                       },
                     }}
                     onClick={handleSetProgress}
@@ -196,6 +256,7 @@ export default function VideoPlayer({
                       size={20}
                       className="cursor-pointer text-slate-300 hover:text-white rounded-sm w-7 px-1 h-full"
                       strokeWidth={2}
+                      onClick={() => seekBy(-5)}
                     />
                   </Tooltip>
                   <Tooltip placement="top" title="Tua tới 5s">
@@ -203,6 +264,7 @@ export default function VideoPlayer({
                       size={20}
                       className="cursor-pointer text-slate-300 hover:text-white rounded-sm w-7 px-1 h-full"
                       strokeWidth={2}
+                      onClick={() => seekBy(5)}
                     />
                   </Tooltip>
                   <div className="font-bold text-sm select-none">
@@ -228,7 +290,7 @@ export default function VideoPlayer({
                     />
                     {showVolumeSlider && (
                       <div
-                        className="absolute h-24 -translate-y-14 -translate-x-2 flex flex-col"
+                        className="cursor-pointer absolute h-24 -translate-y-14 -translate-x-2 flex flex-col before:absolute before:content-[''] before:bg-transparent before:bottom-0 before:translate-y-6 before:left-0 before:w-full before:h-8"
                         onMouseLeave={handleMouseLeaveVolume}
                       >
                         <div className="flex-grow">
@@ -259,6 +321,7 @@ export default function VideoPlayer({
                       size={20}
                       className="cursor-pointer text-slate-300 hover:text-white rounded-sm w-7 px-1 h-full"
                       strokeWidth={2}
+                      onClick={handleFullScreen}
                     />
                   </Tooltip>
                 </div>
@@ -273,6 +336,7 @@ export default function VideoPlayer({
           {firstTimeAccess ? (
             <div
               onClick={togglePlay}
+              onDoubleClick={handleFullScreen}
               className="text-white bg-black rounded-full p-5 flex items-center justify-center shadow-2xl pointer-events-auto"
             >
               <Play size={56} className="cursor-pointer" strokeWidth={2} />
