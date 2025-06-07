@@ -38,7 +38,8 @@
     "react-window": "^1.8.11",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.25.30"
+    "zod": "^3.25.30",
+    "recharts": "^2.15.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
