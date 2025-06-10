@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "lib/utils";
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "outline" | "hover" | "primary";
+  variant?: "default" | "outline" | "hover" | "primary" | "filled";
   size?: "default" | "sm" | "lg";
   expand?: boolean;
 }
@@ -11,6 +11,7 @@ const buttonVariants = {
   default: "text-white hover:bg-indigo-950 hover:opacity-90",
   hover: "text-white hover:text-slate-300",
   outline: "border border-input bg-none hover:bg-gray-800",
+  filled: "bg-indigo-600 hover:bg-indigo-500 text-white font-medium",
   primary:
     "bg-white text-indigo-600 border border-indigo-500 hover:text-indigo-700 hover:border-indigo-700 hover:bg-indigo-50",
 };

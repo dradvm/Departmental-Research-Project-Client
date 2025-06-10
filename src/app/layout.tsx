@@ -1,4 +1,7 @@
+"use client";
+
 import "./globals.css";
+import DynamicHeader from "components/Main/Header/DynamicHeader";
 
 export default function RootLayout({
   children,
@@ -10,7 +13,10 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <body>{children}</body>
+      <body>
+        <DynamicHeader />
+        {children}
+      </body>
     </html>
   );
 }

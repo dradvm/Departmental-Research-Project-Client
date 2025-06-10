@@ -3,13 +3,16 @@ import { Box, LinearProgress, Slider, Tooltip } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Maximize2,
+  Minimize2,
   NotebookPen,
   Pause,
   Play,
   RotateCcw,
   RotateCw,
   Settings,
-  Volume,
+  Volume1,
+  Volume2,
+  VolumeOff,
 } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import formatTime from "utils/time";
@@ -20,7 +23,6 @@ type ReactPlayerRef = {
   seekTo: (amount: number, type?: "seconds" | "fraction") => void;
   getCurrentTime: () => number;
   getDuration: () => number;
-  // thêm các method khác nếu cần
 };
 interface VideoPlayerProps {
   url: string;
@@ -52,6 +54,8 @@ export default function VideoPlayer({
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const playerWrapperRef = useRef(null);
+  const [isMute, setIsMute] = useState(false);
+  const [isFullscreen, setIsFullScreen] = useState(false);
 
   const handleFullScreen = () => {
     if (playerWrapperRef.current && screenfull.isEnabled) {
@@ -60,6 +64,7 @@ export default function VideoPlayer({
       } else {
         screenfull.request(playerWrapperRef.current);
       }
+      setIsFullScreen(!screenfull.isFullscreen);
     }
   };
   const handleProgress = useCallback(
@@ -114,6 +119,10 @@ export default function VideoPlayer({
   const handleFirstTimeAccess = () => {
     setFirstTimeAccess(false);
   };
+
+  const toggleMute = useCallback(() => {
+    setIsMute((prev) => !prev);
+  }, []);
 
   const togglePlay = useCallback(() => {
     setPlaying((prev) => !prev);
@@ -183,7 +192,7 @@ export default function VideoPlayer({
           width={width}
           height={height}
           playing={playing}
-          volume={volume / 100}
+          volume={isMute ? 0 : volume / 100}
           controls={controls}
           loop={loop}
           onDuration={(duration) => setDuration(duration)}
@@ -282,23 +291,49 @@ export default function VideoPlayer({
                 </div>
                 <div className="flex items-center space-x-2 h-full">
                   <div className="w-7 px-1 h-full flex items-center justify-between relative">
-                    <Volume
-                      size={20}
-                      className="absolute cursor-pointer text-slate-300 hover:text-white rounded-sm "
-                      strokeWidth={2}
-                      onMouseEnter={handleMouseEnterVolume}
-                    />
+                    {(volume === 0 || isMute) && (
+                      <VolumeOff
+                        size={20}
+                        className="absolute cursor-pointer text-slate-300 hover:text-white rounded-sm "
+                        strokeWidth={2}
+                        onMouseEnter={handleMouseEnterVolume}
+                        onClick={toggleMute}
+                      />
+                    )}
+                    {volume <= 30 && volume > 0 && !isMute && (
+                      <Volume1
+                        size={20}
+                        className="absolute cursor-pointer text-slate-300 hover:text-white rounded-sm "
+                        strokeWidth={2}
+                        onMouseEnter={handleMouseEnterVolume}
+                        onClick={toggleMute}
+                      />
+                    )}
+                    {volume <= 100 && volume > 30 && !isMute && (
+                      <Volume2
+                        size={20}
+                        className="absolute cursor-pointer text-slate-300 hover:text-white rounded-sm "
+                        strokeWidth={2}
+                        onMouseEnter={handleMouseEnterVolume}
+                        onClick={toggleMute}
+                      />
+                    )}
                     {showVolumeSlider && (
                       <div
-                        className="cursor-pointer absolute h-24 -translate-y-14 -translate-x-2 flex flex-col before:absolute before:content-[''] before:bg-transparent before:bottom-0 before:translate-y-6 before:left-0 before:w-full before:h-8"
+                        className="cursor-pointer absolute h-24 -translate-y-14 -translate-x-2 flex flex-col "
                         onMouseLeave={handleMouseLeaveVolume}
                       >
+                        <div className="absolute bg-transparent bottom-0 translate-y-6 left-0 w-full h-32"></div>
+                        <div
+                          className="absolute bg-transparent bottom-0 translate-y-6 left-0 w-full h-8"
+                          onClick={toggleMute}
+                        ></div>
                         <div className="flex-grow">
                           <Slider
                             aria-label="Temperature"
                             orientation="vertical"
                             valueLabelDisplay="auto"
-                            value={volume}
+                            value={isMute ? 0 : volume}
                             onChange={handleVolumeChange}
                             sx={{
                               color: "white",
@@ -316,14 +351,25 @@ export default function VideoPlayer({
                       strokeWidth={2}
                     />
                   </Tooltip>
-                  <Tooltip placement="top" title="Toàn màn hình">
-                    <Maximize2
-                      size={20}
-                      className="cursor-pointer text-slate-300 hover:text-white rounded-sm w-7 px-1 h-full"
-                      strokeWidth={2}
-                      onClick={handleFullScreen}
-                    />
-                  </Tooltip>
+                  {!isFullscreen ? (
+                    <Tooltip placement="top" title="Toàn màn hình">
+                      <Maximize2
+                        size={20}
+                        className="cursor-pointer text-slate-300 hover:text-white rounded-sm w-7 px-1 h-full"
+                        strokeWidth={2}
+                        onClick={handleFullScreen}
+                      />
+                    </Tooltip>
+                  ) : (
+                    <Tooltip placement="top" title="Thu nhỏ">
+                      <Minimize2
+                        size={20}
+                        className="cursor-pointer text-slate-300 hover:text-white rounded-sm w-7 px-1 h-full"
+                        strokeWidth={2}
+                        onClick={handleFullScreen}
+                      />
+                    </Tooltip>
+                  )}
                 </div>
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-white/0" />
