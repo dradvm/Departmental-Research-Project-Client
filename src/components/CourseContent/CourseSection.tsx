@@ -7,8 +7,13 @@ import React from "react";
 import List from "@mui/material/List";
 import CourseLecture from "./CourseLecture";
 import { Divider } from "@mui/material";
+import { Section } from "types/section";
 
-export default function CourseSection() {
+type Props = {
+  section: Section;
+};
+
+export default function CourseSection({ section }: Props) {
   const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
@@ -18,7 +23,7 @@ export default function CourseSection() {
     <>
       <ListItemButton onClick={handleClick} disableRipple>
         <ListItemText
-          primary="Section 1: Chào mừng đến với khoá học automation với n8n tổng"
+          primary={section.nameSection}
           secondary="1/1 | 1min"
           slotProps={{
             primary: {
@@ -33,10 +38,9 @@ export default function CourseSection() {
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding className="bg-white">
-          <CourseLecture />
-          <CourseLecture />
-          <CourseLecture />
-          <CourseLecture />
+          {section.Lecture.map((lecture, index) => (
+            <CourseLecture lecture={lecture} key={index} />
+          ))}
         </List>
       </Collapse>
       <Divider />

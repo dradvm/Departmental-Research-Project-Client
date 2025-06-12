@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import formatTime from "utils/time";
 import throttle from "lodash/throttle";
 import screenfull from "screenfull";
+import { useLearnContext } from "app/course/[courseId]/learn/lecture/[lesson]/layout";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 type ReactPlayerRef = {
   seekTo: (amount: number, type?: "seconds" | "fraction") => void;
@@ -56,6 +57,7 @@ export default function VideoPlayer({
   const playerWrapperRef = useRef(null);
   const [isMute, setIsMute] = useState(false);
   const [isFullscreen, setIsFullScreen] = useState(false);
+  const { enabledBlock } = useLearnContext();
 
   const handleFullScreen = () => {
     if (playerWrapperRef.current && screenfull.isEnabled) {
@@ -163,22 +165,23 @@ export default function VideoPlayer({
 
   useEffect(() => {
     const handleKeyDown = (e: { code: string; preventDefault: () => void }) => {
-      e.preventDefault();
-      if (e.code === "Space") {
+      if (e.code === "Space" && enabledBlock) {
+        e.preventDefault();
         togglePlay();
       }
       if (e.code === "ArrowLeft") {
-        console.log("aaa");
+        e.preventDefault();
         seekBy(-5);
       }
       if (e.code === "ArrowRight") {
+        e.preventDefault();
         seekBy(5);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [seekBy, togglePlay]);
+  }, [seekBy, togglePlay, enabledBlock]);
 
   return (
     <div

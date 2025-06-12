@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
@@ -8,6 +10,7 @@ import { Search } from "lucide-react";
 import CourseOverview from "./CourseOverview";
 import CourseReviews from "./CourseReviews";
 import CourseQA from "./CourseQA";
+import CourseNotes from "./CourseNotes";
 
 export default function CourseDetails() {
   const [value, setValue] = React.useState("1");
@@ -62,7 +65,9 @@ export default function CourseDetails() {
         <TabPanel value="3">
           <CourseQA />
         </TabPanel>
-        <TabPanel value="4">Item One</TabPanel>
+        <TabPanel value="4">
+          <CourseNotes />
+        </TabPanel>
         {/* <TabPanel value="5">Item Two</TabPanel> */}
         <TabPanel value="6">
           <CourseReviews />

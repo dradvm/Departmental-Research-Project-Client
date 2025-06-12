@@ -1,3 +1,4 @@
+"use client";
 import {
   Checkbox,
   ListItemButton,
@@ -5,13 +6,28 @@ import {
   ListItemText,
 } from "@mui/material";
 import { TvMinimalPlay } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import React, { useCallback } from "react";
+import { Lecture } from "types/lecture";
 
-export default function CourseLecture() {
+type Props = {
+  lecture: Lecture;
+};
+
+export default function CourseLecture({ lecture }: Props) {
+  const params = useParams();
+  const router = useRouter();
+  console.log(params);
+  const idCourse = params.idCourse;
+  const handleLink = useCallback(() => {
+    router.push(`/course/${idCourse}/learn/lecture/${lecture.idLecture}`);
+  }, [idCourse, router, lecture.idLecture]);
+
   return (
-    <ListItemButton disableRipple>
+    <ListItemButton disableRipple onClick={handleLink}>
       <ListItemText
         sx={{ paddingLeft: "12px" }}
-        primary="1. Giới thiệu về n8n là 1 công cụ automation mạnh mẽ"
+        primary={lecture.nameLecture}
         secondary={
           <span className="flex items-center text-xs">
             <TvMinimalPlay size={14} strokeWidth={1} />
@@ -27,7 +43,12 @@ export default function CourseLecture() {
           },
         }}
       />
-      <ListItemIcon sx={{ minWidth: 0 }}>
+      <ListItemIcon
+        sx={{ minWidth: 0 }}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
         <Checkbox
           size="small"
           sx={{

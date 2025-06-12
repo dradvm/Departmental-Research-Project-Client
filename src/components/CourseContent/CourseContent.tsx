@@ -4,8 +4,13 @@ import { Divider } from "@mui/material";
 import { X } from "lucide-react";
 import CourseSection from "./CourseSection";
 import { useStickyObserver } from "hooks/useStickyObserver";
+import { Section } from "types/section";
 
-export default function CourseContent() {
+type Props = {
+  courseContent: Section[];
+};
+
+export default function CourseContent({ courseContent }: Props) {
   const { sentinelRef, isSticky } = useStickyObserver();
 
   React.useEffect(() => {
@@ -34,18 +39,9 @@ export default function CourseContent() {
           component="nav"
           aria-labelledby="nested-list-subheader"
         >
-          <CourseSection />
-          <CourseSection />
-          <CourseSection />
-          <CourseSection />
-          <CourseSection />
-          <CourseSection />
-          <CourseSection />
-          <CourseSection />
-          <CourseSection />
-          <CourseSection />
-          <CourseSection />
-          <CourseSection />
+          {courseContent.map((section, index) => (
+            <CourseSection key={index} section={section} />
+          ))}
         </List>
       </div>
     </>
