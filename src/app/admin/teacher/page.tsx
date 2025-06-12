@@ -1,9 +1,10 @@
 import AccountManagement from "components/AdminUtils/AccountManagement";
+import { adminUiType } from "app/enums/admin.enum";
 
 export default function Teacher() {
   return (
     <div>
-      <AccountManagement type="teacher"></AccountManagement>
+      <AccountManagement type={adminUiType.Teacher}></AccountManagement>
     </div>
   );
 }
