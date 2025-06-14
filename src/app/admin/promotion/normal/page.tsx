@@ -1,7 +1,7 @@
 "use client";
 
 import { productCoupon } from "app/data";
-import { CouponType } from "app/enums/coupon.enum";
+import { CouponType } from "enums/coupon.enum";
 import { ProductCouponType } from "types/coupon";
 import { useEffect, useState } from "react";
 import { Funnel, Search, ArrowBigLeft, ArrowBigRight } from "lucide-react";
@@ -16,7 +16,7 @@ export default function NormalPromotion() {
     const data = productCoupon.slice(skip, skip + limit);
     setproductCoupons(data);
   }, [page]);
-  
+
   return (
     <div className="h-[100%] flex flex-col">
       {/* Filter Utility */}

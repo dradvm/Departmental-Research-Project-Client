@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { teachers, students } from "app/data";
-import { adminUiType } from "app/enums/admin.enum";
+import { adminUiType } from "enums/admin.enum";
 import { Account } from "types/account";
 import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
 

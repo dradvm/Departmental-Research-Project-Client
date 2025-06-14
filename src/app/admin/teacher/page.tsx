@@ -1,5 +1,5 @@
 import AccountManagement from "components/AdminUtils/AccountManagement";
-import { adminUiType } from "app/enums/admin.enum";
+import { adminUiType } from "enums/admin.enum";
 
 export default function Teacher() {
   return (

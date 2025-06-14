@@ -4,7 +4,7 @@ import InforList from "./InforList";
 import InforForm from "./InforForm";
 import { useState } from "react";
 import { Account } from "types/account";
-import { adminUiType } from "app/enums/admin.enum";
+import { adminUiType } from "enums/admin.enum";
 import { Search } from "lucide-react";
 
 export default function AccountManagement({

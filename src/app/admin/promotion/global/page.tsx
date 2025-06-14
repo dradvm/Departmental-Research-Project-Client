@@ -1,7 +1,7 @@
 "use client";
 
 import { globalCoupon } from "app/data";
-import { CouponType } from "app/enums/coupon.enum";
+import { CouponType } from "enums/coupon.enum";
 import { Funnel, Search, ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GlobalCouponType } from "types/coupon";
