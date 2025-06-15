@@ -9,13 +9,14 @@ import {
 } from "@mui/material";
 import { Button } from "components/Button/Button";
 import Input from "components/Input/Input";
-import { Play, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { faPlay, faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 import { motion } from "framer-motion";
-function Course() {
+
+function Course({ title, instructor }: { title: string; instructor: string }) {
   return (
     <Link href={"/"} className="group">
       <Stack className="gap-y-2">
@@ -46,12 +47,12 @@ function Course() {
           </div>
         </div>
         <Stack className="gap-y-1">
-          <div className="font-medium text-base/5">
-            How to create an online course: the official udemy course
+          <div className="font-medium text-base/5 line-clamp-2 h-10">
+            {title}
           </div>
-          <div className="text-slate-500 text-xs">Duy Nguyen</div>
+          <div className="text-slate-500 text-xs truncate">{instructor}</div>
         </Stack>
-        <Stack className="mt-2">
+        <Stack className="mt-2 text-indigo-600">
           <LinearProgress
             variant="determinate"
             value={3}
@@ -201,8 +202,11 @@ export default function LearningPage() {
         </div>
       </Stack>
       <div className="grid grid-cols-4 gap-x-5 gap-y-3">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((a) => {
-          return <Course key={a} />;
+        {[
+          "How to create an online",
+          "How to create an online course: the official udemy course How to create an online course: the official udemy course",
+        ].map((a) => {
+          return <Course key={a} title={a} instructor={a} />;
         })}
       </div>
     </Stack>

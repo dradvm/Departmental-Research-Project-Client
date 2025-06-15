@@ -2,6 +2,7 @@ import { Badge, Divider, LinearProgress, Stack } from "@mui/material";
 import { Button } from "components/Button/Button";
 import { Bell, Heart, ShoppingCart } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Header() {
@@ -46,9 +47,12 @@ export default function Header() {
           </div>
 
           <div className="relative font-sm  select-none h-10 cursor-pointer group hover:text-indigo-700">
-            <div className="hover:bg-violet-100  w-full h-full flex items-center px-3 rounded before:content-[''] before:absolute before:bg-black before:w-full before:h-4 before:left-0 before:bottom-0 before:translate-y-4 before:bg-transparent">
+            <Link
+              href={"/home/my-courses/learning"}
+              className="hover:bg-violet-100  w-full h-full flex items-center px-3 rounded before:content-[''] before:absolute before:bg-black before:w-full before:h-4 before:left-0 before:bottom-0 before:translate-y-4 before:bg-transparent"
+            >
               Học tập
-            </div>
+            </Link>
             <Stack className="absolute right-0 bottom-0 translate-y-[110%] bg-white border border-gray-200 invisible opacity-0 rounded-lg shadow-lg group-hover:visible group-hover:opacity-100 transition-all duration-100 scale-95 group-hover:scale-100">
               <div className="">
                 <div className="flex space-x-3 p-4">
@@ -66,12 +70,15 @@ export default function Header() {
                 </div>
                 <Divider />
               </div>
-
-              <Stack className="p-3">
-                <Button variant="filled">
-                  Chuyển đến Quá trình học tập của tôi
-                </Button>
-              </Stack>
+              <div className="p-3">
+                <Link href={"/home/my-courses/learning"}>
+                  <Stack>
+                    <Button variant="filled">
+                      Chuyển đến Quá trình học tập của tôi
+                    </Button>
+                  </Stack>
+                </Link>
+              </div>
             </Stack>
           </div>
           {isLoggedIn && (
