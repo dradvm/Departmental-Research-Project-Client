@@ -1,8 +1,9 @@
 import { Lecture } from "./lecture";
 
 export interface Section {
-  idSection: number;
-  idCourse: number;
+  sectionId: number;
+  courseId: number;
   nameSection: string;
+  order: number;
   Lecture: Lecture[];
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useLearnContext } from "app/course/[courseId]/learn/lecture/[lesson]/layout";
+import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import "react-quill-new/dist/quill.snow.css";

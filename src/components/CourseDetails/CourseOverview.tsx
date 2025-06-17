@@ -5,14 +5,16 @@ import { Button } from "components/Button/Button";
 import { CircleAlert, Globe } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { CourseDetail } from "types/course";
 
-export default function CourseOverview() {
+export default function CourseOverview({
+  course,
+}: {
+  course: CourseDetail | null;
+}) {
   return (
     <Stack className="space-y-4">
-      <div className="text-2xl">
-        Tự động hóa quy trình làm việc dễ dàng với n8n – Khóa học vỡ lòng cho
-        người mới bắt đầu
-      </div>
+      <div className="text-2xl">{course?.title}</div>
       <div className="flex space-x-5">
         <Stack>
           <div className="flex items-center font-bold text-yellow-700">

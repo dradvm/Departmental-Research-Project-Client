@@ -5,6 +5,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import { TvMinimalPlay } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useCallback } from "react";
@@ -15,19 +16,34 @@ type Props = {
 };
 
 export default function CourseLecture({ lecture }: Props) {
-  const params = useParams();
+  const { lectureId } = useParams<{
+    lectureId: string;
+  }>();
   const router = useRouter();
-  console.log(params);
-  const idCourse = params.idCourse;
   const handleLink = useCallback(() => {
-    router.push(`/course/${idCourse}/learn/lecture/${lecture.idLecture}`);
-  }, [idCourse, router, lecture.idLecture]);
-
+    router.push(`./${lecture.lectureId}`);
+  }, [router, lecture.lectureId]);
+  const { lectures } = useLearnContext();
   return (
-    <ListItemButton disableRipple onClick={handleLink}>
+    <ListItemButton
+      disableRipple
+      onClick={handleLink}
+      sx={{
+        bgcolor: String(lecture.lectureId) === lectureId ? "#ddd" : "white",
+        "&:hover": {
+          bgcolor: "#ddd",
+        },
+      }}
+    >
       <ListItemText
         sx={{ paddingLeft: "12px" }}
-        primary={lecture.nameLecture}
+        primary={
+          `${
+            lectures.findIndex(
+              (lec) => lec.lectureId === Number(lecture.lectureId)
+            ) + 1
+          }. ` + lecture.nameLecture
+        }
         secondary={
           <span className="flex items-center text-xs">
             <TvMinimalPlay size={14} strokeWidth={1} />
@@ -36,7 +52,7 @@ export default function CourseLecture({ lecture }: Props) {
         }
         slotProps={{
           primary: {
-            style: { fontWeight: 400, color: "#444", fontSize: "14px" },
+            style: { fontWeight: 400, color: "#222", fontSize: "14px" },
           },
           secondary: {
             style: { marginTop: "6px" },

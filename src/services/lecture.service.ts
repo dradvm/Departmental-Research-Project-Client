@@ -1,7 +1,7 @@
 import axiosInstance from "./http";
 
 const lectureService = {
-  getLectureById: (id: string) => axiosInstance.get(`/courses/lecture/${id}`),
+  getLectureById: (id: string) => axiosInstance.get(`/courses/lectures/${id}`),
 };
 
 export default lectureService;

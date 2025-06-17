@@ -13,10 +13,7 @@ type Props = {
 export default function CourseContent({ courseContent }: Props) {
   const { sentinelRef, isSticky } = useStickyObserver();
 
-  React.useEffect(() => {
-    console.log("Sticky state:", isSticky);
-  }, [isSticky]);
-
+  React.useEffect(() => {}, [isSticky]);
   return (
     <>
       <div ref={sentinelRef} style={{ height: 1 }}></div>

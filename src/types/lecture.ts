@@ -1,7 +1,8 @@
 export interface Lecture {
-  idLecture: number;
-  idSection: number;
+  lectureId: number;
+  sectionId: number;
   nameLecture: string;
   video: string;
   isDone: boolean;
+  order: number;
 }

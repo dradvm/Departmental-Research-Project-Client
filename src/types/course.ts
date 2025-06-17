@@ -1,8 +1,8 @@
 import { Section } from "./section";
 
 export interface CourseDetail {
-  idCourse: number;
-  idUser: number;
+  courseId: number;
+  userId: number;
   title: string;
   subTitle: string;
   description: string;

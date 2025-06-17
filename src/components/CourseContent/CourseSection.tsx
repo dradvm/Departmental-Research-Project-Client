@@ -23,7 +23,7 @@ export default function CourseSection({ section }: Props) {
     <>
       <ListItemButton onClick={handleClick} disableRipple>
         <ListItemText
-          primary={section.nameSection}
+          primary={`Phần ${section.order}: ` + section.nameSection}
           secondary="1/1 | 1min"
           slotProps={{
             primary: {

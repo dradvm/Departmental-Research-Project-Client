@@ -11,8 +11,13 @@ import CourseOverview from "./CourseOverview";
 import CourseReviews from "./CourseReviews";
 import CourseQA from "./CourseQA";
 import CourseNotes from "./CourseNotes";
+import { CourseDetail } from "types/course";
 
-export default function CourseDetails() {
+export default function CourseDetails({
+  course,
+}: {
+  course: CourseDetail | null;
+}) {
   const [value, setValue] = React.useState("1");
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -60,7 +65,7 @@ export default function CourseDetails() {
         </Box>
         <TabPanel value="1"></TabPanel>
         <TabPanel value="2">
-          <CourseOverview />
+          <CourseOverview course={course} />
         </TabPanel>
         <TabPanel value="3">
           <CourseQA />
