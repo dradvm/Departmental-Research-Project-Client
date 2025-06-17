@@ -1,4 +1,5 @@
 import axios from "axios";
+import { create } from "lodash";
 
 const createAxios = (
   route = "",
@@ -42,4 +43,7 @@ const createAxios = (
   return instance;
 };
 
-export default createAxios;
+const axiosInstance = createAxios();
+
+export default axiosInstance;
+export { createAxios };

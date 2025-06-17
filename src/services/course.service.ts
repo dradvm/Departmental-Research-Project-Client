@@ -1,9 +1,8 @@
-import createAxios from "./http";
+import axiosInstance from "./http";
 
-const axios = createAxios("/courses");
 const courseService = {
-  getAllCourse: () => axios.get(""),
-  getCourseById: (id: string) => axios.get(`/${id}`),
+  getAllCourse: () => axiosInstance.get("/courses"),
+  getCourseById: (id: string) => axiosInstance.get(`/courses/${id}`),
 };
 
 export default courseService;
