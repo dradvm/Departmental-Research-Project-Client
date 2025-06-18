@@ -23,6 +23,7 @@ import { Review, ReviewOverview } from "types/review";
 import { getTimeAgo } from "utils/time";
 import { getInitials } from "utils/text";
 import type { SelectChangeEvent } from "@mui/material/Select";
+import CourseLoading from "./CourseLoading";
 function BarReviews({
   stars,
   barReviewSelect,
@@ -152,29 +153,37 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [search, setSearch] = useState<string>("");
   const [searchValue, setSearchValue] = useState<string>("");
-  const handleFilter = (event: SelectChangeEvent) => {
-    setCursor(undefined);
-    setBarReviewSelect(parseInt(event.target.value));
-  };
+
   const [cursor, setCursor] = useState<number | undefined>(undefined);
   const [numberReviews, setNumberReviews] = useState<number | undefined>(
     undefined
   );
+  const [totalReviews, setTotalReviews] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoadingReviews, setIsLoadingReviews] = useState<boolean>(true);
   const handleClearSearch = () => {
     setSearch("");
     setSearchValue("");
     setCursor(undefined);
   };
-
-  const handleSearch = () => {
-    setSearchValue(search.trim().replace(/\s+/g, " "));
+  const handleFilter = (event: SelectChangeEvent) => {
+    setIsLoadingReviews(true);
     setCursor(undefined);
+    setBarReviewSelect(parseInt(event.target.value));
+  };
+  const handleSearch = () => {
+    if (searchValue !== search.trim().replace(/\s+/g, " ")) {
+      setIsLoadingReviews(true);
+      setSearchValue(search.trim().replace(/\s+/g, " "));
+      setCursor(undefined);
+    }
   };
   const handleLoadMore = () => {
     setCursor(reviews[reviews.length - 1].reviewId);
   };
   const handleBarReviewSelect = useCallback(
     (stars: number) => {
+      setIsLoadingReviews(true);
       setCursor(undefined);
       if (barReviewSelect === stars) {
         setBarReviewSelect(0);
@@ -201,12 +210,14 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
   useEffect(() => {
     courseService
       .getCourseReviewOverview(courseId)
-      .then((res) => setReviewOverview(res.data))
+      .then((res) => {
+        setIsLoading(false);
+        setReviewOverview(res.data);
+      })
       .catch((err) => console.log(err));
   }, [courseId]);
 
   useEffect(() => {
-    console.log(cursor);
     if (cursor !== undefined) {
       courseService
         .getCourseReviews(
@@ -216,6 +227,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
           cursor
         )
         .then((res) => {
+          setIsLoadingReviews(false);
           setReviews((prev) => [...prev, ...res.data]);
         })
         .catch((err) => console.log(err));
@@ -227,165 +239,200 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
           searchValue
         )
         .then((res) => {
+          setIsLoadingReviews(false);
           setReviews(res.data);
         })
         .catch((err) => console.log(err));
     }
+    courseService
+      .getNumberCourseReviews(
+        courseId,
+        barReviewSelect === 0 ? undefined : barReviewSelect,
+        searchValue
+      )
+      .then((res) => setTotalReviews(res.data))
+      .catch((err) => console.log(err));
   }, [barReviewSelect, courseId, searchValue, cursor]);
 
   useEffect(() => {
     setNumberReviews(reviews.length);
   }, [reviews]);
   return (
-    <Stack className="px-28 py-10 gap-y-10">
-      <div className="">
-        <div className="font-bold text-2xl">Đánh giá học viên</div>
-        <div className="grid grid-cols-5 gap-x-3 justify-between mt-6 items-center">
-          <Stack className=" items-center gap-y-2">
-            <div className="text-6xl text-yellow-600 font-bold">
-              {reviewOverview?.average}
+    <>
+      {isLoading ? (
+        <CourseLoading />
+      ) : reviewOverview?.average === null ? (
+        <div className="flex w-full justify-center mt-3">
+          <Button variant="primary">
+            Khoá học chưa có đánh giá. Đánh giá ngay!
+          </Button>
+        </div>
+      ) : (
+        <Stack className="px-28 py-10 gap-y-10">
+          <div className="">
+            <div className="font-bold text-2xl">Đánh giá học viên</div>
+            <div className="grid grid-cols-5 gap-x-3 justify-between mt-6 items-center">
+              <Stack className=" items-center gap-y-2">
+                <div className="text-6xl text-yellow-600 font-bold">
+                  {reviewOverview?.average}
+                </div>
+                <div className="flex items-center w-24 justify-between text-sm">
+                  {reviewOverview &&
+                    Array(5)
+                      .fill(0)
+                      .map((_, index) => (
+                        <FontAwesomeIcon
+                          key={index}
+                          icon={getStartIcon(reviewOverview.average, index)}
+                          className="text-xs text-yellow-600"
+                        />
+                      ))}
+                </div>
+                <div className="text-yellow-600 text-sm font-medium">
+                  Đánh giá khoá học
+                </div>
+              </Stack>
+              <Stack className="col-span-4 flex items-center justify-between gap-y-3 text-gray-500">
+                {reviewOverview &&
+                  Array(5)
+                    .fill(0)
+                    .map((_, index) => (
+                      <BarReviews
+                        key={index}
+                        stars={5 - index}
+                        onClick={handleBarReviewSelect}
+                        reviews={reviewOverview?.ratings[5 - index - 1].review}
+                        percent={reviewOverview?.ratings[5 - index - 1].percent}
+                        barReviewSelect={barReviewSelect}
+                      />
+                    ))}
+              </Stack>
             </div>
-            <div className="flex items-center w-24 justify-between text-sm">
-              {reviewOverview &&
-                Array(5)
-                  .fill(0)
-                  .map((_, index) => (
-                    <FontAwesomeIcon
-                      key={index}
-                      icon={getStartIcon(reviewOverview.average, index)}
-                      className="text-xs text-yellow-600"
-                    />
-                  ))}
-            </div>
-            <div className="text-yellow-600 text-sm font-medium">
-              Đánh giá khoá học
-            </div>
-          </Stack>
-          <Stack className="col-span-4 flex items-center justify-between gap-y-3 text-gray-500">
-            {reviewOverview &&
-              Array(5)
-                .fill(0)
-                .map((_, index) => (
-                  <BarReviews
-                    key={index}
-                    stars={5 - index}
-                    onClick={handleBarReviewSelect}
-                    reviews={reviewOverview?.ratings[5 - index - 1].review}
-                    percent={reviewOverview?.ratings[5 - index - 1].percent}
-                    barReviewSelect={barReviewSelect}
+          </div>
+          <Stack className="gap-y-5">
+            <div>
+              <div className="font-bold text-2xl">Đánh giá</div>
+              <Stack className="mt-2 flex">
+                <div className="font-medium text-sm mb-2 flex justify-end">
+                  <div className="w-[160px]">Lọc đánh giá</div>
+                </div>
+                <div className="flex space-x-3 grow  items-center">
+                  <Input
+                    value={search}
+                    handleValue={setSearch}
+                    placeholder={"Tìm đánh giá"}
                   />
-                ))}
-          </Stack>
-        </div>
-      </div>
-      <Stack className="gap-y-5">
-        <div>
-          <div className="font-bold text-2xl">Đánh giá</div>
-          <Stack className="mt-2 flex">
-            <div className="font-medium text-sm mb-2 flex justify-end">
-              <div className="w-[160px]">Lọc đánh giá</div>
-            </div>
-            <div className="flex space-x-3 grow  items-center">
-              <Input value={search} handleValue={setSearch} />
-              <div className="flex">
-                {search.length > 0 && (
-                  <Button
-                    variant="filled"
-                    className="px-4 py-2"
-                    onClick={handleClearSearch}
-                  >
-                    <X size={16} />
-                  </Button>
-                )}
-                <Button
-                  variant="primary"
-                  className="px-4 py-2"
-                  onClick={handleSearch}
-                >
-                  <Search size={16} />
-                </Button>
-              </div>
-              <FormControl sx={{ minWidth: 160 }} size="small" className="">
-                <Select
-                  displayEmpty
-                  inputProps={{ "aria-label": "Without label" }}
-                  sx={{
-                    fontSize: "0.875rem",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgb(91, 73, 244)", // Khi hover
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      // Khi focus
-                    },
-                  }}
-                  value={barReviewSelect.toString()}
-                  onChange={(event) => handleFilter(event as SelectChangeEvent)}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        "& .MuiMenuItem-root": {
-                          fontSize: "0.875rem", // Giảm font size
+                  <div className="flex">
+                    {search.length > 0 && (
+                      <Button
+                        variant="filled"
+                        className="px-4 py-2"
+                        onClick={handleClearSearch}
+                      >
+                        <X size={16} />
+                      </Button>
+                    )}
+                    <Button
+                      variant="primary"
+                      className="px-4 py-2"
+                      onClick={handleSearch}
+                    >
+                      <Search size={16} />
+                    </Button>
+                  </div>
+                  <FormControl sx={{ minWidth: 160 }} size="small" className="">
+                    <Select
+                      displayEmpty
+                      inputProps={{ "aria-label": "Without label" }}
+                      sx={{
+                        fontSize: "0.875rem",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
                         },
-                      },
-                    },
-                  }}
-                >
-                  <MenuItem value={"0"}>Tất cả xếp hạng</MenuItem>
-                  <MenuItem
-                    value={"5"}
-                    disabled={reviewOverview?.ratings[4].review === 0}
-                  >
-                    Năm sao
-                  </MenuItem>
-                  <MenuItem
-                    value={"4"}
-                    disabled={reviewOverview?.ratings[3].review === 0}
-                  >
-                    Bốn sao
-                  </MenuItem>
-                  <MenuItem
-                    value={"3"}
-                    disabled={reviewOverview?.ratings[2].review === 0}
-                  >
-                    Ba sao
-                  </MenuItem>
-                  <MenuItem
-                    value={"2"}
-                    disabled={reviewOverview?.ratings[1].review === 0}
-                  >
-                    Hai sao
-                  </MenuItem>
-                  <MenuItem
-                    value={"1"}
-                    disabled={reviewOverview?.ratings[0].review === 0}
-                  >
-                    Một sao
-                  </MenuItem>
-                </Select>
-              </FormControl>
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "rgb(91, 73, 244)", // Khi hover
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          // Khi focus
+                        },
+                      }}
+                      value={barReviewSelect.toString()}
+                      onChange={(event) =>
+                        handleFilter(event as SelectChangeEvent)
+                      }
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            "& .MuiMenuItem-root": {
+                              fontSize: "0.875rem", // Giảm font size
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value={"0"}>Tất cả xếp hạng</MenuItem>
+                      <MenuItem
+                        value={"5"}
+                        disabled={reviewOverview?.ratings[4].review === 0}
+                      >
+                        Năm sao
+                      </MenuItem>
+                      <MenuItem
+                        value={"4"}
+                        disabled={reviewOverview?.ratings[3].review === 0}
+                      >
+                        Bốn sao
+                      </MenuItem>
+                      <MenuItem
+                        value={"3"}
+                        disabled={reviewOverview?.ratings[2].review === 0}
+                      >
+                        Ba sao
+                      </MenuItem>
+                      <MenuItem
+                        value={"2"}
+                        disabled={reviewOverview?.ratings[1].review === 0}
+                      >
+                        Hai sao
+                      </MenuItem>
+                      <MenuItem
+                        value={"1"}
+                        disabled={reviewOverview?.ratings[0].review === 0}
+                      >
+                        Một sao
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+              </Stack>
+              {searchValue.trim().length > 0 && (
+                <div className="mt-3">
+                  {numberReviews === 0 ? "Không có" : numberReviews} bình luận{" "}
+                  {numberReviews === 0 && "nào"} đề cập đến &quot;
+                  <b>{searchValue}</b>&quot;
+                </div>
+              )}
             </div>
+            <div className="">
+              {isLoadingReviews ? (
+                <div className="flex items-center justify-around py-10">
+                  <div className="w-12 h-12 border border-4 border-gray-900 border-t-transparent animate-spin rounded-full"></div>
+                </div>
+              ) : (
+                reviews.length > 0 &&
+                reviews.map((review, index) => (
+                  <ReviewItem key={index} review={review} />
+                ))
+              )}
+            </div>
+            {reviews.length < totalReviews && (
+              <Button variant="primary" onClick={handleLoadMore}>
+                Xem thêm đánh giá
+              </Button>
+            )}
           </Stack>
-          {searchValue.trim().length > 0 && (
-            <div className="mt-3">
-              {numberReviews === 0 ? "Không có" : numberReviews} đánh giá{" "}
-              {numberReviews === 0 && "nào"} đề cập đến &quot;
-              <b>{searchValue}</b>&quot;
-            </div>
-          )}
-        </div>
-        <div className="">
-          {reviews.length > 0 &&
-            reviews.map((review, index) => (
-              <ReviewItem key={index} review={review} />
-            ))}
-        </div>
-        <Button variant="primary" onClick={handleLoadMore}>
-          Xem thêm đánh giá
-        </Button>
-      </Stack>
-    </Stack>
+        </Stack>
+      )}
+    </>
   );
 }

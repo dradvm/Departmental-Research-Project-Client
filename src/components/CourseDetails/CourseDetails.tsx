@@ -18,7 +18,7 @@ export default function CourseDetails({
 }: {
   course: CourseDetail | null;
 }) {
-  const [value, setValue] = React.useState("6");
+  const [value, setValue] = React.useState("1");
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
