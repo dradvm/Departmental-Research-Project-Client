@@ -6,7 +6,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import courseService from "services/course.service";
 import { CourseDetail } from "types/course";
 import { Lecture } from "types/lecture";
-import { Section } from "types/section";
 
 type LearnContextType = {
   enabledBlock: boolean;
@@ -38,22 +37,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       .getCourseById(courseId)
       .then((res) => {
         const courseData = res.data as CourseDetail;
-        courseData.Section.forEach((section: Section) => {
-          section.Lecture.sort((a, b) => a.order - b.order);
-        });
-        courseData.Section.sort((a, b) => a.order - b.order);
         setLectures(courseData.Section.flatMap((section) => section.Lecture));
         setCourse(courseData);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [courseId]);
 
   return (
     <LearnContext value={{ enabledBlock, setEnabledBlock, course, lectures }}>
       <div className="flex flex-col">
         <main className="flex flex-1">
           <div className="flex-1 flex flex-col">
-            <div className="flex-1 bg-black flex items-center justify-center max-h-[450px]">
+            <div className="aspect-video bg-black flex items-center justify-center max-h-[450px]">
               {children}
             </div>
             <CourseDetails course={course} />

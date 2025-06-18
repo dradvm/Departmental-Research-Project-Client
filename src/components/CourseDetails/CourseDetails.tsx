@@ -18,7 +18,7 @@ export default function CourseDetails({
 }: {
   course: CourseDetail | null;
 }) {
-  const [value, setValue] = React.useState("1");
+  const [value, setValue] = React.useState("6");
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -75,7 +75,7 @@ export default function CourseDetails({
         </TabPanel>
         {/* <TabPanel value="5">Item Two</TabPanel> */}
         <TabPanel value="6">
-          <CourseReviews />
+          <CourseReviews courseId={course?.courseId?.toString() ?? ""} />
         </TabPanel>
         <TabPanel value="7">Item Three</TabPanel>
       </TabContext>

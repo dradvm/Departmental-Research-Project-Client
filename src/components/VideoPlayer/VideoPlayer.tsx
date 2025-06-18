@@ -17,7 +17,7 @@ import {
   VolumeOff,
 } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import formatTime from "utils/time";
+import { formatTime } from "utils/time";
 import throttle from "lodash/throttle";
 import screenfull from "screenfull";
 import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
@@ -221,7 +221,7 @@ export default function VideoPlayer({
       ref={playerWrapperRef}
       className="w-full h-full flex items-center justify-center relative"
     >
-      <div className="flex items-center justify-center w-full h-full abc">
+      <div className="flex items-center justify-center w-full h-full">
         <ReactPlayer
           ref={playerRef}
           url={url}
