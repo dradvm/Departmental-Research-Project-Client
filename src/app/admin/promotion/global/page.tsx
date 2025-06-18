@@ -3,12 +3,32 @@
 import { globalCoupon } from "app/data";
 import { CouponType } from "enums/coupon.enum";
 import { Funnel, Search, ArrowBigLeft, ArrowBigRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ChangeEvent, useEffect, useState } from "react";
 import { GlobalCouponType } from "types/coupon";
 
 export default function GlobalPromotion() {
   const [page, setPage] = useState<number>(1);
   const [globalCoupons, setglobalCoupons] = useState<GlobalCouponType[]>();
+  const [filter, setFilter] = useState({
+    startDate: undefined,
+    endDate: undefined,
+    minPrice: undefined,
+    minPercent: undefined,
+    searchText: undefined,
+  });
+
+  function onChangeFilterInput(e: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFilter((preFilter) => ({
+      ...preFilter,
+      [name]: value,
+    }));
+  }
+
+  useEffect(() => {
+    console.log(filter);
+  }, [filter]);
 
   useEffect(() => {
     const limit = 4;
@@ -36,6 +56,9 @@ export default function GlobalPromotion() {
                 <input
                   className="w-[72%] px-1 border-2 rounded-[8px]"
                   type="date"
+                  name="startDate"
+                  value={filter.startDate ?? ""}
+                  onChange={onChangeFilterInput}
                 />
               </div>
               <div className="flex gap-2">
@@ -43,6 +66,9 @@ export default function GlobalPromotion() {
                 <input
                   className="w-[72%] px-1 border-2 rounded-[8px]"
                   type="date"
+                  name="endDate"
+                  value={filter.endDate ?? ""}
+                  onChange={onChangeFilterInput}
                 />
               </div>
             </div>
@@ -57,6 +83,9 @@ export default function GlobalPromotion() {
                   min={0}
                   max={10000000}
                   step={100000}
+                  name="minPrice"
+                  value={filter.minPrice ?? ""}
+                  onChange={onChangeFilterInput}
                 />
                 <span> VNĐ</span>
               </div>
@@ -68,18 +97,32 @@ export default function GlobalPromotion() {
                   min={0}
                   max={100}
                   step={1}
+                  name="minPercent"
+                  value={filter.minPercent ?? ""}
+                  onChange={onChangeFilterInput}
                 />
                 <span> %</span>
               </div>
             </div>
           </div>
         </div>
-        <div className="w-[30%] flex gap-2 justify-center items-center">
+        <div className="w-[10%] my-auto">
+          <Link
+            href="/admin/promotion/global/add"
+            className="p-[4px] bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white"
+          >
+            Thêm mới
+          </Link>
+        </div>
+        <div className="w-[20%] flex gap-2 justify-center items-center">
           <Search size={32} />
           <input
             type="text"
             className="h-fit w-[70%] p-[8px] border-2 rounded-[40px]"
             placeholder="Nội dung tìm kiếm"
+            name="searchText"
+            value={filter.searchText ?? ""}
+            onChange={onChangeFilterInput}
           />
         </div>
       </div>
@@ -104,7 +147,7 @@ export default function GlobalPromotion() {
                 className="h-[70%] my-auto p-2 flex flex-col gap-2 justify-center rounded-[8px] shadow-lg shadow-green-200"
               >
                 <h1 className="uppercase font-bold text-center">
-                  #{gCoupon.idCoupon} {typeTitile}
+                  #{gCoupon.couponId} {typeTitile}
                 </h1>
                 <h1 className="font-bold text-red-500">{valueTitle}</h1>
                 <h2>Giảm tối đa: {gCoupon.maxValueDiscount} VNĐ</h2>
@@ -114,14 +157,6 @@ export default function GlobalPromotion() {
                 <h2>
                   Đã áp dụng: {gCoupon.appliedAmount}/ {gCoupon.quantity}{" "}
                 </h2>
-                <div className="flex gap-[8px] justify-center">
-                  <button className="p-[4px] bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white">
-                    Duyệt
-                  </button>
-                  <button className="p-[4px] bg-red-700 shadow-md shadow-red-700 rounded-[8px] font-bold text-white">
-                    Không duyệt
-                  </button>
-                </div>
               </div>
             );
           })

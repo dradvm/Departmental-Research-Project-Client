@@ -1,7 +1,7 @@
 "use client";
 
 import { payments } from "app/data";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { PaymentType } from "types/payment";
 import {
   Funnel,
@@ -17,7 +17,26 @@ export default function Payment() {
   const [selectedPayment, setSelectedPayment] = useState<PaymentType>();
   const [infors, setInfors] = useState<PaymentType[]>();
   const [page, setPage] = useState<number>(1);
-  
+  const [filter, setFilter] = useState({
+    startDate: undefined,
+    endDate: undefined,
+    minPrice: undefined,
+    maxPrice: undefined,
+    searchText: undefined,
+  });
+
+  function onChangeFilterInput(e: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFilter((preFilter) => ({
+      ...preFilter,
+      [name]: value,
+    }));
+  }
+
+  useEffect(() => {
+    console.log(filter);
+  }, [filter]);
+
   useEffect(() => {
     const limit = 10;
     const skip = (page - 1) * limit;
@@ -51,6 +70,9 @@ export default function Payment() {
                   <input
                     className="w-[72%] px-1 border-2 rounded-[8px]"
                     type="date"
+                    name="startDate"
+                    value={filter.startDate ?? ""}
+                    onChange={onChangeFilterInput}
                   />
                 </div>
                 <div className="flex gap-2">
@@ -58,6 +80,9 @@ export default function Payment() {
                   <input
                     className="w-[72%] px-1 border-2 rounded-[8px]"
                     type="date"
+                    name="endDate"
+                    value={filter.endDate ?? ""}
+                    onChange={onChangeFilterInput}
                   />
                 </div>
               </div>
@@ -72,6 +97,9 @@ export default function Payment() {
                     type="number"
                     min={0}
                     step={100000}
+                    name="minPrice"
+                    value={filter.minPrice ?? ""}
+                    onChange={onChangeFilterInput}
                   />
                 </div>
                 <div className="flex gap-2">
@@ -81,6 +109,9 @@ export default function Payment() {
                     type="number"
                     min={0}
                     step={100000}
+                    name="maxPrice"
+                    value={filter.maxPrice ?? ""}
+                    onChange={onChangeFilterInput}
                   />
                 </div>
               </div>
@@ -92,6 +123,9 @@ export default function Payment() {
               type="text"
               className="h-fit w-[70%] p-[8px] border-2 rounded-[40px]"
               placeholder="Nội dung tìm kiếm"
+              name="searchText"
+              value={filter.searchText ?? ""}
+              onChange={onChangeFilterInput}
             />
           </div>
         </div>
