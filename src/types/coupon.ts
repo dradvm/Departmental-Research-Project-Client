@@ -17,7 +17,7 @@ export interface ProductCouponType {
 }
 
 export interface GlobalCouponType {
-  idCoupon: number;
+  couponId?: number;
   type: CouponType;
   value: number;
   startDate: string;
@@ -26,4 +26,5 @@ export interface GlobalCouponType {
   appliedAmount: number;
   minRequire: number;
   maxValueDiscount: number;
+  code: string;
 }

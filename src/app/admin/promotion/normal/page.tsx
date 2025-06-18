@@ -3,12 +3,31 @@
 import { productCoupon } from "app/data";
 import { CouponType } from "enums/coupon.enum";
 import { ProductCouponType } from "types/coupon";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Funnel, Search, ArrowBigLeft, ArrowBigRight } from "lucide-react";
 
 export default function NormalPromotion() {
   const [page, setPage] = useState<number>(1);
   const [productCoupons, setproductCoupons] = useState<ProductCouponType[]>();
+  const [filter, setFilter] = useState({
+    startDate: undefined,
+    endDate: undefined,
+    minPrice: undefined,
+    minPercent: undefined,
+    searchText: undefined,
+  });
+
+  function onChangeFilterInput(e: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFilter((preFilter) => ({
+      ...preFilter,
+      [name]: value,
+    }));
+  }
+
+  useEffect(() => {
+    console.log(filter);
+  }, [filter]);
 
   useEffect(() => {
     const limit = 4;
@@ -36,6 +55,9 @@ export default function NormalPromotion() {
                 <input
                   className="w-[72%] px-1 border-2 rounded-[8px]"
                   type="date"
+                  name="startDate"
+                  value={filter.startDate ?? ""}
+                  onChange={onChangeFilterInput}
                 />
               </div>
               <div className="flex gap-2">
@@ -43,6 +65,9 @@ export default function NormalPromotion() {
                 <input
                   className="w-[72%] px-1 border-2 rounded-[8px]"
                   type="date"
+                  name="endDate"
+                  value={filter.endDate ?? ""}
+                  onChange={onChangeFilterInput}
                 />
               </div>
             </div>
@@ -57,6 +82,9 @@ export default function NormalPromotion() {
                   min={0}
                   max={10000000}
                   step={100000}
+                  name="minPrice"
+                  value={filter.minPrice ?? ""}
+                  onChange={onChangeFilterInput}
                 />
                 <span> VNĐ</span>
               </div>
@@ -68,6 +96,9 @@ export default function NormalPromotion() {
                   min={0}
                   max={100}
                   step={1}
+                  name="minPercent"
+                  value={filter.minPercent ?? ""}
+                  onChange={onChangeFilterInput}
                 />
                 <span> %</span>
               </div>
@@ -80,6 +111,9 @@ export default function NormalPromotion() {
             type="text"
             className="h-fit w-[70%] p-[8px] border-2 rounded-[40px]"
             placeholder="Nội dung tìm kiếm"
+            name="searchText"
+            value={filter.searchText ?? ""}
+            onChange={onChangeFilterInput}
           />
         </div>
       </div>

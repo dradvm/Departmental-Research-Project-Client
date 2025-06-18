@@ -16,6 +16,27 @@ import {
 export default function Post() {
   const [page, setPage] = useState<number>(1);
   const [infors, setInfors] = useState<PostType[]>();
+  const [filter, setFilter] = useState({
+    minTuition: undefined,
+    maxTuition: undefined,
+    minLessonCount: undefined,
+    maxLessonCount: undefined,
+    minDuration: undefined,
+    maxDuration: undefined,
+    searchText: undefined,
+  });
+
+  function onChangeFilter(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFilter((preFilter) => ({
+      ...preFilter,
+      [name]: value,
+    }));
+  }
+
+  useEffect(() => {
+    console.log(filter);
+  }, [filter]);
 
   useEffect(() => {
     const limit = 4;
@@ -51,6 +72,9 @@ export default function Post() {
                   type="number"
                   min={0}
                   step={100000}
+                  name="minTuition"
+                  value={filter.minTuition ?? ""}
+                  onChange={onChangeFilter}
                 />
               </div>
               <div className="flex gap-2">
@@ -60,6 +84,9 @@ export default function Post() {
                   type="number"
                   min={0}
                   step={100000}
+                  name="maxTuition"
+                  value={filter.maxTuition ?? ""}
+                  onChange={onChangeFilter}
                 />
               </div>
             </div>
@@ -74,6 +101,9 @@ export default function Post() {
                   type="number"
                   min={0}
                   step={1}
+                  name="minLessonCount"
+                  value={filter.minLessonCount ?? ""}
+                  onChange={onChangeFilter}
                 />
               </div>
               <div className="flex gap-2">
@@ -83,6 +113,9 @@ export default function Post() {
                   type="number"
                   min={0}
                   step={1}
+                  name="maxLessonCount"
+                  value={filter.maxLessonCount ?? ""}
+                  onChange={onChangeFilter}
                 />
               </div>
             </div>
@@ -97,6 +130,9 @@ export default function Post() {
                   type="number"
                   min={0}
                   step={1}
+                  name="minDuration"
+                  value={filter.minDuration ?? ""}
+                  onChange={onChangeFilter}
                 />
               </div>
               <div className="flex gap-2">
@@ -106,6 +142,9 @@ export default function Post() {
                   type="number"
                   min={0}
                   step={1}
+                  name="maxDuration"
+                  value={filter.maxDuration ?? ""}
+                  onChange={onChangeFilter}
                 />
               </div>
             </div>
@@ -117,6 +156,9 @@ export default function Post() {
             type="text"
             className="h-fit w-[70%] p-[8px] border-2 rounded-[40px]"
             placeholder="Nội dung tìm kiếm"
+            name="searchText"
+            value={filter.searchText ?? ""}
+            onChange={onChangeFilter}
           />
         </div>
       </div>
