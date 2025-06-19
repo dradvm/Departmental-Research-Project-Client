@@ -3,6 +3,6 @@ export interface Lecture {
   sectionId: number;
   nameLecture: string;
   video: string;
-  isDone: boolean;
+  time: number;
   order: number;
 }

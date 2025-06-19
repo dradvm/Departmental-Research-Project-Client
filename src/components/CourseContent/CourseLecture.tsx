@@ -10,6 +10,7 @@ import { TvMinimalPlay } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useCallback } from "react";
 import { Lecture } from "types/lecture";
+import { formatDuration } from "utils/time";
 
 type Props = {
   lecture: Lecture;
@@ -47,7 +48,7 @@ export default function CourseLecture({ lecture }: Props) {
         secondary={
           <span className="flex items-center text-xs">
             <TvMinimalPlay size={14} strokeWidth={1} />
-            <span className="ms-1">1min</span>
+            <span className="ms-1">{formatDuration(lecture.time)}</span>
           </span>
         }
         slotProps={{

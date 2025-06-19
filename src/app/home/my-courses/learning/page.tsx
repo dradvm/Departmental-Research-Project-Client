@@ -15,6 +15,9 @@ import Link from "next/link";
 import { faPlay, faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import courseService from "services/course.service";
+import { Enrollment } from "types/enrollment";
 
 function Course({ title, instructor }: { title: string; instructor: string }) {
   return (
@@ -87,6 +90,16 @@ function Course({ title, instructor }: { title: string; instructor: string }) {
 }
 
 export default function LearningPage() {
+  const [courseEnrolled, setCourseEnrolled] = useState<Enrollment[]>([]);
+
+  useEffect(() => {
+    courseService
+      .getCourseEnrolled()
+      .then((res) => {
+        setCourseEnrolled(res.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
   return (
     <Stack className="gap-y-8">
       <Stack className="space-y-2">
@@ -202,12 +215,16 @@ export default function LearningPage() {
         </div>
       </Stack>
       <div className="grid grid-cols-4 gap-x-5 gap-y-3">
-        {[
-          "How to create an online",
-          "How to create an online course: the official udemy course How to create an online course: the official udemy course",
-        ].map((a) => {
-          return <Course key={a} title={a} instructor={a} />;
-        })}
+        {courseEnrolled &&
+          courseEnrolled.map((course, index) => {
+            return (
+              <Course
+                key={index}
+                title={course.Course.title}
+                instructor={course.Course.userId.toString()}
+              />
+            );
+          })}
       </div>
     </Stack>
   );

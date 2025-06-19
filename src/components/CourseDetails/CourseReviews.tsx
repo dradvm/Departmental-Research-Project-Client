@@ -86,8 +86,39 @@ function BarReviews({
     </Tooltip>
   );
 }
+function HighlightText({
+  text,
+  keywords = "",
+}: {
+  text: string;
+  keywords: string;
+}) {
+  console.log(keywords);
+  const kw = keywords.split(" ");
+  const regex = new RegExp(`(${kw.join("|")})`, "gi");
+  const parts = text.split(regex);
 
-function ReviewItem({ review }: { review: Review }) {
+  return (
+    <span>
+      {parts.map((part, index) =>
+        kw.some((word) => word.toLowerCase() === part.toLowerCase()) ? (
+          <span key={index} className="font-medium">
+            {part}
+          </span>
+        ) : (
+          <span key={index}>{part}</span>
+        )
+      )}
+    </span>
+  );
+}
+function ReviewItem({
+  review,
+  keywords,
+}: {
+  review: Review;
+  keywords: string;
+}) {
   return (
     <Stack className="gap-y-8 mt-5">
       <div className="flex space-x-5">
@@ -137,7 +168,9 @@ function ReviewItem({ review }: { review: Review }) {
               {getTimeAgo(review.created_at)}
             </div>
           </div>
-          <div className="text-sm">{review.review}</div>
+          <div className="text-sm">
+            <HighlightText text={review.review} keywords={keywords} />
+          </div>
         </Stack>
       </div>
       <Divider />
@@ -320,7 +353,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
                   <Input
                     value={search}
                     handleValue={setSearch}
-                    placeholder={"Tìm đánh giá"}
+                    placeholder={"Tìm bình luận"}
                   />
                   <div className="flex">
                     {search.length > 0 && (
@@ -421,7 +454,11 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
               ) : (
                 reviews.length > 0 &&
                 reviews.map((review, index) => (
-                  <ReviewItem key={index} review={review} />
+                  <ReviewItem
+                    key={index}
+                    review={review}
+                    keywords={searchValue}
+                  />
                 ))
               )}
             </div>

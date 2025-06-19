@@ -34,3 +34,19 @@ export function getTimeAgo(dateInput: string | Date): string {
   if (minutes > 0) return `${minutes} phút trước`;
   return "Vừa xong";
 }
+
+export function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${Math.round(seconds)} giây`;
+
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  if (hours > 0 && remainingMinutes > 0) {
+    return `${hours} giờ ${remainingMinutes} phút`;
+  } else if (hours > 0) {
+    return `${hours} giờ`;
+  } else {
+    return `${minutes} phút`;
+  }
+}

@@ -1,6 +1,6 @@
 import { Section } from "./section";
 
-export interface CourseDetail {
+export interface Course {
   courseId: number;
   userId: number;
   title: string;
@@ -12,5 +12,7 @@ export interface CourseDetail {
   thumbnail: string;
   requirement: string;
   targetAudience: string;
+}
+export interface CourseDetail extends Course {
   Section: Section[];
 }

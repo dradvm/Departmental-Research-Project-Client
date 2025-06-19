@@ -8,6 +8,7 @@ import List from "@mui/material/List";
 import CourseLecture from "./CourseLecture";
 import { Divider } from "@mui/material";
 import { Section } from "types/section";
+import { formatDuration } from "utils/time";
 
 type Props = {
   section: Section;
@@ -24,7 +25,9 @@ export default function CourseSection({ section }: Props) {
       <ListItemButton onClick={handleClick} disableRipple>
         <ListItemText
           primary={`Phần ${section.order}: ` + section.nameSection}
-          secondary="1/1 | 1min"
+          secondary={`1/${section.Lecture.length} | ${formatDuration(
+            section.Lecture.reduce((total, lecture) => total + lecture.time, 0)
+          )}`}
           slotProps={{
             primary: {
               style: { fontWeight: "bold", color: "#000" },
