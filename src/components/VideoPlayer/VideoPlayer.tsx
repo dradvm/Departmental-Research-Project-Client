@@ -35,6 +35,7 @@ interface VideoPlayerProps {
   playing?: boolean;
   controls?: boolean;
   loop?: boolean;
+  startTime?: number;
 }
 
 export default function VideoPlayer({
@@ -43,6 +44,7 @@ export default function VideoPlayer({
   height = "100%",
   controls = false,
   loop = false,
+  startTime = 0,
 }: VideoPlayerProps) {
   const [showControls, setShowControls] = useState(true);
   const hideTimerShowControls = useRef<NodeJS.Timeout | null>(null);
@@ -64,6 +66,7 @@ export default function VideoPlayer({
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { lectureId } = useParams<{ lectureId: string }>();
+  const hasSeekedRef = useRef(false);
 
   const getCurrrentLectureIndex = useCallback(() => {
     return lectures.findIndex(
@@ -193,7 +196,15 @@ export default function VideoPlayer({
   };
 
   const handleReady = () => {
-    setIsLoading(false);
+    if (!hasSeekedRef.current) {
+      console.log(startTime);
+      playerRef.current?.seekTo(startTime, "seconds");
+      console.log("A"); // chỉ log 1 lần
+
+      hasSeekedRef.current = true; // Đánh dấu đã seek
+    } else {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

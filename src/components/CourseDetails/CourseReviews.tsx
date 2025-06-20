@@ -390,9 +390,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
                         },
                       }}
                       value={barReviewSelect.toString()}
-                      onChange={(event) =>
-                        handleFilter(event as SelectChangeEvent)
-                      }
+                      onChange={(event) => handleFilter(event)}
                       MenuProps={{
                         PaperProps: {
                           sx: {

@@ -12,7 +12,12 @@ export interface Course {
   thumbnail: string;
   requirement: string;
   targetAudience: string;
+  User: {
+    userId: number;
+    name: string;
+  };
 }
+
 export interface CourseDetail extends Course {
   Section: Section[];
 }

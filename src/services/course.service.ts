@@ -31,23 +31,6 @@ const courseService = {
         search: search,
       },
     }),
-  trackStudyProgress: (lectureId: string, seconds: number = 0) =>
-    axiosInstance.post(`/courses/lectures/${lectureId}/study-progress/track`, {
-      params: {
-        seconds: seconds,
-      },
-    }),
-  toggleStudyProgress: (lectureId: string, isDone: boolean) => {
-    axiosInstance.patch(
-      `/courses/lectures/${lectureId}/study-progress/toggle-done`,
-      {
-        params: {
-          isDone: isDone,
-        },
-      }
-    );
-  },
-  getCourseEnrolled: () => axiosInstance.get("courses/enrollment"),
 };
 
 export default courseService;
