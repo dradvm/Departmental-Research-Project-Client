@@ -1,4 +1,4 @@
-import { Section } from "./section";
+import { Section, SectionStudyProgress } from "./section";
 
 export interface Course {
   courseId: number;
@@ -20,4 +20,8 @@ export interface Course {
 
 export interface CourseDetail extends Course {
   Section: Section[];
+}
+
+export interface CourseStudyProgress extends CourseDetail {
+  Section: SectionStudyProgress[];
 }

@@ -21,12 +21,9 @@ export default function LecturePage({}) {
       .getTrackStudyProgress(lectureId)
       .then((res) => setStudyProgress(res.data))
       .catch((err) => console.log(err));
-    console.log("LecturePage mounted", courseId, lectureId);
     studyProgressService
       .trackLastStudyLecture(courseId, parseInt(lectureId))
-      .then((res) => {
-        console.log(res.data);
-      })
+      .then()
       .catch((err) => console.log(err));
   }, [courseId, lectureId]);
   return (

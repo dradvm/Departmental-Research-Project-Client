@@ -93,7 +93,6 @@ function HighlightText({
   text: string;
   keywords: string;
 }) {
-  console.log(keywords);
   const kw = keywords.split(" ");
   const regex = new RegExp(`(${kw.join("|")})`, "gi");
   const parts = text.split(regex);

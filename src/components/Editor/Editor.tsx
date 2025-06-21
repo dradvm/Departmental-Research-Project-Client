@@ -29,6 +29,10 @@ export default function Editor() {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    console.log(value);
+  }, [value]);
+
   if (!mounted) return null;
 
   return (

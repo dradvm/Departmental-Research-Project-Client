@@ -22,6 +22,7 @@ import throttle from "lodash/throttle";
 import screenfull from "screenfull";
 import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import { useParams, useRouter } from "next/navigation";
+import studyProgressService from "services/study-progress.service";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 type ReactPlayerRef = {
   seekTo: (amount: number, type?: "seconds" | "fraction") => void;
@@ -197,15 +198,34 @@ export default function VideoPlayer({
 
   const handleReady = () => {
     if (!hasSeekedRef.current) {
-      console.log(startTime);
       playerRef.current?.seekTo(startTime, "seconds");
-      console.log("A"); // chỉ log 1 lần
-
+      setCurrentTime(startTime);
+      setProgress((startTime / duration) * 100);
       hasSeekedRef.current = true; // Đánh dấu đã seek
     } else {
       setIsLoading(false);
     }
   };
+
+  const saveProgress = useCallback(() => {
+    studyProgressService
+      .trackStudyProgress(lectureId, playerRef.current?.getCurrentTime() || 0)
+      .then()
+      .catch((err) => console.log(err));
+  }, [lectureId]);
+
+  const handlePause = useCallback(
+    throttle(() => {
+      saveProgress();
+    }, 3000),
+    [saveProgress]
+  );
+  const handleSeek = useCallback(
+    throttle(() => {
+      saveProgress();
+    }, 500),
+    [saveProgress]
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: { code: string; preventDefault: () => void }) => {
@@ -227,6 +247,13 @@ export default function VideoPlayer({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [seekBy, togglePlay, enabledBlock]);
 
+  useEffect(() => {
+    const saveProgessInterval = setInterval(() => {
+      saveProgress();
+    }, 10000);
+    return () => clearInterval(saveProgessInterval);
+  }, [saveProgress]);
+
   return (
     <div
       ref={playerWrapperRef}
@@ -245,6 +272,8 @@ export default function VideoPlayer({
           onDuration={(duration) => setDuration(duration)}
           onProgress={handleProgress}
           onReady={handleReady}
+          onPause={handlePause}
+          onSeek={handleSeek}
         />
       </div>
       {isLoading ? (
