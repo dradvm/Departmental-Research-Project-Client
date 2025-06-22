@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function CourseSection({ section }: Props) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const [lectures, setLectures] = useState<LectureStudyProgress[]>(
     section.Lecture
   );
@@ -53,7 +53,7 @@ export default function CourseSection({ section }: Props) {
             <CourseLecture
               lecture={lecture}
               key={index}
-              lectures={lectures}
+              lecturesStudyProgress={lectures}
               setLectures={setLectures}
             />
           ))}

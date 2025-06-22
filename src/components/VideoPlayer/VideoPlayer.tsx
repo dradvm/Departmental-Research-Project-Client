@@ -63,12 +63,12 @@ export default function VideoPlayer({
   const playerWrapperRef = useRef(null);
   const [isMute, setIsMute] = useState(false);
   const [isFullscreen, setIsFullScreen] = useState(false);
-  const { enabledBlock, lectures } = useLearnContext();
+  const { enabledBlock, lectures, setCurrentTimeNote } = useLearnContext();
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { lectureId } = useParams<{ lectureId: string }>();
   const hasSeekedRef = useRef(false);
-
+  const {} = useLearnContext();
   const getCurrrentLectureIndex = useCallback(() => {
     return lectures.findIndex(
       (lecture) => lecture.lectureId === Number(lectureId)
@@ -253,6 +253,10 @@ export default function VideoPlayer({
     }, 10000);
     return () => clearInterval(saveProgessInterval);
   }, [saveProgress]);
+
+  useEffect(() => {
+    setCurrentTimeNote(Math.floor(currentTime));
+  }, [currentTime, setCurrentTimeNote]);
 
   return (
     <div

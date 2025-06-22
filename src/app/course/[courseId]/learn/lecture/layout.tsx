@@ -18,6 +18,10 @@ type LearnContextType = {
   course: CourseDetail | null;
   lectures: Lecture[];
   handleSetTotalWatched: (checked: boolean) => void;
+  currentTimeNote: number;
+  setCurrentTimeNote: React.Dispatch<React.SetStateAction<number>>;
+  lectureId: string;
+  courseId: string;
 };
 
 const LearnContext = createContext<LearnContextType>({
@@ -26,6 +30,10 @@ const LearnContext = createContext<LearnContextType>({
   course: null,
   lectures: [],
   handleSetTotalWatched: () => {},
+  currentTimeNote: 0,
+  setCurrentTimeNote: () => {},
+  lectureId: "",
+  courseId: "",
 });
 
 export function useLearnContext() {
@@ -35,11 +43,15 @@ export function useLearnContext() {
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [enabledBlock, setEnabledBlock] = useState(true);
 
-  const { courseId } = useParams<{ courseId: string }>();
+  const { courseId, lectureId } = useParams<{
+    courseId: string;
+    lectureId: string;
+  }>();
   const [course, setCourse] = useState<CourseStudyProgress | null>(null);
   const [lectures, setLectures] = useState<LectureStudyProgress[] | []>([]);
   const [progress, setProgress] = useState<number>(0);
   const [totalWatched, setTotalWatched] = useState<number>(0);
+  const [currentTimeNote, setCurrentTimeNote] = useState<number>(0);
   useEffect(() => {
     studyProgressService
       .getCourseStudyProgress(Number(courseId))
@@ -89,6 +101,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         course,
         lectures,
         handleSetTotalWatched,
+        currentTimeNote,
+        setCurrentTimeNote,
+        lectureId,
+        courseId,
       }}
     >
       <header className="h-14 bg-gray-950 w-full flex items-center justify-between px-4 text-white border-b border-slate-700">

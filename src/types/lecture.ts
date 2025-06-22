@@ -1,3 +1,4 @@
+import { Section } from "./section";
 import { StudyProgress } from "types/study-progress";
 export interface Lecture {
   lectureId: number;
@@ -10,4 +11,7 @@ export interface Lecture {
 
 export interface LectureStudyProgress extends Lecture {
   StudyProgress: StudyProgress[];
+}
+export interface LectureWithSection extends Lecture {
+  Section: Section;
 }

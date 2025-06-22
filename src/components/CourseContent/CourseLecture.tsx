@@ -16,13 +16,13 @@ import { formatDuration } from "utils/time";
 
 type Props = {
   lecture: LectureStudyProgress;
-  lectures: LectureStudyProgress[];
+  lecturesStudyProgress: LectureStudyProgress[];
   setLectures: React.Dispatch<React.SetStateAction<LectureStudyProgress[]>>;
 };
 
 export default function CourseLecture({
   lecture,
-  lectures,
+  lecturesStudyProgress,
   setLectures,
 }: Props) {
   const { lectureId } = useParams<{
@@ -30,7 +30,7 @@ export default function CourseLecture({
   }>();
   const router = useRouter();
   const [checked, setChecked] = React.useState(lecture.StudyProgress[0].isDone);
-  const { handleSetTotalWatched } = useLearnContext();
+  const { handleSetTotalWatched, lectures } = useLearnContext();
   const handleLink = useCallback(() => {
     router.push(`./${lecture.lectureId}`);
   }, [router, lecture.lectureId]);
@@ -47,7 +47,7 @@ export default function CourseLecture({
 
   const newLectures = useCallback(
     (checked: boolean) =>
-      lectures.map((lec) => {
+      lecturesStudyProgress.map((lec) => {
         if (lec.lectureId == lecture.lectureId) {
           return {
             ...lec,
@@ -61,7 +61,7 @@ export default function CourseLecture({
         }
         return lec;
       }),
-    [lectures, lecture.lectureId]
+    [lecturesStudyProgress, lecture.lectureId]
   );
 
   const handleClickIcon = useCallback(
