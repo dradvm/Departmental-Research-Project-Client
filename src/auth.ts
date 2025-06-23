@@ -57,6 +57,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (user) { // User is available during sign-in
                 token.user = (user as IUser);
             }
+            console.log(">>> check token: ", token)
             return token
         },
         session({ session, token }) {
