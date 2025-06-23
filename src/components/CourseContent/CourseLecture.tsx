@@ -6,24 +6,74 @@ import {
   ListItemText,
 } from "@mui/material";
 import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
+import { debounce } from "lodash";
 import { TvMinimalPlay } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useCallback } from "react";
-import { Lecture } from "types/lecture";
+import studyProgressService from "services/study-progress.service";
+import { LectureStudyProgress } from "types/lecture";
+import { formatDuration } from "utils/time";
 
 type Props = {
-  lecture: Lecture;
+  lecture: LectureStudyProgress;
+  lecturesStudyProgress: LectureStudyProgress[];
+  setLectures: React.Dispatch<React.SetStateAction<LectureStudyProgress[]>>;
 };
 
-export default function CourseLecture({ lecture }: Props) {
+export default function CourseLecture({
+  lecture,
+  lecturesStudyProgress,
+  setLectures,
+}: Props) {
   const { lectureId } = useParams<{
     lectureId: string;
   }>();
   const router = useRouter();
+  const [checked, setChecked] = React.useState(lecture.StudyProgress[0].isDone);
+  const { handleSetTotalWatched, lectures } = useLearnContext();
   const handleLink = useCallback(() => {
     router.push(`./${lecture.lectureId}`);
   }, [router, lecture.lectureId]);
-  const { lectures } = useLearnContext();
+
+  const saveProgress = useCallback(
+    debounce((checked: boolean) => {
+      studyProgressService
+        .toggleStudyProgress(lecture.lectureId, checked)
+        .then()
+        .catch((err) => console.log(err));
+    }, 500),
+    [lecture.lectureId]
+  );
+
+  const newLectures = useCallback(
+    (checked: boolean) =>
+      lecturesStudyProgress.map((lec) => {
+        if (lec.lectureId == lecture.lectureId) {
+          return {
+            ...lec,
+            StudyProgress: [
+              {
+                ...lec.StudyProgress[0],
+                isDone: checked,
+              },
+            ],
+          };
+        }
+        return lec;
+      }),
+    [lecturesStudyProgress, lecture.lectureId]
+  );
+
+  const handleClickIcon = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setChecked((prev) => !prev);
+      setLectures(newLectures(!checked));
+      handleSetTotalWatched(!checked);
+      saveProgress(!checked);
+    },
+    [saveProgress, checked, newLectures, setLectures, handleSetTotalWatched]
+  );
   return (
     <ListItemButton
       disableRipple
@@ -47,7 +97,7 @@ export default function CourseLecture({ lecture }: Props) {
         secondary={
           <span className="flex items-center text-xs">
             <TvMinimalPlay size={14} strokeWidth={1} />
-            <span className="ms-1">1min</span>
+            <span className="ms-1">{formatDuration(lecture.time)}</span>
           </span>
         }
         slotProps={{
@@ -59,13 +109,9 @@ export default function CourseLecture({ lecture }: Props) {
           },
         }}
       />
-      <ListItemIcon
-        sx={{ minWidth: 0 }}
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
+      <ListItemIcon sx={{ minWidth: 0 }} onClick={handleClickIcon}>
         <Checkbox
+          checked={checked}
           size="small"
           sx={{
             padding: 0,

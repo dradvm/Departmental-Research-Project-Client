@@ -2,7 +2,7 @@
 
 import InforList from "./InforList";
 import InforForm from "./InforForm";
-import { useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Account } from "types/account";
 import { adminUiType } from "enums/admin.enum";
 import { Search } from "lucide-react";
@@ -11,6 +11,21 @@ export default function AccountManagement({
   type,
 }: Readonly<{ type: adminUiType }>) {
   const [selectedAccount, setSelectedAccount] = useState<Account>();
+  const [filter, setFilter] = useState({
+    searchText: undefined,
+  });
+
+  function onChangeFilterInput(e: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFilter((preFilter) => ({
+      ...preFilter,
+      [name]: value,
+    }));
+  }
+
+  useEffect(() => {
+    console.log(filter);
+  }, [filter]);
 
   let title: string = "";
   if (type === adminUiType.Student) {
@@ -34,6 +49,9 @@ export default function AccountManagement({
               type="text"
               className="h-fit w-[70%] p-[8px] border-2 rounded-[40px]"
               placeholder="Nội dung tìm kiếm"
+              name="searchText"
+              value={filter.searchText ?? ""}
+              onChange={onChangeFilterInput}
             />
           </div>
         </div>
