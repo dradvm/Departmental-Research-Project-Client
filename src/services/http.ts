@@ -1,11 +1,22 @@
 import axios from "axios";
 import { create } from "lodash";
+import { getSession } from "next-auth/react";
 
-const createAxios = (
+
+const createAxios = async (
   route = "",
   contentType = "application/json",
   timeout = 30000
 ) => {
+  //--------------
+  let session = null;
+  while (!session) {
+    session = await getSession();
+    await new Promise((res) => setTimeout(res, 100));
+  }
+  console.log(">>>check session: ", session)
+  const token = session?.user.access_token
+  //--------------
   const instance = axios.create({
     baseURL: `http://localhost:3001/api${route}`,
     timeout: timeout,
@@ -45,7 +56,11 @@ const createAxios = (
   return instance;
 };
 
-const axiosInstance = createAxios();
+//const axiosInstance = createAxios();
 
-export default axiosInstance;
+
+//export default axiosInstance;
+// axiosInstance.ts
+export const getAxiosInstance = async () => await createAxios();
+
 export { createAxios };
