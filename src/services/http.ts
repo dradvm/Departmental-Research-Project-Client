@@ -1,5 +1,7 @@
 import axios from "axios";
 import { create } from "lodash";
+import { useSession } from "next-auth/react";
+
 
 const createAxios = (
   route = "",
@@ -13,6 +15,13 @@ const createAxios = (
       "Content-Type": contentType,
     },
   });
+
+  //-------------------
+  const { data: sessions, status } = useSession()
+  console.log(">>> check data: ", sessions, status)
+  const token = sessions?.access_token;
+
+  //-------------------
 
   instance.interceptors.request.use(
     (config) => {
