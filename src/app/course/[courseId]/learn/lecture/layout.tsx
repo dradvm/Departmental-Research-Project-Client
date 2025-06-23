@@ -10,13 +10,13 @@ import { useParams } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import studyProgressService from "services/study-progress.service";
 import { CourseDetail, CourseStudyProgress } from "types/course";
-import { Lecture, LectureStudyProgress } from "types/lecture";
+import { LectureStudyProgress } from "types/lecture";
 
 type LearnContextType = {
   enabledBlock: boolean;
   setEnabledBlock: React.Dispatch<React.SetStateAction<boolean>>;
   course: CourseDetail | null;
-  lectures: Lecture[];
+  lectures: LectureStudyProgress[];
   handleSetTotalWatched: (checked: boolean) => void;
   currentTimeNote: number;
   setCurrentTimeNote: React.Dispatch<React.SetStateAction<number>>;

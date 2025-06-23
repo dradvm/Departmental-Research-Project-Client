@@ -5,30 +5,150 @@ import Editor from "components/Editor/Editor";
 import { CirclePlus, Pencil, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import noteService from "services/note.service";
+import { LectureStudyProgress } from "types/lecture";
 import { Note } from "types/note";
 import { formatTime } from "utils/time";
 
+const NoteItem = ({
+  note,
+  lectures,
+  loadNotes,
+  handleDeleteNote,
+  isDisplayMain,
+  setIsDisplayMain,
+}: {
+  note: Note;
+  lectures: LectureStudyProgress[];
+  loadNotes: () => void;
+  handleDeleteNote: (noteId: number) => void;
+  isDisplayMain: boolean;
+  setIsDisplayMain: (isDisplay: boolean) => void;
+}) => {
+  const [isDisplay, setIsDisplay] = useState<boolean>(false);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [value, setValue] = useState<string>(note.note);
+  const handleOpen = () => {
+    setIsDisplay(true);
+    setIsDisplayMain(false);
+  };
+
+  const handleCancel = () => {
+    setIsDisplay(false);
+  };
+
+  const handleSave = () => {
+    noteService.updateNote(note.noteId, value).then(() => {
+      loadNotes();
+      setIsDisabled(false);
+      setIsDisplay(false);
+      setValue("");
+    });
+  };
+
+  useEffect(() => {
+    if (isDisplay) {
+      setValue(note.note);
+    }
+  }, [isDisplay, note]);
+
+  useEffect(() => {
+    if (isDisplayMain) {
+      setIsDisplay(false);
+    }
+  }, [isDisplayMain]);
+
+  return (
+    <div className="flex space-x-3">
+      <div>
+        <div className="bg-black text-white font-medium rounded-full px-2">
+          {formatTime(note.timeNote)}
+        </div>
+      </div>
+      <div className={`${isDisplay ? "" : "hidden"}`}>
+        <Editor value={value} setValue={setValue} isDisplay={isDisplay} />
+        <div className="flex justify-end mt-4">
+          <div className="flex space-x-3">
+            <Button
+              variant="primary"
+              onClick={handleCancel}
+              disabled={isDisabled}
+            >
+              Huỷ
+            </Button>
+            <Button variant="filled" onClick={handleSave} disabled={isDisabled}>
+              Lưu ghi chú
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className={`w-full  ${isDisplay ? "hidden" : ""}`}>
+        <Stack className="w-full gap-y-3">
+          <div className="flex justify-between items-center">
+            <div className="flex flex-wrap items-center">
+              <div className="me-3 font-medium">
+                {note.Lecture.Section.order}. {note.Lecture.Section.nameSection}
+              </div>
+              <div className="text-sm">
+                {lectures.findIndex(
+                  (lecture) => lecture.lectureId === note.lectureId
+                ) + 1}
+                . {note.Lecture.nameLecture}
+              </div>
+            </div>
+            <div className="flex items-center">
+              <div
+                className="hover:bg-slate-200 rounded px-2 py-1 cursor-pointer"
+                onClick={handleOpen}
+              >
+                <Pencil size={12} />
+              </div>
+              <div
+                className="hover:bg-slate-200 rounded px-2 py-1 cursor-pointer"
+                onClick={() => handleDeleteNote(note.noteId)}
+              >
+                <Trash2 size={12} />
+              </div>
+            </div>
+          </div>
+          <div
+            className="w-full bg-gray-100 min-h-20 px-5 py-3 text-sm ql-editor"
+            dangerouslySetInnerHTML={{ __html: note.note }}
+          ></div>
+        </Stack>
+      </div>
+    </div>
+  );
+};
+
 export default function CourseNotes() {
   const { currentTimeNote, courseId, lectureId, lectures } = useLearnContext();
-  const [isDislay, setIsDisplay] = useState<boolean>(false);
+  const [isDisplay, setIsDisplay] = useState<boolean>(false);
   const [value, setValue] = useState<string>("");
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [timeNote, setTimeNote] = useState<number>(currentTimeNote);
   const placeholderText = useMemo(() => {
     const existNote = notes.filter(
       (note) =>
-        note.lectureId.toString() === lectureId && note.timeNote === timeNote
+        note.lectureId.toString() === lectureId &&
+        note.timeNote === currentTimeNote
     );
     if (existNote.length > 0) {
-      return `Chỉnh sửa ghi chú của bạn tại ${formatTime(timeNote)}`;
+      return `Chỉnh sửa ghi chú của bạn tại ${formatTime(currentTimeNote)}`;
     } else {
-      return `Tạo ghi chú của bạn tại ${formatTime(timeNote)}`;
+      return `Tạo ghi chú của bạn tại ${formatTime(currentTimeNote)}`;
     }
-  }, [timeNote, lectureId, notes]);
+  }, [currentTimeNote, lectureId, notes]);
 
   const handleOpen = () => {
     setIsDisplay(true);
+    const existNote = notes.filter(
+      (note) =>
+        note.lectureId.toString() === lectureId &&
+        note.timeNote === currentTimeNote
+    );
+    if (existNote.length > 0) {
+      setValue(existNote[0].note);
+    }
   };
 
   const handleCancel = () => {
@@ -38,13 +158,13 @@ export default function CourseNotes() {
     setIsDisabled(true);
     const existNote = notes.filter(
       (note) =>
-        note.lectureId.toString() === lectureId && note.timeNote === timeNote
+        note.lectureId.toString() === lectureId &&
+        note.timeNote === currentTimeNote
     );
     console.log(existNote);
     if (existNote.length === 0) {
-      console.log(timeNote);
       noteService
-        .addNote(timeNote, value, parseInt(lectureId))
+        .addNote(currentTimeNote, value, parseInt(lectureId))
         .then(() => {
           loadNotes();
           setIsDisabled(false);
@@ -71,18 +191,14 @@ export default function CourseNotes() {
       .catch((err) => console.log(err));
   }, [courseId]);
 
-  const handleUpdateNote = useCallback((note: Note) => {
-    setTimeNote(note.timeNote);
-    setValue(note.note);
-    setIsDisplay(true);
-  }, []);
-
   const handleDeleteNote = useCallback(
     (noteId: number) => {
       noteService
         .deleteNote(noteId)
         .then(() => {
           loadNotes();
+          setIsDisplay(false);
+          setNotes([]);
         })
         .catch((err) => console.log(err));
     },
@@ -96,14 +212,16 @@ export default function CourseNotes() {
   return (
     <div className="flex justify-around mt-6">
       <Stack className="w-[800px] gap-y-3">
-        <div className={`${isDislay ? "" : "hidden"}`}>
+        <div className={`${isDisplay ? "" : "hidden"}`}>
           <div className="flex space-x-3  justify-around">
             <div>
               <div className="bg-black text-white font-medium rounded-full px-2">
-                {formatTime(timeNote)}
+                {formatTime(currentTimeNote)}
               </div>
             </div>
-            <Editor value={value} setValue={setValue} isDisplay={isDislay} />
+            {isDisplay && (
+              <Editor value={value} setValue={setValue} isDisplay={isDisplay} />
+            )}
           </div>
           <div className="flex justify-end mt-4">
             <div className="flex space-x-3">
@@ -127,7 +245,7 @@ export default function CourseNotes() {
         <div
           onClick={handleOpen}
           className={`${
-            isDislay ? "hidden" : ""
+            isDisplay ? "hidden" : ""
           } flex rounded border border-2 border-slate-300 px-4 py-2 text-gray-700 justify-between items-center cursor-pointer hover:bg-gray-100`}
         >
           <div>{placeholderText}</div>
@@ -138,47 +256,15 @@ export default function CourseNotes() {
         {notes.length > 0 ? (
           <Stack className="gap-y-8 mt-10">
             {notes.map((note) => (
-              <div key={note.noteId} className="flex space-x-3">
-                <div>
-                  <div className="bg-black text-white font-medium rounded-full px-2">
-                    {formatTime(note.timeNote)}
-                  </div>
-                </div>
-                <Stack className="w-full gap-y-3">
-                  <div className="flex justify-between items-center">
-                    <div className="flex flex-wrap items-center">
-                      <div className="me-3 font-medium">
-                        {note.Lecture.Section.order}.{" "}
-                        {note.Lecture.Section.nameSection}
-                      </div>
-                      <div className="text-sm">
-                        {lectures.findIndex(
-                          (lecture) => lecture.lectureId === note.lectureId
-                        ) + 1}
-                        . {note.Lecture.nameLecture}
-                      </div>
-                    </div>
-                    <div className="flex items-center">
-                      <div
-                        className="hover:bg-slate-200 rounded px-2 py-1 cursor-pointer"
-                        onClick={() => handleUpdateNote(note)}
-                      >
-                        <Pencil size={12} />
-                      </div>
-                      <div
-                        className="hover:bg-slate-200 rounded px-2 py-1 cursor-pointer"
-                        onClick={() => handleDeleteNote(note.noteId)}
-                      >
-                        <Trash2 size={12} />
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    className="w-full bg-gray-100 min-h-20 px-5 py-3 text-sm ql-editor"
-                    dangerouslySetInnerHTML={{ __html: note.note }}
-                  ></div>
-                </Stack>
-              </div>
+              <NoteItem
+                key={note.noteId}
+                note={note}
+                loadNotes={loadNotes}
+                handleDeleteNote={handleDeleteNote}
+                lectures={lectures}
+                isDisplayMain={isDisplay}
+                setIsDisplayMain={setIsDisplay}
+              />
             ))}
           </Stack>
         ) : (
