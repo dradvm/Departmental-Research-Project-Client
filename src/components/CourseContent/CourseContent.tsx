@@ -4,10 +4,10 @@ import { Divider } from "@mui/material";
 import { X } from "lucide-react";
 import CourseSection from "./CourseSection";
 import { useStickyObserver } from "hooks/useStickyObserver";
-import { Section } from "types/section";
+import { SectionStudyProgress } from "types/section";
 
 type Props = {
-  courseContent: Section[];
+  courseContent: SectionStudyProgress[];
 };
 
 export default function CourseContent({ courseContent }: Props) {
@@ -20,7 +20,7 @@ export default function CourseContent({ courseContent }: Props) {
       <div
         className={`w-[420px] ${
           isSticky ? "h-screen" : "h-[calc(100vh-3.5rem)]"
-        } flex flex-col sticky top-0`}
+        } flex flex-col sticky top-0 border border-gray-200`}
       >
         <div className="flex items-center justify-between px-4 py-3">
           <div className="font-bold">Nội dung khoá học</div>

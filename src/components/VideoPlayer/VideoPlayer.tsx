@@ -17,11 +17,12 @@ import {
   VolumeOff,
 } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import formatTime from "utils/time";
+import { formatTime } from "utils/time";
 import throttle from "lodash/throttle";
 import screenfull from "screenfull";
 import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import { useParams, useRouter } from "next/navigation";
+import studyProgressService from "services/study-progress.service";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 type ReactPlayerRef = {
   seekTo: (amount: number, type?: "seconds" | "fraction") => void;
@@ -35,6 +36,7 @@ interface VideoPlayerProps {
   playing?: boolean;
   controls?: boolean;
   loop?: boolean;
+  startTime?: number;
 }
 
 export default function VideoPlayer({
@@ -43,6 +45,7 @@ export default function VideoPlayer({
   height = "100%",
   controls = false,
   loop = false,
+  startTime = 0,
 }: VideoPlayerProps) {
   const [showControls, setShowControls] = useState(true);
   const hideTimerShowControls = useRef<NodeJS.Timeout | null>(null);
@@ -60,11 +63,12 @@ export default function VideoPlayer({
   const playerWrapperRef = useRef(null);
   const [isMute, setIsMute] = useState(false);
   const [isFullscreen, setIsFullScreen] = useState(false);
-  const { enabledBlock, lectures } = useLearnContext();
+  const { enabledBlock, lectures, setCurrentTimeNote } = useLearnContext();
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { lectureId } = useParams<{ lectureId: string }>();
-
+  const hasSeekedRef = useRef(false);
+  const {} = useLearnContext();
   const getCurrrentLectureIndex = useCallback(() => {
     return lectures.findIndex(
       (lecture) => lecture.lectureId === Number(lectureId)
@@ -193,8 +197,35 @@ export default function VideoPlayer({
   };
 
   const handleReady = () => {
-    setIsLoading(false);
+    if (!hasSeekedRef.current) {
+      playerRef.current?.seekTo(startTime, "seconds");
+      setCurrentTime(startTime);
+      setProgress((startTime / duration) * 100);
+      hasSeekedRef.current = true; // Đánh dấu đã seek
+    } else {
+      setIsLoading(false);
+    }
   };
+
+  const saveProgress = useCallback(() => {
+    studyProgressService
+      .trackStudyProgress(lectureId, playerRef.current?.getCurrentTime() || 0)
+      .then()
+      .catch((err) => console.log(err));
+  }, [lectureId]);
+
+  const handlePause = useCallback(
+    throttle(() => {
+      saveProgress();
+    }, 3000),
+    [saveProgress]
+  );
+  const handleSeek = useCallback(
+    throttle(() => {
+      saveProgress();
+    }, 500),
+    [saveProgress]
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: { code: string; preventDefault: () => void }) => {
@@ -216,12 +247,23 @@ export default function VideoPlayer({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [seekBy, togglePlay, enabledBlock]);
 
+  useEffect(() => {
+    const saveProgessInterval = setInterval(() => {
+      saveProgress();
+    }, 10000);
+    return () => clearInterval(saveProgessInterval);
+  }, [saveProgress]);
+
+  useEffect(() => {
+    setCurrentTimeNote(Math.floor(currentTime));
+  }, [currentTime, setCurrentTimeNote]);
+
   return (
     <div
       ref={playerWrapperRef}
       className="w-full h-full flex items-center justify-center relative"
     >
-      <div className="flex items-center justify-center w-full h-full abc">
+      <div className="flex items-center justify-center w-full h-full">
         <ReactPlayer
           ref={playerRef}
           url={url}
@@ -234,6 +276,8 @@ export default function VideoPlayer({
           onDuration={(duration) => setDuration(duration)}
           onProgress={handleProgress}
           onReady={handleReady}
+          onPause={handlePause}
+          onSeek={handleSeek}
         />
       </div>
       {isLoading ? (

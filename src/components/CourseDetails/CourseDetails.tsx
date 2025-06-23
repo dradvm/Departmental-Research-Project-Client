@@ -75,7 +75,7 @@ export default function CourseDetails({
         </TabPanel>
         {/* <TabPanel value="5">Item Two</TabPanel> */}
         <TabPanel value="6">
-          <CourseReviews />
+          <CourseReviews courseId={course?.courseId?.toString() ?? ""} />
         </TabPanel>
         <TabPanel value="7">Item Three</TabPanel>
       </TabContext>
