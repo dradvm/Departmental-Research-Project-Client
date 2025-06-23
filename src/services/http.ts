@@ -1,21 +1,15 @@
 import axios from "axios";
 import { create } from "lodash";
 import { getSession } from "next-auth/react";
+import { IUser } from "types/next-auth";
 
-
-const createAxios = async (
+const createAxios = (
   route = "",
   contentType = "application/json",
-  timeout = 30000
+  timeout = 5000
 ) => {
   //--------------
-  let session = null;
-  while (!session) {
-    session = await getSession();
-    await new Promise((res) => setTimeout(res, 100));
-  }
-  console.log(">>>check session: ", session)
-  const token = session?.user.access_token
+
   //--------------
   const instance = axios.create({
     baseURL: `http://localhost:3001/api${route}`,
@@ -24,12 +18,16 @@ const createAxios = async (
       "Content-Type": contentType,
     },
   });
-
+  let token: string | undefined | null = null;
   instance.interceptors.request.use(
-    (config) => {
-      // const token = localStorage.getItem("token");
-      const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imgubmh1MjAwM0BnbWFpbC5jb20iLCJzdWIiOjEsImlhdCI6MTc1MDA4MDY1MywiZXhwIjoxODM2NDgwNjUzfQ.C-WBhlBgW2oKxU_-jpT_ypVIdyZkmoUesrDBI1qi-1M";
+    async (config) => {
+      if (config.url?.includes("/api/auth/session")) {
+        return config;
+      }
+      if (!token) {
+        const session = await getSession();
+        token = session?.user.access_token;
+      }
       if (token) {
         config.headers["Authorization"] = `Bearer ${token}`;
       }
@@ -56,11 +54,9 @@ const createAxios = async (
   return instance;
 };
 
-//const axiosInstance = createAxios();
+const axiosInstance = await createAxios();
 
-
-//export default axiosInstance;
+export default axiosInstance;
 // axiosInstance.ts
-export const getAxiosInstance = async () => await createAxios();
 
 export { createAxios };
