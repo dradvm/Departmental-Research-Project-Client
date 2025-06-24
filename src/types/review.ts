@@ -15,8 +15,8 @@ export type Review = {
   courseId: number;
   rating: number;
   review: string;
-  created_at: string; // ISO timestamp
-  updated_at: string;
+  createdAt: string; // ISO timestamp
+  updatedAt: string;
   User: {
     name: string;
     img: string | null;

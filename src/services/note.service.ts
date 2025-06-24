@@ -1,10 +1,18 @@
 import axiosInstance from "./http";
 
 const noteService = {
-  getNotes: (courseId: number) =>
+  getNotes: (courseId: number, orderBy: boolean = true) =>
     axiosInstance.get("/notes", {
       params: {
         courseId,
+        orderBy,
+      },
+    }),
+  getNotesLecture: (lectureId: number, orderBy: boolean = true) =>
+    axiosInstance.get("/notes/lecture", {
+      params: {
+        lectureId,
+        orderBy,
       },
     }),
   getNote: (noteId: number) => axiosInstance.get(`/notes/${noteId}`),

@@ -86,7 +86,7 @@ function BarReviews({
     </Tooltip>
   );
 }
-function HighlightText({
+function TextContent({
   text,
   keywords = "",
 }: {
@@ -164,11 +164,11 @@ function ReviewItem({
                 ))}
             </div>
             <div className="font-thin text-gray-700 text-sm">
-              {getTimeAgo(review.created_at)}
+              {getTimeAgo(review.createdAt)}
             </div>
           </div>
           <div className="text-sm">
-            <HighlightText text={review.review} keywords={keywords} />
+            <TextContent text={review.review} keywords={keywords} />
           </div>
         </Stack>
       </div>
@@ -445,9 +445,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
             </div>
             <div className="">
               {isLoadingReviews ? (
-                <div className="flex items-center justify-around py-10">
-                  <div className="w-12 h-12 border border-4 border-gray-900 border-t-transparent animate-spin rounded-full"></div>
-                </div>
+                <CourseLoading />
               ) : (
                 reviews.length > 0 &&
                 reviews.map((review, index) => (
