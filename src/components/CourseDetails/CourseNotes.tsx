@@ -1,4 +1,14 @@
-import { FormControl, MenuItem, Select, Stack } from "@mui/material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  MenuItem,
+  Select,
+  Stack,
+} from "@mui/material";
 import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import { Button } from "components/Button/Button";
 import Editor from "components/Editor/Editor";
@@ -9,6 +19,8 @@ import { LectureStudyProgress } from "types/lecture";
 import { Note } from "types/note";
 import { formatTime } from "utils/time";
 import CourseLoading from "./CourseLoading";
+
+const MAX_LENGTH_NOTE = 1000;
 
 const NoteItem = ({
   note,
@@ -28,6 +40,15 @@ const NoteItem = ({
   const [isDisplay, setIsDisplay] = useState<boolean>(false);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [value, setValue] = useState<string>(note.note);
+  const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
+
+  const handleOpenDialog = () => {
+    setIsOpenDialog(true);
+  };
+  const handleCloseDialog = () => {
+    setIsOpenDialog(false);
+  };
+
   const handleOpen = () => {
     setIsDisplay(true);
     setIsDisplayMain(false);
@@ -58,6 +79,8 @@ const NoteItem = ({
     }
   }, [isDisplayMain]);
 
+  useEffect(() => {});
+
   return (
     <div className="flex space-x-3">
       <div>
@@ -66,21 +89,18 @@ const NoteItem = ({
         </div>
       </div>
       <div className={`${isDisplay ? "" : "hidden"}`}>
-        <Editor value={value} setValue={setValue} isDisplay={isDisplay} />
-        <div className="flex justify-end mt-4">
-          <div className="flex space-x-3">
-            <Button
-              variant="primary"
-              onClick={handleCancel}
-              disabled={isDisabled}
-            >
-              Huỷ
-            </Button>
-            <Button variant="filled" onClick={handleSave} disabled={isDisabled}>
-              Lưu ghi chú
-            </Button>
-          </div>
-        </div>
+        <Editor
+          value={value}
+          setValue={setValue}
+          isDisplay={isDisplay}
+          isDisabled={isDisabled}
+          handleCancel={handleCancel}
+          handleSave={handleSave}
+          warningMessageMaxLength={`Bạn không thể lưu ghi chú dài hơn ${MAX_LENGTH_NOTE} ký tự`}
+          warningMessageMinLength={`Bạn không thể lưu ghi chú trống`}
+          saveButtonMessage="Lưu ghi chú"
+          maxLength={MAX_LENGTH_NOTE}
+        />
       </div>
 
       <div className={`w-full  ${isDisplay ? "hidden" : ""}`}>
@@ -106,7 +126,7 @@ const NoteItem = ({
               </div>
               <div
                 className="hover:bg-slate-200 rounded px-2 py-1 cursor-pointer"
-                onClick={() => handleDeleteNote(note.noteId)}
+                onClick={handleOpenDialog}
               >
                 <Trash2 size={12} />
               </div>
@@ -118,6 +138,26 @@ const NoteItem = ({
           ></div>
         </Stack>
       </div>
+      <Dialog open={isOpenDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Vui lòng xác nhận</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bạn có chắc chắn muốn xóa ghi chú không?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="primary" onClick={handleCloseDialog}>
+            Huỷ
+          </Button>
+          <Button
+            variant="filled"
+            size="lg"
+            onClick={() => handleDeleteNote(note.noteId)}
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
@@ -247,26 +287,19 @@ export default function CourseNotes() {
               </div>
             </div>
             {isDisplay && (
-              <Editor value={value} setValue={setValue} isDisplay={isDisplay} />
+              <Editor
+                value={value}
+                setValue={setValue}
+                isDisplay={isDisplay}
+                handleCancel={handleCancel}
+                handleSave={handleSave}
+                warningMessageMaxLength={`Bạn không thể lưu ghi chú dài hơn ${MAX_LENGTH_NOTE} ký tự`}
+                warningMessageMinLength={`Bạn không thể lưu ghi chú trống`}
+                saveButtonMessage="Lưu ghi chú"
+                isDisabled={isDisabled}
+                maxLength={MAX_LENGTH_NOTE}
+              />
             )}
-          </div>
-          <div className="flex justify-end mt-4">
-            <div className="flex space-x-3">
-              <Button
-                variant="primary"
-                onClick={handleCancel}
-                disabled={isDisabled}
-              >
-                Huỷ
-              </Button>
-              <Button
-                variant="filled"
-                onClick={handleSave}
-                disabled={isDisabled}
-              >
-                Lưu ghi chú
-              </Button>
-            </div>
           </div>
         </div>
         <div

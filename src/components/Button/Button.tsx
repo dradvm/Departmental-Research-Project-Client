@@ -19,7 +19,7 @@ const buttonVariants = {
 const buttonSizes = {
   default: "h-10 px-2 py-2",
   sm: "h-9 px-3 rounded-md",
-  lg: "h-11 px-8 rounded-md",
+  lg: "h-10 px-6 rounded-md",
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -40,6 +40,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         buttonVariants[variant],
         buttonSizes[size],
         expand && "w-full",
+        props.disabled && "cursor-not-allowed",
         className
       )}
       ref={ref}

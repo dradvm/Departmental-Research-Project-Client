@@ -1,6 +1,8 @@
 "use client";
 
+import { Alert, Stack } from "@mui/material";
 import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
+import { Button } from "components/Button/Button";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import "react-quill-new/dist/quill.snow.css";
@@ -15,15 +17,28 @@ export default function Editor({
   setValue = (val: string) => {
     console.log(val);
   },
+  handleCancel,
+  handleSave,
+  isDisabled,
+  warningMessageMaxLength = "",
+  warningMessageMinLength = "",
+  saveButtonMessage = "",
+  maxLength = 500,
 }: {
   isDisplay: boolean;
   value?: string;
   setValue?: (val: string) => void;
+  handleCancel: () => void;
+  handleSave: () => void;
+  isDisabled: boolean;
+  warningMessageMaxLength?: string;
+  warningMessageMinLength?: string;
+  saveButtonMessage?: string;
+  maxLength: number;
 }) {
   const [mounted, setMounted] = useState(false);
   const { setEnabledBlock } = useLearnContext();
-  const MAX_LENGTH = 500;
-  const [remainingLength, setRemainingLength] = useState(MAX_LENGTH);
+  const [remainingLength, setRemainingLength] = useState(maxLength);
   const [isFocus, setIsFocus] = useState<boolean>(isDisplay);
   const handleFocus = () => {
     setEnabledBlock(false);
@@ -38,55 +53,72 @@ export default function Editor({
     toolbar: [
       ["bold", "italic"], // Kiểu chữ
       [{ list: "ordered" }, { list: "bullet" }], // OL, UL
-      ["code"], // Kiểu code (inline)
+      ["code-block"], // Kiểu code (inline)
     ],
   };
 
-  const formats = ["bold", "italic", "list", "code"];
+  const formats = ["bold", "italic", "list", "code-block"];
 
   const handleChange = (content: string) => {
     const plainText = content.replace(/<\/?[^>]+(>|$)/g, "");
-    console.log(plainText);
-    if (plainText.length > MAX_LENGTH) {
-      const truncated = plainText.substring(0, MAX_LENGTH);
-      setValue(truncated);
-    } else {
-      setRemainingLength(MAX_LENGTH - plainText.length);
-      setValue(content);
-    }
+    setRemainingLength(maxLength - plainText.length);
+    setValue(content);
   };
 
   useEffect(() => {
     setMounted(true);
-    // const editor = document.querySelector(".ql-editor");
-    // console.log(editor);
-    // if (editor instanceof HTMLElement) {
-    //   editor.focus();
-    // }
   }, []); // 👈 chạy sau khi component mount
 
   useEffect(() => {
     setIsFocus(isDisplay);
-  }, [isDisplay]);
-
+    if (isDisplay) {
+      setRemainingLength(maxLength);
+    }
+  }, [isDisplay, maxLength]);
   if (!mounted) return null;
 
   return (
-    <div className="relative w-[750px]">
-      <ReactQuill
-        value={value}
-        onChange={handleChange}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        modules={modules}
-        formats={formats}
-        className={`break-words whitespace-pre-wrap rounded ${
-          isFocus ? "border border-indigo-600 border-2" : "border border-2"
-        } `}
-      />
-      <div className="absolute top-0 right-0 py-2 px-4 text-slate-600">
-        {remainingLength}
+    <Stack className="gap-y-5">
+      <div className="relative w-[750px]">
+        <ReactQuill
+          value={value}
+          onChange={handleChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          modules={modules}
+          formats={formats}
+          className={`break-words whitespace-pre-wrap rounded ${
+            isFocus ? "border border-indigo-600 border-2" : "border border-2"
+          } `}
+        />
+        <div className="absolute top-0 right-0 py-2 px-4 text-slate-600">
+          {remainingLength}
+        </div>
       </div>
-    </div>
+      {remainingLength < 0 && (
+        <Alert severity="warning">{warningMessageMaxLength}</Alert>
+      )}
+      {value.replace(/<\/?[^>]+(>|$)/g, "").trim().length === 0 && (
+        <Alert severity="warning">{warningMessageMinLength}</Alert>
+      )}
+      <div className="flex justify-end">
+        <div className="flex space-x-3">
+          <Button variant="primary" onClick={handleCancel}>
+            Huỷ
+          </Button>
+          <Button
+            variant="filled"
+            onClick={handleSave}
+            disabled={
+              isDisabled ||
+              remainingLength < 0 ||
+              value.replace(/<\/?[^>]+(>|$)/g, "").trim().length === 0
+            }
+          >
+            {saveButtonMessage}
+          </Button>
+        </div>
+      </div>
+    </Stack>
   );
 }
