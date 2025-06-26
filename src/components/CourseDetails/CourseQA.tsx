@@ -1,8 +1,12 @@
-import { FormControl, MenuItem, Select, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import { Button } from "components/Button/Button";
+import FlexibleSelect, {
+  FlexibleSelectWithCheckbox,
+} from "components/FlexibleSelect/FlexibleSelect";
 import Input from "components/Input/Input";
 import { MessageSquare, Search } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 function Question() {
   return (
@@ -53,17 +57,38 @@ function Question() {
 }
 
 export default function CourseQA() {
+  const [search, setSearch] = useState<string>("");
+  const [questionSelect, setQuestionSelect] = useState<boolean>(true);
+  const [questionFilter, setQuestionFilter] = useState<string[]>([]);
+  const [questionOrderBy, setQuestionOrderBy] = useState<boolean>(true);
+
+  const handleQuestionSelect = (value: string) => {
+    setQuestionSelect(value === "course");
+  };
+
+  const handleQuestionOrderBy = (value: string) => {
+    setQuestionOrderBy(value === "desc");
+  };
+
+  const handleQuestionFilter = (value: string[]) => {
+    setQuestionFilter(value);
+  };
+
   return (
     <Stack className="px-28 py-10 gap-y-5">
       <div className="flex items-center space-x-3">
-        <Input />
+        <Input
+          placeholder="Tìm kiếm tất cả các câu hỏi trong khoá học"
+          value={search}
+          handleValue={setSearch}
+        />
         <Button variant="primary" className="px-4 py-2">
           <Search size={16} />
         </Button>
       </div>
       <Stack className="gap-y-3">
         <div className="flex items-center space-x-3">
-          <div className="w-[120px]">
+          <div className="w-[200px]">
             <div className="font-bold text-sm">Bộ lọc:</div>
           </div>
           <div className="w-[120px]">
@@ -71,78 +96,40 @@ export default function CourseQA() {
           </div>
         </div>
         <div className="flex items-center space-x-3">
-          <FormControl sx={{ minWidth: 120 }} size="small" className="">
-            <Select
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={{
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Khi hover
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Khi focus
-                },
-              }}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl sx={{ minWidth: 120 }} size="small" className="">
-            <Select
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={{
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Khi hover
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Khi focus
-                },
-              }}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl sx={{ minWidth: 120 }} size="small" className="">
-            <Select
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={{
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Khi hover
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Khi focus
-                },
-              }}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem>
-            </Select>
-          </FormControl>
+          <FlexibleSelect
+            minWidth={200}
+            value={questionSelect ? "course" : "lecture"}
+            handleValue={handleQuestionSelect}
+            items={[
+              { value: "course", text: "Tất cả các bài giảng" },
+              { value: "lecture", text: "Bài giảng hiện tại" },
+            ]}
+          />
+          <FlexibleSelect
+            value={questionOrderBy ? "desc" : "asc"}
+            handleValue={handleQuestionOrderBy}
+            items={[
+              { value: "desc", text: "Sắp xếp theo câu hỏi mới nhất" },
+              { value: "asc", text: "Sắp xếp theo câu hỏi lâu nhất" },
+            ]}
+          />
+          <FlexibleSelectWithCheckbox
+            value={questionFilter}
+            handleValue={handleQuestionFilter}
+            items={[
+              {
+                value: "questionAsked",
+                text: "Câu hỏi tôi đã hỏi",
+              },
+              {
+                value: "questionNoAnswer",
+                text: "Câu hỏi không có câu trả lời",
+              },
+            ]}
+            handleRenderValue={() => {
+              return "Lọc câu hỏi";
+            }}
+          />
         </div>
       </Stack>
       <Stack>

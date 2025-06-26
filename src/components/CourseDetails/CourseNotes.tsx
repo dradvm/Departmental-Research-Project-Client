@@ -4,9 +4,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControl,
-  MenuItem,
-  Select,
   Stack,
 } from "@mui/material";
 import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
@@ -19,6 +16,9 @@ import { LectureStudyProgress } from "types/lecture";
 import { Note } from "types/note";
 import { formatTime } from "utils/time";
 import CourseLoading from "./CourseLoading";
+import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
+import { useRouter } from "next/navigation";
+import studyProgressService from "services/study-progress.service";
 
 const MAX_LENGTH_NOTE = 1000;
 
@@ -41,6 +41,17 @@ const NoteItem = ({
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [value, setValue] = useState<string>(note.note);
   const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
+  const router = useRouter();
+  const handleLink = () => {
+    studyProgressService
+      .trackStudyProgress(note.lectureId.toString(), note.timeNote)
+      .then(() => {
+        router.push(
+          `/course/${note.Lecture.Section.courseId}/learn/lecture/${note.lectureId}?start=${note.timeNote}`
+        );
+      })
+      .catch((err) => console.log(err));
+  };
 
   const handleOpenDialog = () => {
     setIsOpenDialog(true);
@@ -106,7 +117,10 @@ const NoteItem = ({
       <div className={`w-full  ${isDisplay ? "hidden" : ""}`}>
         <Stack className="w-full gap-y-3">
           <div className="flex justify-between items-center">
-            <div className="flex flex-wrap items-center">
+            <div
+              onClick={handleLink}
+              className="flex flex-wrap items-center cursor-pointer"
+            >
               <div className="me-3 font-medium">
                 {note.Lecture.Section.order}. {note.Lecture.Section.nameSection}
               </div>
@@ -168,7 +182,7 @@ export default function CourseNotes() {
   const [value, setValue] = useState<string>("");
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [noteFilter, setNotefilter] = useState<boolean>(true);
+  const [noteFilter, setNoteFilter] = useState<boolean>(true);
   const [orderByFilter, setOrderByFilter] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingNotes, setIsLoadingNotes] = useState<boolean>(false);
@@ -264,6 +278,13 @@ export default function CourseNotes() {
     [loadNotes]
   );
 
+  const handleNoteFilter = (value: string) => {
+    setNoteFilter(value === "course");
+  };
+  const handleOrderByFilter = (value: string) => {
+    setOrderByFilter(value === "desc");
+  };
+
   useEffect(() => {
     loadNotes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -314,70 +335,24 @@ export default function CourseNotes() {
           </div>
         </div>
         <div className="flex space-x-3">
-          <FormControl sx={{ minWidth: 160 }} size="small" className="">
-            <Select
-              value={noteFilter ? "course" : "lecture"}
-              onChange={(e) => setNotefilter(e?.target?.value === "course")}
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={{
-                fontSize: "0.875rem",
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Khi hover
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  // Khi focus
-                },
-              }}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    "& .MuiMenuItem-root": {
-                      fontSize: "0.875rem", // Giảm font size
-                    },
-                  },
-                },
-              }}
-            >
-              <MenuItem value="course">Tất cả các bài giảng</MenuItem>
-              <MenuItem value="lecture">Bài giảng hiện tại</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl sx={{ minWidth: 160 }} size="small" className="">
-            <Select
-              value={orderByFilter ? "desc" : "asc"}
-              onChange={(e) => setOrderByFilter(e?.target?.value === "desc")}
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={{
-                fontSize: "0.875rem",
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "rgb(91, 73, 244)", // Khi hover
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  // Khi focus
-                },
-              }}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    "& .MuiMenuItem-root": {
-                      fontSize: "0.875rem", // Giảm font size
-                    },
-                  },
-                },
-              }}
-            >
-              <MenuItem value="desc">Sắp xếp theo thứ tự gần đây nhất</MenuItem>
-              <MenuItem value="asc">Sắp xếp theo thứ tự cũ nhất</MenuItem>
-            </Select>
-          </FormControl>
+          <FlexibleSelect
+            minWidth={160}
+            value={noteFilter ? "course" : "lecture"}
+            handleValue={handleNoteFilter}
+            items={[
+              { value: "course", text: "Tất cả các bài giảng" },
+              { value: "lecture", text: "Bài giảng hiện tại" },
+            ]}
+          />
+          <FlexibleSelect
+            minWidth={160}
+            value={orderByFilter ? "desc" : "asc"}
+            handleValue={handleOrderByFilter}
+            items={[
+              { value: "desc", text: "Sắp xếp theo thứ tự gần nhất" },
+              { value: "asc", text: "Sắp xếp theo thứ tự cũ nhất" },
+            ]}
+          />
         </div>
         {isLoadingNotes ? (
           <CourseLoading />

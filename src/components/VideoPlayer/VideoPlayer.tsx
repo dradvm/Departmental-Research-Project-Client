@@ -21,7 +21,7 @@ import { formatTime } from "utils/time";
 import throttle from "lodash/throttle";
 import screenfull from "screenfull";
 import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import studyProgressService from "services/study-progress.service";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 type ReactPlayerRef = {
@@ -69,6 +69,8 @@ export default function VideoPlayer({
   const { lectureId } = useParams<{ lectureId: string }>();
   const hasSeekedRef = useRef(false);
   const {} = useLearnContext();
+  const searchParams = useSearchParams();
+
   const getCurrrentLectureIndex = useCallback(() => {
     return lectures.findIndex(
       (lecture) => lecture.lectureId === Number(lectureId)
@@ -258,6 +260,16 @@ export default function VideoPlayer({
     setCurrentTimeNote(Math.floor(currentTime));
   }, [currentTime, setCurrentTimeNote]);
 
+  useEffect(() => {
+    const start = searchParams.get("start");
+    if (start !== null) {
+      const startNum: number = parseInt(start);
+      console.log(startNum);
+      playerRef.current?.seekTo(startNum);
+      setProgress((startNum / duration) * 100);
+      setCurrentTime(startNum);
+    }
+  }, [duration, searchParams, seekBy]);
   return (
     <div
       ref={playerWrapperRef}

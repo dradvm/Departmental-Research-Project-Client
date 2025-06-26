@@ -1,12 +1,4 @@
-import {
-  Divider,
-  FormControl,
-  LinearProgress,
-  MenuItem,
-  Select,
-  Stack,
-  Tooltip,
-} from "@mui/material";
+import { Divider, LinearProgress, Stack, Tooltip } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStarHalfStroke,
@@ -22,8 +14,8 @@ import courseService from "services/course.service";
 import { Review, ReviewOverview } from "types/review";
 import { getTimeAgo } from "utils/time";
 import { getInitials } from "utils/text";
-import type { SelectChangeEvent } from "@mui/material/Select";
 import CourseLoading from "./CourseLoading";
+import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
 function BarReviews({
   stars,
   barReviewSelect,
@@ -198,10 +190,10 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
     setSearchValue("");
     setCursor(undefined);
   };
-  const handleFilter = (event: SelectChangeEvent) => {
+  const handleFilter = (value: string) => {
     setIsLoadingReviews(true);
     setCursor(undefined);
-    setBarReviewSelect(parseInt(event.target.value));
+    setBarReviewSelect(parseInt(value));
   };
   const handleSearch = () => {
     if (searchValue !== search.trim().replace(/\s+/g, " ")) {
@@ -372,67 +364,42 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
                       <Search size={16} />
                     </Button>
                   </div>
-                  <FormControl sx={{ minWidth: 160 }} size="small" className="">
-                    <Select
-                      displayEmpty
-                      inputProps={{ "aria-label": "Without label" }}
-                      sx={{
-                        fontSize: "0.875rem",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
-                        },
-                        "&:hover .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "rgb(91, 73, 244)", // Khi hover
-                        },
-                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          // Khi focus
-                        },
-                      }}
-                      value={barReviewSelect.toString()}
-                      onChange={(event) => handleFilter(event)}
-                      MenuProps={{
-                        PaperProps: {
-                          sx: {
-                            "& .MuiMenuItem-root": {
-                              fontSize: "0.875rem", // Giảm font size
-                            },
-                          },
-                        },
-                      }}
-                    >
-                      <MenuItem value={"0"}>Tất cả xếp hạng</MenuItem>
-                      <MenuItem
-                        value={"5"}
-                        disabled={reviewOverview?.ratings[4].review === 0}
-                      >
-                        Năm sao
-                      </MenuItem>
-                      <MenuItem
-                        value={"4"}
-                        disabled={reviewOverview?.ratings[3].review === 0}
-                      >
-                        Bốn sao
-                      </MenuItem>
-                      <MenuItem
-                        value={"3"}
-                        disabled={reviewOverview?.ratings[2].review === 0}
-                      >
-                        Ba sao
-                      </MenuItem>
-                      <MenuItem
-                        value={"2"}
-                        disabled={reviewOverview?.ratings[1].review === 0}
-                      >
-                        Hai sao
-                      </MenuItem>
-                      <MenuItem
-                        value={"1"}
-                        disabled={reviewOverview?.ratings[0].review === 0}
-                      >
-                        Một sao
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
+                  <FlexibleSelect
+                    minWidth={160}
+                    value={barReviewSelect.toString()}
+                    handleValue={handleFilter}
+                    items={[
+                      {
+                        value: "0",
+                        text: "Tất cả xếp hạng",
+                      },
+                      {
+                        value: "5",
+                        text: "Năm sao",
+                        disabled: reviewOverview?.ratings[4].review === 0,
+                      },
+                      {
+                        value: "4",
+                        text: "Bốn sao",
+                        disabled: reviewOverview?.ratings[3].review === 0,
+                      },
+                      {
+                        value: "3",
+                        text: "Ba sao",
+                        disabled: reviewOverview?.ratings[2].review === 0,
+                      },
+                      {
+                        value: "2",
+                        text: "Hai sao",
+                        disabled: reviewOverview?.ratings[1].review === 0,
+                      },
+                      {
+                        value: "1",
+                        text: "Một sao",
+                        disabled: reviewOverview?.ratings[0].review === 0,
+                      },
+                    ]}
+                  />
                 </div>
               </Stack>
               {searchValue.trim().length > 0 && (
