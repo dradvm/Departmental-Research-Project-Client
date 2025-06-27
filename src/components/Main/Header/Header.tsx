@@ -1,13 +1,33 @@
-import { Badge, Divider, LinearProgress, Stack } from "@mui/material";
-import { Button } from "components/Button/Button";
-import { Bell, Heart, ShoppingCart } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
+'use client';
+
+import { Badge, Divider, LinearProgress, Stack, Menu, MenuItem } from '@mui/material';
+import { Button } from 'components/Button/Button';
+import { Bell, Heart, ShoppingCart } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react';
+import { useState } from 'react';
 
 export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === 'authenticated';
   const [isInstructor, setIsInstructor] = useState(false);
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    handleClose();
+    await signOut({ callbackUrl: '/' });
+  };
 
   return (
     <>
@@ -81,6 +101,7 @@ export default function Header() {
               </div>
             </Stack>
           </div>
+
           {isLoggedIn && (
             <div className="relative font-sm h-10 select-none flex items-center px-3 rounded hover:bg-violet-100 hover:text-indigo-700 cursor-pointer">
               <Heart size={18} />
@@ -96,22 +117,65 @@ export default function Header() {
               </Badge>
             </div>
           )}
+
+          {/* 👇 Avatar + Dropdown thêm vào đây 👇 */}
           {isLoggedIn && (
-            <div className="relative font-sm h-10 select-none flex items-center px-3 rounded hover:bg-violet-100 hover:text-indigo-700 cursor-pointer">
-              <Badge overlap="circular" color="error" variant="dot">
-                <div className="rounded-full w-8 h-8 overflow-hidden">
-                  <Image src="/test.jpg" alt="image" width={64} height={64} />
-                </div>
-              </Badge>
+            <>
+              <div
+                className="relative font-sm h-10 select-none flex items-center px-3 rounded hover:bg-violet-100 hover:text-indigo-700 cursor-pointer"
+                onClick={handleAvatarClick}
+              >
+                <Badge overlap="circular" color="error" variant="dot">
+                  <div className="rounded-full w-8 h-8 overflow-hidden">
+                    <Image
+                      src={session?.user?.image || '/default-avatar.jpg'}
+                      alt="avatar"
+                      width={64}
+                      height={64}
+                      className="object-cover"
+                    />
+                  </div>
+                </Badge>
+              </div>
+
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                PaperProps={{
+                  elevation: 3,
+                  sx: {
+                    mt: 1,
+                    minWidth: 160,
+                    borderRadius: '10px',
+                  },
+                }}
+              >
+                <MenuItem component={Link} href="/profile">
+                  Manage Profile
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>Log out</MenuItem>
+              </Menu>
+            </>
+          )}
+          {/* 👆 Hết phần thêm 👆 */}
+
+          {!isLoggedIn && (
+            <div className="flex items-center space-x-2">
+              <Link href="/auth/login" passHref legacyBehavior>
+                <Button variant="primary">
+                  Đăng nhập
+                </Button>
+              </Link>
+              <Link href="/auth/login" passHref legacyBehavior>
+                <Button variant="filled">
+                  Đăng ký
+                </Button>
+              </Link>
             </div>
           )}
+
         </div>
-        {!isLoggedIn && (
-          <div className="flex items-center space-x-2">
-            <Button variant="primary">Đăng nhập</Button>
-            <Button variant="filled">Đăng ký</Button>
-          </div>
-        )}
       </div>
       <Divider />
     </>
