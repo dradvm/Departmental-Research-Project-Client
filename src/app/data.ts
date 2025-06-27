@@ -1,8 +1,6 @@
 import { Account } from "types/account";
 import { ReportType } from "types/report";
-import { PaymentType } from "types/payment";
 import { PostType } from "types/post";
-import { ItemCartType } from "types/itemcart";
 import { GlobalCouponType, ProductCouponType } from "types/coupon";
 import { CouponType } from "../enums/coupon.enum";
 
@@ -537,64 +535,6 @@ export const students: Array<Account> = [
   },
 ];
 
-export const courses: Array<ItemCartType> = [
-  {
-    id: 1,
-    name: "Lập Trình Web Với Node.js",
-    teacherId: "nguyenvanan",
-    ratingScore: 4.6,
-    reviewCount: 154,
-    totalDuration: 25,
-    lessionCount: 78,
-    price: 799000,
-    isBestSeller: true,
-  },
-  {
-    id: 2,
-    name: "Cơ Sở Dữ Liệu Nâng Cao",
-    teacherId: "tranbichngoc",
-    ratingScore: 4.3,
-    reviewCount: 89,
-    totalDuration: 20,
-    lessionCount: 62,
-    price: 599000,
-    isBestSeller: false,
-  },
-  {
-    id: 3,
-    name: "Trí Tuệ Nhân Tạo Cơ Bản",
-    teacherId: "leminhtam",
-    ratingScore: 4.7,
-    reviewCount: 120,
-    totalDuration: 15,
-    lessionCount: 45,
-    price: 699000,
-    isBestSeller: true,
-  },
-  {
-    id: 4,
-    name: "Phát Triển Ứng Dụng Di Động Với Flutter",
-    teacherId: "phamquanghuy",
-    ratingScore: 4.8,
-    reviewCount: 203,
-    totalDuration: 30,
-    lessionCount: 91,
-    price: 899000,
-    isBestSeller: true,
-  },
-  {
-    id: 5,
-    name: "An Toàn Thông Tin",
-    teacherId: "dangthilan",
-    ratingScore: 4.2,
-    reviewCount: 67,
-    totalDuration: 12,
-    lessionCount: 37,
-    price: 499000,
-    isBestSeller: false,
-  },
-];
-
 export const reports: Array<ReportType> = [
   {
     idReport: 1,
@@ -722,204 +662,6 @@ export const reports: Array<ReportType> = [
     contentReport: "Nội dung mang tính lý thuyết, thiếu thực tiễn.",
     idUser: 1147,
     name: "Nguyễn Thị Cẩm Tú",
-  },
-];
-
-export const payments: Array<PaymentType> = [
-  {
-    idPayment: 1,
-    timePayment: "2025-06-10T09:15:00",
-    totalPrice: 950000,
-    idUser: 101,
-    name: "Nguyễn Văn A",
-    PaymentDetail: [
-      {
-        idPayment: 1,
-        idCourse: 201,
-        courseName: "JavaScript cơ bản",
-        originalPrice: 600000,
-        price: 500000,
-      },
-      {
-        idPayment: 1,
-        idCourse: 202,
-        courseName: "HTML nâng cao",
-        originalPrice: 500000,
-        price: 450000,
-      },
-    ],
-  },
-  {
-    idPayment: 2,
-    timePayment: "2025-06-09T13:20:00",
-    totalPrice: 300000,
-    idUser: 102,
-    name: "Trần Thị B",
-    PaymentDetail: [
-      {
-        idPayment: 2,
-        idCourse: 203,
-        courseName: "Python cơ bản",
-        originalPrice: 350000,
-        price: 300000,
-      },
-    ],
-  },
-  {
-    idPayment: 3,
-    timePayment: "2025-06-08T18:10:00",
-    totalPrice: 1100000,
-    idUser: 103,
-    name: "Lê Minh C",
-    PaymentDetail: [
-      {
-        idPayment: 3,
-        idCourse: 204,
-        courseName: "ReactJS nâng cao",
-        originalPrice: 800000,
-        price: 700000,
-      },
-      {
-        idPayment: 3,
-        idCourse: 205,
-        courseName: "Redux chuyên sâu",
-        originalPrice: 450000,
-        price: 400000,
-      },
-    ],
-  },
-  {
-    idPayment: 4,
-    timePayment: "2025-06-07T10:00:00",
-    totalPrice: 600000,
-    idUser: 104,
-    name: "Phạm Quang D",
-    PaymentDetail: [
-      {
-        idPayment: 4,
-        idCourse: 206,
-        courseName: "VueJS cơ bản",
-        originalPrice: 700000,
-        price: 600000,
-      },
-    ],
-  },
-  {
-    idPayment: 5,
-    timePayment: "2025-06-06T20:45:00",
-    totalPrice: 1450000,
-    idUser: 105,
-    name: "Đỗ Hồng E",
-    PaymentDetail: [
-      {
-        idPayment: 5,
-        idCourse: 207,
-        courseName: "Node.js",
-        originalPrice: 800000,
-        price: 700000,
-      },
-      {
-        idPayment: 5,
-        idCourse: 208,
-        courseName: "Express nâng cao",
-        originalPrice: 900000,
-        price: 750000,
-      },
-    ],
-  },
-  {
-    idPayment: 6,
-    timePayment: "2025-06-05T17:30:00",
-    totalPrice: 850000,
-    idUser: 106,
-    name: "Hoàng Gia F",
-    PaymentDetail: [
-      {
-        idPayment: 6,
-        idCourse: 209,
-        courseName: "MongoDB cơ bản",
-        originalPrice: 900000,
-        price: 850000,
-      },
-    ],
-  },
-  {
-    idPayment: 7,
-    timePayment: "2025-06-04T14:50:00",
-    totalPrice: 1250000,
-    idUser: 107,
-    name: "Ngô Thị G",
-    PaymentDetail: [
-      {
-        idPayment: 7,
-        idCourse: 210,
-        courseName: "SQL nâng cao",
-        originalPrice: 700000,
-        price: 650000,
-      },
-      {
-        idPayment: 7,
-        idCourse: 211,
-        courseName: "Phân tích hệ thống",
-        originalPrice: 700000,
-        price: 600000,
-      },
-    ],
-  },
-  {
-    idPayment: 8,
-    timePayment: "2025-06-03T11:25:00",
-    totalPrice: 400000,
-    idUser: 108,
-    name: "Lý Quốc H",
-    PaymentDetail: [
-      {
-        idPayment: 8,
-        idCourse: 212,
-        courseName: "HTML & CSS cơ bản",
-        originalPrice: 450000,
-        price: 400000,
-      },
-    ],
-  },
-  {
-    idPayment: 9,
-    timePayment: "2025-06-02T08:00:00",
-    totalPrice: 1350000,
-    idUser: 109,
-    name: "Mai Văn I",
-    PaymentDetail: [
-      {
-        idPayment: 9,
-        idCourse: 213,
-        courseName: "Angular",
-        originalPrice: 750000,
-        price: 650000,
-      },
-      {
-        idPayment: 9,
-        idCourse: 214,
-        courseName: "Typescript",
-        originalPrice: 800000,
-        price: 700000,
-      },
-    ],
-  },
-  {
-    idPayment: 10,
-    timePayment: "2025-06-01T16:10:00",
-    totalPrice: 600000,
-    idUser: 110,
-    name: "Tống Hà K",
-    PaymentDetail: [
-      {
-        idPayment: 10,
-        idCourse: 215,
-        courseName: "REST API cơ bản",
-        originalPrice: 700000,
-        price: 600000,
-      },
-    ],
   },
 ];
 
@@ -1095,7 +837,8 @@ export const productCoupon: ProductCouponType[] = [
 
 export const globalCoupon: GlobalCouponType[] = [
   {
-    idCoupon: 101,
+    couponId: 101,
+    code: "123ABC",
     type: CouponType.DISCOUNT,
     value: 10,
     startDate: "2025-06-01T00:00:00",
@@ -1106,7 +849,8 @@ export const globalCoupon: GlobalCouponType[] = [
     maxValueDiscount: 100000,
   },
   {
-    idCoupon: 102,
+    couponId: 102,
+    code: "123ABC",
     type: CouponType.VOUCHER,
     value: 50000,
     startDate: "2025-06-05T00:00:00",
@@ -1117,7 +861,8 @@ export const globalCoupon: GlobalCouponType[] = [
     maxValueDiscount: 0,
   },
   {
-    idCoupon: 103,
+    couponId: 103,
+    code: "123ABC",
     type: CouponType.DISCOUNT,
     value: 25,
     startDate: "2025-06-10T00:00:00",
@@ -1128,7 +873,8 @@ export const globalCoupon: GlobalCouponType[] = [
     maxValueDiscount: 250000,
   },
   {
-    idCoupon: 104,
+    couponId: 104,
+    code: "123ABC",
     type: CouponType.VOUCHER,
     value: 100000,
     startDate: "2025-06-03T00:00:00",
@@ -1139,7 +885,8 @@ export const globalCoupon: GlobalCouponType[] = [
     maxValueDiscount: 0,
   },
   {
-    idCoupon: 105,
+    couponId: 105,
+    code: "123ABC",
     type: CouponType.DISCOUNT,
     value: 30,
     startDate: "2025-06-02T00:00:00",
@@ -1150,7 +897,8 @@ export const globalCoupon: GlobalCouponType[] = [
     maxValueDiscount: 300000,
   },
   {
-    idCoupon: 106,
+    couponId: 106,
+    code: "123ABC",
     type: CouponType.DISCOUNT,
     value: 10,
     startDate: "2025-06-01T00:00:00",
@@ -1161,7 +909,8 @@ export const globalCoupon: GlobalCouponType[] = [
     maxValueDiscount: 100000,
   },
   {
-    idCoupon: 107,
+    couponId: 107,
+    code: "123ABC",
     type: CouponType.DISCOUNT,
     value: 15,
     startDate: "2025-06-01T00:00:00",
@@ -1172,7 +921,8 @@ export const globalCoupon: GlobalCouponType[] = [
     maxValueDiscount: 120000,
   },
   {
-    idCoupon: 108,
+    couponId: 108,
+    code: "123ABC",
     type: CouponType.DISCOUNT,
     value: 20,
     startDate: "2025-06-01T00:00:00",
@@ -1183,7 +933,8 @@ export const globalCoupon: GlobalCouponType[] = [
     maxValueDiscount: 150000,
   },
   {
-    idCoupon: 109,
+    couponId: 109,
+    code: "123ABC",
     type: CouponType.DISCOUNT,
     value: 10,
     startDate: "2025-06-01T00:00:00",
@@ -1194,7 +945,8 @@ export const globalCoupon: GlobalCouponType[] = [
     maxValueDiscount: 100000,
   },
   {
-    idCoupon: 110,
+    couponId: 110,
+    code: "123ABC",
     type: CouponType.DISCOUNT,
     value: 12,
     startDate: "2025-06-01T00:00:00",
