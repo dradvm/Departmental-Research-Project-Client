@@ -7,10 +7,12 @@ import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import ModalReactive from "./modal.reactive";
+import ModalResetPassword from "./modal.change.password";
 
 const LoginPage = () => {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalResetOpen, setIsModalResetOpen] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -110,6 +112,10 @@ const LoginPage = () => {
                 <div className="text-sm">
                   <a
                     href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsModalResetOpen(true);
+                    }}
                     className="font-semibold text-indigo-600 hover:text-indigo-500"
                   >
                     Forgot password?
@@ -162,6 +168,10 @@ const LoginPage = () => {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         userEmail={email}
+      />
+      <ModalResetPassword
+        isModalOpen={isModalResetOpen}
+        setIsModalOpen={setIsModalResetOpen}
       />
     </>
   );

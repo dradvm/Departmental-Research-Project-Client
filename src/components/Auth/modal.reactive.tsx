@@ -27,6 +27,7 @@ export default function ModalReactive(props: any) {
             method: 'POST',
             body: { email: userEmail },
         })
+        console.log(">>>check res000:", res)
         if (res?.data) {
             setUserId(res?.data?.id)
             setStep(prev => Math.min(prev + 1, 3))
@@ -54,7 +55,7 @@ export default function ModalReactive(props: any) {
         handleClose()
     }
 
-    const stepTitle = ['Login', 'Verification', 'Confirmation']
+    const stepTitle = ['Login', 'Verify', 'Confirmation']
 
     const renderStepContent = () => {
         switch (step) {

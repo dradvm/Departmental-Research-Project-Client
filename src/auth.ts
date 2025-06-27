@@ -16,35 +16,59 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {},
       },
       authorize: async (credentials) => {
-        try {
-          const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
-            {
-              email: credentials.email,
-              password: credentials.password,
-            }
-          );
+        // try {
+        //   const res = await axios.post(
+        //     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
+        //     {
+        //       email: credentials.email,
+        //       password: credentials.password,
+        //     }
+        //   );
+        const res = await sendRequest<IBackendRes<any>>({
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
+          method: 'POST',
+          body: {
+            email: credentials.email,
+            password: credentials.password
+          },
+        });
 
-          console.log(">>> check res: ", res);
-          if (res.status === 201) {
-            // return user object with their profile data
-            return {
-              userId: res.data?.user?.userId,
-              name: res.data?.user?.name,
-              email: res.data?.user?.email,
-              image: res.data?.user?.image,
-              access_token: res.data?.access_token,
-            };
-          } else if (+res.status === 401) {
-            throw new InvalidEmailPasswordError();
-          } else if (+res.status === 400) {
-            throw new InactiveAccoounError();
-          } else {
-            throw new Error("Internal server error");
-          }
-        } catch (err) {
-          throw new Error(err instanceof Error ? err.message : String(err));
+        if (res.statusCode === 201) {
+          // return user object with their profile data
+          return {
+            userId: res.data?.user?.userId,
+            name: res.data?.user?.name,
+            email: res.data?.user?.email,
+            image: res.data?.user?.image,
+            biography: res.data?.user?.biography,
+            role: res.data?.user?.role,
+            access_token: res.data?.access_token,
+          };
         }
+        //Sai pass: 401
+        //Chưa active: 400
+        else if (+res.statusCode === 401) {
+          throw new InvalidEmailPasswordError()
+        }
+        else if (+res.statusCode === 400) {
+          throw new InactiveAccoounError()
+        }
+        else {
+          throw new Error("Internal server error")
+        }
+        //   return {
+
+        //   }
+        // } catch(err) {
+        //   if (axios.isAxiosError(err) && err.response) {
+        //     if (err.response.status === 401) {
+        //       throw new InvalidEmailPasswordError();
+        //     } else if (err.response.status === 400) {
+        //       throw new InactiveAccoounError();
+        //     }
+        //   }
+        //   throw new Error("Internal server error");
+        // }
       },
     }),
   ],
@@ -52,11 +76,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/auth/login",
   },
   callbacks: {
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
       if (user) {
         // User is available during sign-in
         token.user = user as IUser;
       }
+
+      // Khi gọi update() từ client
+      if (trigger === 'update' && session) {
+        token.user = {
+          ...token.user,
+          ...session, // các field bạn truyền từ `update()`
+        };
+      }
+
       return token;
     },
     session({ session, token }) {
