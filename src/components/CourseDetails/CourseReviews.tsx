@@ -182,7 +182,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
   const [numberReviews, setNumberReviews] = useState<number | undefined>(
     undefined
   );
-  const [totalReviews, setTotalReviews] = useState<number>(0);
+  const [totalReview, setTotalReview] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingReviews, setIsLoadingReviews] = useState<boolean>(true);
   const handleClearSearch = () => {
@@ -242,39 +242,28 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
   }, [courseId]);
 
   useEffect(() => {
-    if (cursor !== undefined) {
-      courseService
-        .getCourseReviews(
-          courseId,
-          barReviewSelect === 0 ? undefined : barReviewSelect,
-          searchValue,
-          cursor
-        )
-        .then((res) => {
-          setIsLoadingReviews(false);
-          setReviews((prev) => [...prev, ...res.data]);
-        })
-        .catch((err) => console.log(err));
-    } else {
-      courseService
-        .getCourseReviews(
-          courseId,
-          barReviewSelect === 0 ? undefined : barReviewSelect,
-          searchValue
-        )
-        .then((res) => {
-          setIsLoadingReviews(false);
-          setReviews(res.data);
-        })
-        .catch((err) => console.log(err));
-    }
     courseService
-      .getNumberCourseReviews(
+      .getCourseReviews(
+        courseId,
+        barReviewSelect || undefined,
+        searchValue,
+        cursor
+      )
+      .then((res) => {
+        setIsLoadingReviews(false);
+        setReviews((prev) =>
+          cursor !== undefined ? [...prev, ...res.data] : res.data
+        );
+      })
+      .catch(console.error);
+
+    courseService
+      .getTotalCourseReviews(
         courseId,
         barReviewSelect === 0 ? undefined : barReviewSelect,
         searchValue
       )
-      .then((res) => setTotalReviews(res.data))
+      .then((res) => setTotalReview(res.data))
       .catch((err) => console.log(err));
   }, [barReviewSelect, courseId, searchValue, cursor]);
 
@@ -424,7 +413,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
                 ))
               )}
             </div>
-            {reviews.length < totalReviews && (
+            {reviews.length < totalReview && (
               <Button variant="primary" onClick={handleLoadMore}>
                 Xem thêm đánh giá
               </Button>

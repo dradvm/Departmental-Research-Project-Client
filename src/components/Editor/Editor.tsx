@@ -17,24 +17,28 @@ export default function Editor({
   setValue = (val: string) => {
     console.log(val);
   },
-  handleCancel,
-  handleSave,
+  handleCancel = () => {},
+  handleSave = () => {},
   isDisabled,
   warningMessageMaxLength = "",
   warningMessageMinLength = "",
   saveButtonMessage = "",
   maxLength = 500,
+  minLength = 1,
+  isButton = true,
 }: {
   isDisplay: boolean;
   value?: string;
   setValue?: (val: string) => void;
-  handleCancel: () => void;
-  handleSave: () => void;
+  handleCancel?: () => void;
+  handleSave?: () => void;
   isDisabled: boolean;
   warningMessageMaxLength?: string;
   warningMessageMinLength?: string;
   saveButtonMessage?: string;
-  maxLength: number;
+  maxLength?: number;
+  minLength?: number;
+  isButton?: boolean;
 }) {
   const [mounted, setMounted] = useState(false);
   const { setEnabledBlock } = useLearnContext();
@@ -98,27 +102,31 @@ export default function Editor({
       {remainingLength < 0 && (
         <Alert severity="warning">{warningMessageMaxLength}</Alert>
       )}
-      {value.replace(/<\/?[^>]+(>|$)/g, "").trim().length === 0 && (
+      {value.replace(/<\/?[^>]+(>|$)/g, "").trim().length < minLength && (
         <Alert severity="warning">{warningMessageMinLength}</Alert>
       )}
-      <div className="flex justify-end">
-        <div className="flex space-x-3">
-          <Button variant="primary" onClick={handleCancel}>
-            Huỷ
-          </Button>
-          <Button
-            variant="filled"
-            onClick={handleSave}
-            disabled={
-              isDisabled ||
-              remainingLength < 0 ||
-              value.replace(/<\/?[^>]+(>|$)/g, "").trim().length === 0
-            }
-          >
-            {saveButtonMessage}
-          </Button>
+      {isButton ? (
+        <div className="flex justify-end">
+          <div className="flex space-x-3">
+            <Button variant="primary" onClick={handleCancel}>
+              Huỷ
+            </Button>
+            <Button
+              variant="filled"
+              onClick={handleSave}
+              disabled={
+                isDisabled ||
+                remainingLength < 0 ||
+                value.replace(/<\/?[^>]+(>|$)/g, "").trim().length === 0
+              }
+            >
+              {saveButtonMessage}
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <></>
+      )}
     </Stack>
   );
 }

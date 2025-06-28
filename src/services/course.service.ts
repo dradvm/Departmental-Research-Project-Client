@@ -20,12 +20,8 @@ const courseService = {
         cursor: cursor,
       },
     }),
-  getNumberCourseReviews: (
-    courseId: string,
-    rating?: number,
-    search?: string
-  ) =>
-    axiosInstance.get(`/courses/${courseId}/reviews/number`, {
+  getTotalCourseReviews: (courseId: string, rating?: number, search?: string) =>
+    axiosInstance.get(`/courses/${courseId}/reviews/total`, {
       params: {
         rating: rating,
         search: search,

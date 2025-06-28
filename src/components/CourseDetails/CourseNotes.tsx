@@ -293,12 +293,12 @@ export default function CourseNotes() {
   useEffect(() => {
     setIsLoadingNotes(true);
     loadNotes();
-  }, [orderByFilter, noteFilter, loadNotes]);
+  }, [loadNotes]);
 
   return isLoading ? (
     <CourseLoading />
   ) : (
-    <div className="flex justify-around mt-6">
+    <div className="flex justify-around py-10">
       <Stack className="w-[800px] gap-y-3">
         <div className={`${isDisplay ? "" : "hidden"}`}>
           <div className="flex space-x-3  justify-around">

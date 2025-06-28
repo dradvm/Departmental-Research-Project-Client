@@ -1,7 +1,5 @@
 import axios from "axios";
-import { create } from "lodash";
 import { getSession } from "next-auth/react";
-import { IUser } from "types/next-auth";
 
 const createAxios = (
   route = "",

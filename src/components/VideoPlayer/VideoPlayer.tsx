@@ -305,53 +305,55 @@ export default function VideoPlayer({
             onMouseMove={handleMouseEnterShowControls}
           >
             <div className="absolute w-full h-full flex items-center pointer-events-none">
-              <div className="flex justify-between w-full">
-                <Tooltip
-                  className={`${
-                    lectures[0].lectureId === Number(lectureId)
-                      ? "invisible"
-                      : ""
-                  }`}
-                  title={
-                    lectures[getCurrrentLectureIndex() - 1]
-                      ? `${getCurrrentLectureIndex()}. ${
-                          lectures[getCurrrentLectureIndex() - 1].nameLecture
-                        }`
-                      : ""
-                  }
-                  placement="right"
-                >
-                  <ChevronLeft
-                    onClick={() => handleChangeLecture(false)}
-                    size={16}
-                    strokeWidth={1}
-                    className="text-white pointer-events-auto w-6 h-10 cursor-pointer border border-gray-400 bg-indigo-600 hover:bg-indigo-700 rounded"
-                  />
-                </Tooltip>
-                <Tooltip
-                  className={`${
-                    lectures[lectures.length - 1].lectureId ===
-                    Number(lectureId)
-                      ? "invisible"
-                      : ""
-                  }`}
-                  title={
-                    lectures[getCurrrentLectureIndex() + 1]
-                      ? `${getCurrrentLectureIndex() + 2}. ${
-                          lectures[getCurrrentLectureIndex() + 1].nameLecture
-                        }`
-                      : ""
-                  }
-                  placement="left"
-                >
-                  <ChevronRight
-                    onClick={() => handleChangeLecture(true)}
-                    size={16}
-                    strokeWidth={1}
-                    className="text-white pointer-events-auto w-6 h-10 cursor-pointer border border-gray-400 bg-indigo-600 hover:bg-indigo-700 rounded"
-                  />
-                </Tooltip>
-              </div>
+              {lectures.length > 0 && (
+                <div className="flex justify-between w-full">
+                  <Tooltip
+                    className={`${
+                      lectures[0].lectureId === Number(lectureId)
+                        ? "invisible"
+                        : ""
+                    }`}
+                    title={
+                      lectures[getCurrrentLectureIndex() - 1]
+                        ? `${getCurrrentLectureIndex()}. ${
+                            lectures[getCurrrentLectureIndex() - 1].nameLecture
+                          }`
+                        : ""
+                    }
+                    placement="right"
+                  >
+                    <ChevronLeft
+                      onClick={() => handleChangeLecture(false)}
+                      size={16}
+                      strokeWidth={1}
+                      className="text-white pointer-events-auto w-6 h-10 cursor-pointer border border-gray-400 bg-indigo-600 hover:bg-indigo-700 rounded"
+                    />
+                  </Tooltip>
+                  <Tooltip
+                    className={`${
+                      lectures[lectures.length - 1].lectureId ===
+                      Number(lectureId)
+                        ? "invisible"
+                        : ""
+                    }`}
+                    title={
+                      lectures[getCurrrentLectureIndex() + 1]
+                        ? `${getCurrrentLectureIndex() + 2}. ${
+                            lectures[getCurrrentLectureIndex() + 1].nameLecture
+                          }`
+                        : ""
+                    }
+                    placement="left"
+                  >
+                    <ChevronRight
+                      onClick={() => handleChangeLecture(true)}
+                      size={16}
+                      strokeWidth={1}
+                      className="text-white pointer-events-auto w-6 h-10 cursor-pointer border border-gray-400 bg-indigo-600 hover:bg-indigo-700 rounded"
+                    />
+                  </Tooltip>
+                </div>
+              )}
             </div>
             <div
               className="flex-grow"
