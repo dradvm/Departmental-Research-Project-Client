@@ -7,8 +7,10 @@ import ProformaInvoice from "components/CartComponent/ProformaInvoice";
 import ItemCart from "components/CartComponent/ItemCart";
 import Link from "next/link";
 import { PaymentBodyType, PaymentDetailBodyType } from "types/payment";
-import paymentTransactionService from "services/paymenttransaction.service";
 import { useRouter } from "next/navigation";
+import paymentService from "services/payment.service";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Cart() {
   const router = useRouter();
@@ -26,8 +28,12 @@ export default function Cart() {
     let cart: CartType;
     if (code) cart = (await cartService.getCart(code)).data;
     else cart = (await cartService.getCart()).data;
-    console.log(cart.message);
-    console.log(cart.success);
+    if (cart.success) {
+      if (cart.couponId) toast.success(cart.message || "Đã áp dụng khuyến mãi");
+    } else {
+      if (cart.message)
+        toast.error(cart.message || "Không áp dụng được khuyến mãi");
+    }
     setCart(cart);
   }
 
@@ -36,9 +42,10 @@ export default function Cart() {
   }, []);
 
   // delete a course from cart
-  async function handleDeleteOneItem(courseId: number) {
+  async function handleDeleteOneItem(courseId: number, titleCourse: string) {
     if (confirm(`Xác nhận xóa khóa học này ra khỏi giỏ hàng của bạn?`)) {
       await cartService.deleteOneItem(courseId);
+      toast.success(`Đã xóa ${titleCourse} khỏi giỏ hàng!`);
       await fetchData();
     }
   }
@@ -49,6 +56,7 @@ export default function Cart() {
       confirm(`Xác nhận xóa toàn bộ các khóa học này ra khỏi giỏ hàng của bạn?`)
     ) {
       await cartService.deleteAllItem();
+      toast.success(`Đã xóa tất cả khóa học khỏi giỏ hàng!`);
       await fetchData();
     }
   }
@@ -79,7 +87,7 @@ export default function Cart() {
         const preClientSecret = localStorage.getItem("clientSecret");
         if (!preClientSecret) {
           const data: { clientSecret: string } = (
-            await paymentTransactionService.createPaymentTransaction({
+            await paymentService.createPaymentIntent({
               amount: parseInt(cart.finalPrice),
             })
           ).data;
@@ -88,7 +96,7 @@ export default function Cart() {
         router.push("/cart/checkout");
       } catch (e) {
         console.log(`Có lỗi xảy ra khi tạo paymentIntent: ${e}`);
-        confirm(`Có lỗi khi tạo paymentIntent`);
+        toast.error(`Có lỗi khi tạo paymentIntent`);
       }
     }
   }
@@ -122,7 +130,6 @@ export default function Cart() {
           </div>
           <ProformaInvoice
             dataInput={{
-              originalPrice: cart.originalPrice,
               totalPrice: cart.totalPrice,
               finalPrice: cart.finalPrice,
               inputRef: inputRef,
@@ -138,11 +145,12 @@ export default function Cart() {
           </h1>
           <button className="mt-8 p-2 bg-purple-500 rounded-[12px] hover:mt-6 hover:bg-purple-400">
             <Link href="#" className="text-[28px] text-white">
-              Đến trang mua sắm ngay!
+              Khám phá trang khóa học ngay!
             </Link>
           </button>
         </div>
       )}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

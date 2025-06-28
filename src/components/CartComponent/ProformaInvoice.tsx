@@ -1,7 +1,7 @@
 import { RefObject } from "react";
+import { formatVND } from "utils/money";
 
 interface InputProformalInvoice {
-  originalPrice: string;
   totalPrice: string;
   finalPrice: string;
   inputRef: RefObject<HTMLInputElement | null>;
@@ -20,11 +20,7 @@ export default function ProformaInvoice({
       <div className="mt-[12px]">
         <p className="text-[18px] font-bold">Tạm tính:</p>
         <p className="text-[18px] font-bold text-blue-500">
-          {dataInput.totalPrice} VNĐ
-        </p>
-        <p className="text-[18px] font-bold">Giá gốc</p>
-        <p className="text-[18px] font-bold text-gray-500 line-through">
-          {dataInput.originalPrice} VNĐ
+          {formatVND(parseInt(dataInput.totalPrice))}
         </p>
       </div>
       <div className="flex">
@@ -47,7 +43,7 @@ export default function ProformaInvoice({
           Cần thanh toán:
         </p>
         <p className="text-[28px] font-bold text-blue-500">
-          {dataInput.finalPrice} VNĐ
+          {formatVND(parseInt(dataInput.finalPrice))}
         </p>
       </div>
 

@@ -1,11 +1,12 @@
 import { ItemType } from "types/cart";
+import { formatVND } from "utils/money";
 
 export default function ItemCart({
   item,
   onDelete,
 }: {
   item: ItemType;
-  onDelete: (courseId: number) => void;
+  onDelete: (courseId: number, titleCourse: string) => void;
 }) {
   return (
     <div className="border-b-[4px] border-double border-sky-500">
@@ -28,7 +29,9 @@ export default function ItemCart({
         <div className="hidden lg:w-[20%] lg:flex lg:flex-col items-end justify-evenly">
           <button
             className="w-fit p-[4px] border rounded-[8px] bg-red-700 text-white"
-            onClick={() => onDelete(parseInt(item.course.courseId))}
+            onClick={() =>
+              onDelete(parseInt(item.course.courseId), item.course.title)
+            }
           >
             Xóa
           </button>
@@ -39,9 +42,8 @@ export default function ItemCart({
         {/* Div 4 */}
         <div className="w-[30%] md:w-[20%] flex flex-col justify-center">
           <p className="text-center text-[20px] font-bold">
-            {item.course.final_price} VNĐ
+            {formatVND(parseInt(item.course.final_price))}
           </p>
-          <p className="line-through text-center">{item.course.price} VNĐ</p>
         </div>
       </div>
       {/* Div 3 only for mobile and tablet*/}
