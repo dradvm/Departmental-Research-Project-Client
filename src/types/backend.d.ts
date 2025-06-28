@@ -1,4 +1,4 @@
-export {};
+export { };
 // https://bobbyhadz.com/blog/typescript-make-types-global#declare-global-types-in-typescript
 
 declare global {
@@ -15,7 +15,7 @@ declare global {
   interface IBackendRes<T> {
     error?: string | string[];
     message: string;
-    status: number | string;
+    statusCode: number | string;
     data?: T;
   }
 

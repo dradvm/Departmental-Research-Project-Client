@@ -1,6 +1,5 @@
 "use client";
 
-import { payments } from "app/data";
 import { ChangeEvent, useEffect, useState } from "react";
 import { PaymentType } from "types/payment";
 import {
@@ -11,6 +10,7 @@ import {
   CircleDollarSign,
   CalendarDays,
 } from "lucide-react";
+import paymentService from "services/payment.service";
 
 export default function Payment() {
   const [activatedItem, setActivatedItem] = useState<number>();
@@ -38,10 +38,15 @@ export default function Payment() {
   }, [filter]);
 
   useEffect(() => {
-    const limit = 10;
-    const skip = (page - 1) * limit;
-    const data: PaymentType[] = payments.slice(skip, skip + limit);
-    setInfors(data);
+    const fetchPayment = async () => {
+      const limit = 10;
+      const skip = (page - 1) * limit;
+      const paymentsDB: PaymentType[] = (
+        await paymentService.getAllPayment({ limit, skip })
+      ).data;
+      setInfors(paymentsDB);
+    };
+    fetchPayment();
   }, [page]);
 
   return (
@@ -143,16 +148,16 @@ export default function Payment() {
                       <li
                         key={index}
                         className={`grid grid-cols-3 grid-rows-1 gap-4 px-6 py-2 border-b hover:underline cursor-pointer
-               ${infor.idUser === activatedItem ? "bg-blue-100" : ""}`}
+               ${infor.paymentId === activatedItem ? "bg-blue-100" : ""}`}
                         onClick={() => {
-                          if (infor.idUser !== activatedItem) {
+                          if (infor.paymentId !== activatedItem) {
                             setSelectedPayment(infor);
-                            setActivatedItem(infor.idUser);
+                            setActivatedItem(infor.paymentId);
                           }
                         }}
                       >
                         <p>
-                          #{infor.idPayment}. {infor.name}
+                          #{infor.paymentId}. {infor.userName}
                         </p>
                         <div
                           className="flex gap-2 items-center"
@@ -208,27 +213,29 @@ export default function Payment() {
               </h1>
               {/* Block 2 */}
               <div className="h-[12%] grid grid-cols-2 grid-rows-2 gap-2 text-[20px] font-semibold">
-                <h1>Số hóa đơn: {selectedPayment.idPayment}</h1>
+                <h1>Số hóa đơn: {selectedPayment.paymentId}</h1>
                 <h1>Ngày lập: {selectedPayment.timePayment.slice(0, 10)}</h1>
-                <h1>Khách hàng: {selectedPayment.name}</h1>
-                <h2>Mã khách hàng: {selectedPayment.idUser}</h2>
+                <h1>Khách hàng: {selectedPayment.userName}</h1>
+                <h2>Mã khách hàng: {selectedPayment.userId}</h2>
               </div>
               {/* Block 3 */}
               <div className="max-h-[50%] text-[18px]">
                 <h1 className="underline">Danh sách khóa học</h1>
                 <div>
-                  {selectedPayment.PaymentDetail.map((detailPayment) => (
+                  {selectedPayment.paymentDetail.map((detailPayment) => (
                     <div
-                      key={detailPayment.idCourse}
+                      key={detailPayment.courseId}
                       className="grid grid-cols-10 grid-rows-1"
                     >
-                      <h1>{detailPayment.idCourse}</h1>
-                      <h1 className="col-span-5">{detailPayment.courseName}</h1>
+                      <h1>{detailPayment.courseId}</h1>
+                      <h1 className="col-span-5">
+                        {detailPayment.courseTitle}
+                      </h1>
                       <h1 className="col-span-2 line-through">
-                        {detailPayment.originalPrice}
+                        {detailPayment.price}
                       </h1>
                       <h1 className="col-span-2 font-bold">
-                        {detailPayment.price}
+                        {detailPayment.final_price}
                       </h1>
                     </div>
                   ))}
@@ -237,7 +244,7 @@ export default function Payment() {
               {/* Block 4 */}
               <div className="h-[10%] text-[20px] font-bold">
                 <h1 className="text-blue-500">
-                  Tổng số khóa học: {selectedPayment.PaymentDetail.length}
+                  Tổng số khóa học: {selectedPayment.paymentDetail.length}
                 </h1>
                 <h1 className="text-red-500">
                   Tổng tiền: {selectedPayment.totalPrice}

@@ -14,7 +14,7 @@ import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { DemoProvider, useDemoRouter } from "@toolpad/core/internal";
 import Stack from "@mui/material/Stack";
 import Link from "@mui/material/Link";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { signOut as nextAuthSignOut } from "next-auth/react";
 
 const NAVIGATION: Navigation = [
@@ -80,7 +80,7 @@ interface DemoProps {
 export default function DashboardLayoutAccount(props: DemoProps) {
   const { window } = props;
   const { data: sessions, status } = useSession();
-  console.log(">>> check data: ", sessions, status);
+
 
   const [session, setSession] = React.useState<Session | null>(null);
 
@@ -98,6 +98,8 @@ export default function DashboardLayoutAccount(props: DemoProps) {
       });
     }
   }, [status, sessions]);
+
+  console.log(">>> check data: ", sessions, status);
 
   const authentication = React.useMemo(() => {
     return {
