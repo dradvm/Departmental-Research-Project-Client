@@ -70,6 +70,8 @@ const qaService = {
   getAnswers: (questionId: number) =>
     axiosInstance.get(`questions/${questionId}/answers`),
   addQuestion: (formData: FormData) => formDataAxiosInstance.post("", formData),
+  updateQuestion: (formData: FormData) =>
+    formDataAxiosInstance.patch("", formData),
 };
 
 export default qaService;

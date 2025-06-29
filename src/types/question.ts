@@ -1,3 +1,5 @@
+import { Image } from "./image";
+
 interface Question {
   questionId: number;
   userId: number;
@@ -12,6 +14,7 @@ interface Question {
     isActive: boolean;
     isDeleted: boolean;
   };
+  QuestionImage: Image[];
   _count: {
     Answer: number;
   };

@@ -4,7 +4,7 @@ import { getSession } from "next-auth/react";
 const createAxios = (
   route = "",
   contentType = "application/json",
-  timeout = 5000
+  timeout = 30000
 ) => {
   //--------------
 

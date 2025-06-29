@@ -26,6 +26,7 @@ export default function Editor({
   maxLength = 500,
   minLength = 1,
   isButton = true,
+  isFocusEditor = true,
 }: {
   isDisplay: boolean;
   value?: string;
@@ -39,11 +40,12 @@ export default function Editor({
   maxLength?: number;
   minLength?: number;
   isButton?: boolean;
+  isFocusEditor?: boolean;
 }) {
   const [mounted, setMounted] = useState(false);
   const { setEnabledBlock } = useLearnContext();
   const [remainingLength, setRemainingLength] = useState(maxLength);
-  const [isFocus, setIsFocus] = useState<boolean>(isDisplay);
+  const [isFocus, setIsFocus] = useState<boolean>(isFocusEditor);
   const handleFocus = () => {
     setEnabledBlock(false);
     setIsFocus(true);
@@ -74,7 +76,6 @@ export default function Editor({
   }, []); // 👈 chạy sau khi component mount
 
   useEffect(() => {
-    setIsFocus(isDisplay);
     if (isDisplay) {
       setRemainingLength(maxLength);
     }

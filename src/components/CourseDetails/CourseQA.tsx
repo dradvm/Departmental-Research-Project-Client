@@ -1,11 +1,11 @@
-import { Stack } from "@mui/material";
+import { Menu, MenuItem, Stack } from "@mui/material";
 import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import { Button } from "components/Button/Button";
 import FlexibleSelect, {
   FlexibleSelectWithCheckbox,
 } from "components/FlexibleSelect/FlexibleSelect";
 import Input from "components/Input/Input";
-import { MessageSquare, Search, User, X } from "lucide-react";
+import { EllipsisVertical, MessageSquare, Search, User, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -17,6 +17,7 @@ import { getTimeAgo } from "utils/time";
 import CourseLoading from "./CourseLoading";
 import Answer from "types/answer";
 import Editor from "components/Editor/Editor";
+import { Image as ImageType } from "types/image";
 
 function QuestionItem({
   question,
@@ -40,7 +41,18 @@ function QuestionItem({
   const handleQuestion = () => {
     setQuestion(question);
   };
+  const sanitizeHTMLContent = (html: string) => {
+    const div = document.createElement("div");
+    div.innerHTML = html;
 
+    div
+      .querySelectorAll("ol, ul, code, pre, table, blockquote")
+      .forEach((el) => {
+        el.remove();
+      });
+
+    return div.innerText.trim().replace(/\s+/g, " ");
+  };
   return (
     <div
       className="flex space-x-3 px-10 py-5 hover:bg-gray-100 cursor-pointer"
@@ -77,9 +89,15 @@ function QuestionItem({
               <div className="font-bold truncate w-[550px]">
                 {question.questionTitle}
               </div>
-              <div className="block text-sm truncate w-[550px] text-gray-900">
-                {question.questionContent}
-              </div>
+              <div
+                className="block text-sm truncate w-[550px] text-gray-900"
+                dangerouslySetInnerHTML={{
+                  __html:
+                    question.QuestionImage.map(() => "<b>[Hình ảnh]</b>").join(
+                      ""
+                    ) + sanitizeHTMLContent(question.questionContent),
+                }}
+              ></div>
             </Stack>
             <Stack className="w-12">
               <div className="flex items-center space-x-1 text-black ">
@@ -178,6 +196,7 @@ function CourseQuestions({
           cursor
         )
         .then((res) => {
+          console.log(res.data);
           setIsLoadingQuestions(false);
           setQuestions((prev) => (cursor ? [...prev, ...res.data] : res.data));
         })
@@ -262,7 +281,7 @@ function CourseQuestions({
       {isLoading ? (
         <CourseLoading />
       ) : (
-        <Stack className="gap-y-5">
+        <Stack className="gap-y-5 w-[800px]">
           <div
             className="font-bold text-gray-700 hover:text-black cursor-pointer flex"
             onClick={() => setIsAsk(true)}
@@ -433,13 +452,44 @@ function CourseAnswers({
 }) {
   const { lectures, courseId } = useLearnContext();
   const [answers, setAnswers] = useState<Answer[]>([]);
+
+  const router = useRouter();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isOption, setIsOption] = useState<boolean>(false);
+  const [isUpdate, setIsUpdate] = useState<boolean>(false);
+
+  const handleOption = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    setIsOption(true);
+  };
+
+  const handleIsUpdate = () => {
+    setIsUpdate(true);
+    handleClose();
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+    setIsOption(false);
+  };
+
   const backToQuestions = () => {
     setQuestion(null);
   };
-  const router = useRouter();
 
   const handleLinkLecture = () => {
     router.push(`/course/${courseId}/learn/lecture/${question.lectureId}`);
+  };
+
+  const handleSave = (formData: FormData) => {
+    qaService
+      .updateQuestion(formData)
+      .then((res) => {
+        console.log(res);
+        setQuestion(res.data);
+        setIsUpdate(false);
+      })
+      .catch((err) => console.log(err));
   };
 
   useEffect(() => {
@@ -449,6 +499,8 @@ function CourseAnswers({
       .catch((err) => console.log(err));
   }, [question]);
 
+  useEffect(() => {}, [isUpdate]);
+
   return (
     <Stack className="gap-y-5">
       <div>
@@ -456,8 +508,8 @@ function CourseAnswers({
           Quay lại tất cả câu hỏi
         </Button>
       </div>
-      <div className="flex space-x-3">
-        <div className="rounded-full w-12 h-12 overflow-hidden">
+      <div className="flex space-x-3 ">
+        <div className="rounded-full w-12 h-12 overflow-hidden flex-shrink-0">
           {!question.User.isDeleted && question.User.isActive ? (
             question.User.img ? (
               <Image
@@ -479,30 +531,103 @@ function CourseAnswers({
             </div>
           )}
         </div>
-        <Stack>
-          <div className="font-medium text-lg">{question.questionTitle}</div>
-          <div className="flex items-center space-x-1">
-            <div className="underline text-indigo-600 hover:text-indigo-800 text-xs font-thin">
-              {!question.User.isDeleted && question.User.isActive
-                ? question.User.name
-                : "Tài khoản người dùng"}
+        <Stack className="gap-y-3 flex w-[750px]">
+          <Stack>
+            {!isUpdate && (
+              <div className="font-medium text-lg">
+                {question.questionTitle}
+              </div>
+            )}
+            <div className="flex items-center space-x-1">
+              <div className="underline text-indigo-600 hover:text-indigo-800 text-xs font-thin">
+                {!question.User.isDeleted && question.User.isActive
+                  ? question.User.name
+                  : "Tài khoản người dùng"}
+              </div>
+              <span className="text-indigo-600">{" · "}</span>
+              <div
+                onClick={handleLinkLecture}
+                className="text-indigo-600 hover:text-indigo-800 text-xs font-thin cursor-pointer"
+              >
+                Bài giảng số{" "}
+                {lectures.findIndex(
+                  (lecture) => lecture.lectureId === question.lectureId
+                ) + 1}
+              </div>
+              <span className="">{" · "}</span>
+              <div className="text-xs font-thin cursor-pointer">
+                {getTimeAgo(question.createdAt)}
+              </div>
             </div>
-            <span className="text-indigo-600">{" · "}</span>
-            <div
-              onClick={handleLinkLecture}
-              className="text-indigo-600 hover:text-indigo-800 text-xs font-thin cursor-pointer"
-            >
-              Bài giảng số{" "}
-              {lectures.findIndex(
-                (lecture) => lecture.lectureId === question.lectureId
-              ) + 1}
-            </div>
-            <span className="">{" · "}</span>
-            <div className="text-xs font-thin cursor-pointer">
-              {getTimeAgo(question.createdAt)}
-            </div>
-          </div>
+          </Stack>
+          <Stack className="gap-y-1">
+            {!isUpdate ? (
+              <>
+                <div
+                  dangerouslySetInnerHTML={{ __html: question.questionContent }}
+                ></div>
+                {question.QuestionImage.map((image, index) => (
+                  <div key={index} className="flex">
+                    <Image
+                      src={image.secureUrl}
+                      alt={`question-image-${index}`}
+                      unoptimized
+                      width={0}
+                      height={0}
+                      sizes="100vw"
+                      className="w-auto h-auto max-w-full  object-scale-down"
+                    />
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="">
+                <QuestionForm
+                  isUpdate={true}
+                  handleSave={handleSave}
+                  title={question.questionTitle}
+                  content={question.questionContent}
+                  lectureId={question.lectureId.toString()}
+                  oldImages={question.QuestionImage}
+                  questionId={question.questionId.toString()}
+                />
+              </div>
+            )}
+          </Stack>
         </Stack>
+        <div className="flex-shrink-0">
+          <div
+            className="relative cursor-pointer px-2 py-1"
+            onClick={handleOption}
+          >
+            <EllipsisVertical size={16} />
+          </div>
+          <Menu
+            anchorEl={anchorEl}
+            open={isOption}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            MenuListProps={{
+              sx: {
+                "& .MuiMenuItem-root": {
+                  fontSize: "0.875rem",
+                  px: 2,
+                  py: 1,
+                },
+              },
+            }}
+          >
+            <MenuItem onClick={handleIsUpdate}>Chỉnh sửa</MenuItem>
+            <MenuItem>Xoá</MenuItem>
+          </Menu>
+        </div>
       </div>
       <Stack className="gap-y-3 mt-5 px-6">
         {answers.length > 0 ? (
@@ -517,29 +642,53 @@ function CourseAnswers({
   );
 }
 
-function AskQuestion({
-  setIsAsk,
+function QuestionForm({
+  handleSave,
   lectureId,
+  isUpdate = false,
+  title = "",
+  content = "",
+  oldImages = [],
+  questionId = "",
 }: {
-  setIsAsk: (value: boolean) => void;
-  lectureId: number;
+  handleSave: (formData: FormData) => void;
+  lectureId: string;
+  isUpdate?: boolean;
+  title?: string;
+  content?: string;
+  oldImages?: ImageType[];
+  width?: number;
+  questionId?: string;
 }) {
-  const [questionTitle, setQuestionTitle] = useState<string>("");
-  const [questionContent, setQuestionContent] = useState<string>("");
+  const [questionTitle, setQuestionTitle] = useState<string>(title);
+  const [questionContent, setQuestionContent] = useState<string>(content);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const maxLength = 5000;
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<(File | ImageType)[]>(oldImages);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const handleSave = () => {
+
+  const save = () => {
     const formData = new FormData();
-    images.forEach((image) => formData.append("images", image));
+    setIsDisabled(true);
+
+    images.forEach((image) => {
+      if (image instanceof File) {
+        formData.append("images", image);
+      } else {
+        console.log(image);
+        formData.append("oldImages", image.publicId);
+      }
+    });
+    if (isUpdate) {
+      formData.append("questionId", questionId);
+    }
     formData.append("questionTitle", questionTitle);
     formData.append("questionContent", questionContent);
-    formData.append("lectureId", lectureId.toString());
-    qaService
-      .addQuestion(formData)
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
+    formData.append("lectureId", lectureId);
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+    handleSave(formData);
   };
 
   const handleFiles = (files: FileList | null) => {
@@ -567,99 +716,125 @@ function AskQuestion({
   };
 
   return (
+    <Stack className="gap-y-3">
+      <Stack className="gap-y-2">
+        <div className="font-medium">Tiêu đề hoặc tóm tắt</div>
+        <Input
+          value={questionTitle}
+          handleValue={setQuestionTitle}
+          placeholder="Ví dụ: vì sao chúng ta sử dụng giá trị này?"
+        />
+      </Stack>
+      <Stack className="gap-y-2">
+        <div className="font-medium">Chi tiết (tuỳ chọn)</div>
+        <div className="flex justify-around">
+          <Editor
+            value={questionContent}
+            setValue={setQuestionContent}
+            isDisplay={true}
+            isDisabled={isDisabled}
+            maxLength={maxLength}
+            minLength={0}
+            isButton={false}
+            warningMessageMaxLength={`Bạn không thể lưu nội dung dài hơn ${maxLength}`}
+            isFocusEditor={false}
+          />
+        </div>
+        <div className="">
+          <div className="grid grid-cols-3 gap-5 mb-4">
+            {images.map((img, index) => (
+              <div
+                key={index}
+                className="relative border rounded overflow-hidden"
+              >
+                <Image
+                  src={
+                    img instanceof File
+                      ? URL.createObjectURL(img)
+                      : img.secureUrl
+                  }
+                  width={100}
+                  height={100}
+                  alt={`Uploaded ${index}`}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  onClick={() => removeImage(index)}
+                  className="absolute top-0 right-0 bg-black bg-opacity-50 text-white text-xs p-2"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className="border-2 border-dashed border-indigo-600 rounded p-14 text-center cursor-pointer hover:bg-gray-50 transition"
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+          >
+            <p className="text-gray-600">
+              Kéo thả hoặc bấm để chọn ảnh (tối đa 3 ảnh)
+            </p>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
+      </Stack>
+      <Button
+        className="mt-3"
+        variant="filled"
+        size="lg"
+        disabled={questionTitle.trim().length === 0 || isDisabled}
+        onClick={save}
+      >
+        {isUpdate ? "Lưu" : "Xuất bản"}
+      </Button>
+    </Stack>
+  );
+}
+
+function AskQuestion({
+  setIsAsk,
+  lectureId,
+}: {
+  setIsAsk: (value: boolean) => void;
+  lectureId: string;
+}) {
+  const handleSave = (formData: FormData) => {
+    return qaService
+      .addQuestion(formData)
+      .then(() => {
+        setIsAsk(false);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  return (
     <Stack className="gap-y-5">
       <div>
         <Button variant="primary" size="sm" onClick={() => setIsAsk(false)}>
           Quay lại tất cả câu hỏi
         </Button>
       </div>
-      <Stack className="gap-y-3">
-        <Stack className="gap-y-2">
-          <div className="font-medium">Tiêu đề hoặc tóm tắt</div>
-          <Input
-            value={questionTitle}
-            handleValue={setQuestionTitle}
-            placeholder="Ví dụ: vì sao chúng ta sử dụng giá trị này?"
-          />
-        </Stack>
-        <Stack className="gap-y-2">
-          <div className="font-medium">Chi tiết (tuỳ chọn)</div>
-          <div className="flex justify-around">
-            <Editor
-              value={questionContent}
-              setValue={setQuestionContent}
-              isDisplay={true}
-              isDisabled={isDisabled}
-              maxLength={maxLength}
-              minLength={0}
-              isButton={false}
-              warningMessageMaxLength={`Bạn không thể lưu nội dung dài hơn ${maxLength}`}
-            />
-          </div>
-          <div className="">
-            <div className="grid grid-cols-3 gap-5 mb-4">
-              {images.map((img, index) => (
-                <div
-                  key={index}
-                  className="relative border rounded overflow-hidden"
-                >
-                  <Image
-                    src={URL.createObjectURL(img)}
-                    width={100}
-                    height={100}
-                    alt={`Uploaded ${index}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    onClick={() => removeImage(index)}
-                    className="absolute top-0 right-0 bg-black bg-opacity-50 text-white text-xs p-2"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div
-              className="border-2 border-dashed border-indigo-600 rounded p-14 text-center cursor-pointer hover:bg-gray-50 transition"
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-            >
-              <p className="text-gray-600">
-                Kéo thả hoặc bấm để chọn ảnh (tối đa 3 ảnh)
-              </p>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                ref={fileInputRef}
-                className="hidden"
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-        </Stack>
-        <Button
-          className="mt-3"
-          variant="filled"
-          size="lg"
-          disabled={questionTitle.trim().length === 0}
-          onClick={handleSave}
-        >
-          Xuất bản
-        </Button>
-      </Stack>
+      <QuestionForm handleSave={handleSave} lectureId={lectureId} />
     </Stack>
   );
 }
 
 export default function CourseQA() {
   const [question, setQuestion] = useState<Question | null>(null);
-  const [isAsk, setIsAsk] = useState<boolean>(true);
+  const [isAsk, setIsAsk] = useState<boolean>(false);
   const { lectureId } = useLearnContext();
   return (
-    <div className="px-28 py-8">
+    <div className="flex justify-around py-10">
       {isAsk ? (
         <AskQuestion setIsAsk={setIsAsk} lectureId={lectureId} />
       ) : question === null ? (
