@@ -15,9 +15,11 @@ import { PaymentBodyType } from "types/payment";
 export default function StripeCheckoutForm({
   clientSecret,
   cart,
+  handleErrorPaymentCreation,
 }: {
   clientSecret: string;
   cart: PaymentBodyType;
+  handleErrorPaymentCreation: (e: unknown) => void;
 }) {
   const router = useRouter();
   const stripe = useStripe();
@@ -50,14 +52,19 @@ export default function StripeCheckoutForm({
     });
 
     if (result.error) {
-      setMessage(result.error.message || "Đã có lỗi xảy ra.");
+      setMessage(result.error.message || "Đã có lỗi xảy ra. Hãy thử lại");
     } else if (result.paymentIntent?.status === "succeeded") {
       // succeeded => create payment
-      await paymentService.createPayment(cart);
-      localStorage.removeItem("cartInfor");
-      localStorage.removeItem("clientSecret");
-      router.push("/cart");
-      setMessage("Thanh toán thành công!");
+      try {
+        await paymentService.createPayment(cart);
+        localStorage.removeItem("cartInfor");
+        localStorage.removeItem("clientSecret");
+        setMessage("Thanh toán thành công! Làm mới trang sau 5 giây nữa!");
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        router.push("/cart");
+      } catch (e) {
+        handleErrorPaymentCreation(e);
+      }
     }
 
     setProcessing(false);
