@@ -1,3 +1,5 @@
+import { Image } from "./image";
+
 interface Answer {
   answerId: number;
   userId: number;
@@ -11,5 +13,6 @@ interface Answer {
     isActive: boolean;
     isDeleted: boolean;
   };
+  AnswerImage: Image[];
 }
 export default Answer;
