@@ -1,3 +1,4 @@
+import { Review } from "./review";
 import { Section, SectionStudyProgress } from "./section";
 
 export interface Course {
@@ -24,4 +25,8 @@ export interface CourseDetail extends Course {
 
 export interface CourseStudyProgress extends CourseDetail {
   Section: SectionStudyProgress[];
+}
+
+export interface CourseEnrolled extends CourseStudyProgress {
+  Review: Review[];
 }

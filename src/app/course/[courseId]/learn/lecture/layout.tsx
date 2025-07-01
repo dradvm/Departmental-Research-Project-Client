@@ -61,12 +61,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           (section) => section.Lecture
         );
         setLectures(lecturesData);
-        const totalWatched = lecturesData.reduce(
-          (total, lecture) => total + (lecture.StudyProgress[0].isDone ? 1 : 0),
+        const studyProgressData = lecturesData.flatMap(
+          (studyProgress) => studyProgress.StudyProgress
+        );
+        console.log(studyProgressData);
+        const totalWatched = studyProgressData.reduce(
+          (total, studyProgress) => total + (studyProgress.isDone ? 1 : 0),
           0
         );
         setTotalWatched(totalWatched);
-        const progress = (totalWatched / lecturesData.length) * 100;
+        const progress =
+          studyProgressData.length > 0
+            ? Math.ceil((totalWatched / studyProgressData.length) * 100)
+            : 0;
         setProgress(progress);
         setCourse(courseData);
       })

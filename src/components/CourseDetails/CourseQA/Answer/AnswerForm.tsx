@@ -99,6 +99,7 @@ export default function AnswerForm({
             isDisabled={isDisabled}
             maxLength={maxLength}
             isButton={false}
+            warningMessageMinLength="Bạn không thể gửi phản hồi trống"
             warningMessageMaxLength={`Bạn không thể lưu nội dung dài hơn ${maxLength}`}
             isFocusEditor={false}
           />

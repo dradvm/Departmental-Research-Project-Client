@@ -1,35 +1,67 @@
 "use client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  FormControl,
-  LinearProgress,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Stack,
-} from "@mui/material";
+import { LinearProgress, Stack } from "@mui/material";
 import { Button } from "components/Button/Button";
 import Input from "components/Input/Input";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { faPlay, faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlay,
+  faStarHalfStroke,
+  faStar as solidStar,
+} from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Enrollment } from "types/enrollment";
-import { Course } from "types/course";
+import { CourseEnrolled } from "types/course";
 import { Lecture } from "types/lecture";
 import studyProgressSerivce from "services/study-progress.service";
 import enrollmentService from "services/enrollment.service";
+import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
+import { Category } from "types/category";
+import { StudyProgress } from "types/study-progress";
 
-function CourseItem({ course }: { course: Course }) {
+function CourseItem({ course }: { course: CourseEnrolled }) {
   const [lecture, setLecture] = useState<Lecture>();
+  const progress = useMemo(() => {
+    const studyProgress: StudyProgress[] = course.Section.flatMap((section) =>
+      section.Lecture.flatMap((lecture) => lecture.StudyProgress)
+    );
+    return Math.ceil(
+      (studyProgress.reduce((total, sp) => total + (sp.isDone ? 1 : 0), 0) /
+        studyProgress.length) *
+        100
+    );
+  }, [course]);
+  const rating = useMemo(() => {
+    const reviews = course.Review;
+    return Number(
+      (
+        reviews.reduce((total, review) => total + review.rating, 0) /
+        reviews.length
+      ).toFixed(1)
+    );
+  }, [course]);
+  const getStartIcon = (average: number, star: number) => {
+    if (average > star) {
+      const reminder = average - star;
+      if (reminder < 0.25) {
+        return regularStar;
+      } else if (reminder < 0.75) {
+        return faStarHalfStroke;
+      } else {
+        return solidStar;
+      }
+    } else {
+      return regularStar;
+    }
+  };
   useEffect(() => {
     studyProgressSerivce
       .getLastStudyLecture(course.courseId)
       .then((res) => {
-        console.log(res.data);
         setLecture(res.data);
       })
       .catch((err) => console.log(err));
@@ -79,7 +111,7 @@ function CourseItem({ course }: { course: Course }) {
           <Stack className="mt-2 text-indigo-600">
             <LinearProgress
               variant="determinate"
-              value={3}
+              value={progress}
               className="w-full col-span-3"
               sx={{
                 height: 2,
@@ -87,19 +119,23 @@ function CourseItem({ course }: { course: Course }) {
               color="inherit"
             />
             <div className="flex justify-between mt-1">
-              <div className="text-xs text-slate-700 h-4">Hoàn thành 100%</div>
+              <div className="text-xs text-slate-700 h-4">
+                Hoàn thành {progress}%
+              </div>
               <Stack className="items-end">
                 <div className="flex items-center space-x-1 h-4">
-                  {[1, 2, 3, 4, 5].map((s, i) => {
-                    return (
-                      <FontAwesomeIcon
-                        key={s}
-                        icon={i + 1 > 3 ? regularStar : solidStar}
-                        className={`text-yellow-600`}
-                        fontSize={8}
-                      />
-                    );
-                  })}
+                  {Array(5)
+                    .fill(0)
+                    .map((star, index) => {
+                      return (
+                        <FontAwesomeIcon
+                          key={index}
+                          icon={getStartIcon(rating, index)}
+                          className={`text-yellow-600`}
+                          fontSize={8}
+                        />
+                      );
+                    })}
                 </div>
                 <div className="text-xs text-slate-700 ">Đưa ra đánh giá</div>
               </Stack>
@@ -118,216 +154,177 @@ export default function LearningPage() {
   const [progressFilter, setProgressFilter] = useState<string>("");
   const [instructorFilter, setInstructorFilter] = useState<string>("");
 
-  const [categories, setCategories] = useState<string[]>([
-    "Web Development",
-    "Data Science",
-    "Machine Learning",
-    "Mobile Development",
-    "Game Development",
-  ]);
-  const [instructors, setInstructors] = useState<string[]>([
-    "John Doe",
-    "Jane Smith",
-    "Alice Johnson",
-    "Bob Brown",
-  ]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [instructors, setInstructors] = useState<
+    {
+      userId: number;
+      name: string;
+    }[]
+  >([]);
 
-  const handleSetSort = (event: SelectChangeEvent) => {
-    setSort(event.target.value as string);
-  };
-  const handleSetCategoryFilter = (event: SelectChangeEvent) => {
-    setCategoryFilter(event.target.value as string);
-  };
-  const handleSetProgressFilter = (event: SelectChangeEvent) => {
-    setProgressFilter(event.target.value as string);
-  };
-  const handleSetInstructorFilter = (event: SelectChangeEvent) => {
-    setInstructorFilter(event.target.value as string);
-  };
-  useEffect(() => {
+  const loadCourses = useCallback(() => {
     enrollmentService
-      .getCourseEnrolled()
+      .getCourseEnrolled(
+        sort,
+        categoryFilter === "" ? undefined : categoryFilter,
+        progressFilter,
+        instructorFilter === "" ? undefined : instructorFilter
+      )
       .then((res) => {
         setCourseEnrolled(res.data);
       })
       .catch((err) => console.log(err));
+  }, [sort, categoryFilter, progressFilter, instructorFilter]);
+
+  const clearFilter = () => {
+    setSort("recentlyAccessed");
+    setCategoryFilter("");
+    setProgressFilter("");
+    setInstructorFilter("");
+  };
+
+  useEffect(() => {
+    enrollmentService
+      .getCourseEnrolledCategories()
+      .then((res) => {
+        setCategories(res.data);
+      })
+      .catch((err) => console.log(err));
+    enrollmentService
+      .getCourseEnrolledInstructors()
+      .then((res) => {
+        setInstructors(res.data);
+      })
+      .catch((err) => console.log(err));
+    loadCourses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    loadCourses();
+  }, [loadCourses]);
+
   return (
     <Stack className="gap-y-8">
-      <Stack className="space-y-2">
-        <div className="flex space-x-3 text-sm font-medium">
-          <div className="w-[200px]">Sắp xếp theo</div>
-          <div className="">Lọc theo</div>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex space-x-3">
-            <FormControl sx={{ minWidth: 200 }} size="small" className="">
-              <Select
-                displayEmpty
-                inputProps={{ "aria-label": "Without label" }}
-                value={sort}
-                onChange={(e) => handleSetSort(e)}
-                sx={{
-                  fontSize: "0.875rem", // Giảm font size
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Khi hover
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Khi focus
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      "& .MuiMenuItem-root": {
-                        fontSize: "0.875rem", // Giảm font size
-                      },
-                    },
-                  },
-                }}
-              >
-                <MenuItem value={"recentlyAccessed"}>
-                  Đã truy cập gần đây
-                </MenuItem>
-                <MenuItem value={"recentlyEnrolled"}>
-                  Đã ghi danh gần đây
-                </MenuItem>
-                <MenuItem value={"titleAsc"}>Tiêu đề: Từ A đến Z</MenuItem>
-                <MenuItem value={"titleDesc"}>Tiêu đề: Từ Z đến A</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl sx={{ minWidth: 120 }} size="small" className="">
-              <Select
-                displayEmpty
+      <div className="flex justify-between">
+        <div className="flex space-x-3">
+          <Stack className="gap-y-2">
+            <div className="text-xs font-bold">Sắp xếp theo</div>
+            <FlexibleSelect
+              value={sort}
+              handleValue={setSort}
+              items={[
+                {
+                  value: "recentlyAccessed",
+                  text: "Đã truy cập gần đây",
+                },
+                {
+                  value: "recentlyEnrolled",
+                  text: "Đã ghi danh gần đây",
+                },
+                {
+                  value: "titleAsc",
+                  text: "Tiêu đề: Từ A đến Z",
+                },
+                {
+                  value: "titleDesc",
+                  text: "Tiêu đề: Từ Z đến A",
+                },
+              ]}
+              minWidth={200}
+            />
+          </Stack>
+          <Stack className="gap-y-2">
+            <div className="text-xs font-bold">Lọc theo</div>
+            <div className="flex space-x-3 items-center ">
+              <FlexibleSelect
                 value={categoryFilter}
-                onChange={(e) => handleSetCategoryFilter(e)}
-                inputProps={{ "aria-label": "Without label" }}
-                sx={{
-                  fontSize: "0.875rem", // Giảm font size
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Khi hover
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Khi focus
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      "& .MuiMenuItem-root": {
-                        fontSize: "0.875rem", // Giảm font size
-                      },
-                    },
-                  },
-                }}
-                renderValue={(selected) => {
+                handleValue={setCategoryFilter}
+                minWidth={120}
+                items={categories.map((category) => {
+                  return {
+                    value: category.categoryId.toString(),
+                    text: category.categoryName,
+                  };
+                })}
+                handleRenderValue={(selected) => {
                   if (selected === "") {
-                    return <>Danh mục</>; // placeholder hiển thị
+                    return "Danh mục"; // placeholder hiển thị
                   }
-                  return selected;
+                  return (
+                    categories.find(
+                      (category) => category.categoryId.toString() === selected
+                    )?.categoryName ?? ""
+                  );
                 }}
-              >
-                {categories.map((category, index) => (
-                  <MenuItem key={index} value={category}>
-                    {category}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl sx={{ minWidth: 120 }} size="small" className="">
-              <Select
-                displayEmpty
+              />
+              <FlexibleSelect
                 value={progressFilter}
-                onChange={(e) => handleSetProgressFilter(e)}
-                inputProps={{ "aria-label": "Without label" }}
-                sx={{
-                  fontSize: "0.875rem", // Giảm font size
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
+                handleValue={setProgressFilter}
+                minWidth={120}
+                items={[
+                  {
+                    value: "inProgress",
+                    text: "Đang tiến hành",
                   },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Khi hover
+                  {
+                    value: "completed",
+                    text: "Đã hoàn thành",
                   },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Khi focus
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      "& .MuiMenuItem-root": {
-                        fontSize: "0.875rem", // Giảm font size
-                      },
-                    },
-                  },
-                }}
-                renderValue={(selected) => {
+                ]}
+                handleRenderValue={(selected) => {
                   if (selected === "") {
-                    return <>Danh mục</>; // placeholder hiển thị
+                    return "Tiến độ"; // placeholder hiển thị
                   }
-                  return selected;
-                }}
-              >
-                <MenuItem value="inProgress">Đang tiến hành</MenuItem>
-                <MenuItem value="completed">Đã hoàn thành</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl sx={{ minWidth: 120 }} size="small" className="">
-              <Select
-                displayEmpty
-                inputProps={{ "aria-label": "Without label" }}
-                sx={{
-                  fontSize: "0.875rem", // Giảm font size
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Đổi màu viền ở đây
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Khi hover
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgb(91, 73, 244)", // Khi focus
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      "& .MuiMenuItem-root": {
-                        fontSize: "0.875rem", // Giảm font size
-                      },
+                  const value = [
+                    {
+                      value: "inProgress",
+                      text: "Đang tiến hành",
                     },
-                  },
+                    {
+                      value: "completed",
+                      text: "Đã hoàn thành",
+                    },
+                  ];
+                  return value.find((item) => item.value === selected)?.text;
                 }}
+              />
+              <FlexibleSelect
                 value={instructorFilter}
-                onChange={(e) => handleSetInstructorFilter(e)}
-                renderValue={(selected) => {
+                handleValue={setInstructorFilter}
+                minWidth={120}
+                items={instructors.map((instructor) => {
+                  return {
+                    value: instructor.userId.toString(),
+                    text: instructor.name,
+                  };
+                })}
+                handleRenderValue={(selected) => {
                   if (selected === "") {
-                    return <>Giảng viên</>; // placeholder hiển thị
+                    return "Giảng viên"; // placeholder hiển thị
                   }
-                  return selected;
+                  return (
+                    instructors.find(
+                      (instructor) => instructor.userId.toString() === selected
+                    )?.name ?? ""
+                  );
                 }}
+              />
+              <div
+                onClick={clearFilter}
+                className="flex items-center text-sm font-medium cursor-pointer h-full hover:bg-gray-300 rounded px-1 text-middle"
               >
-                {instructors.map((instructor, index) => (
-                  <MenuItem key={index} value={instructor}>
-                    {instructor}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
-          <div className="flex space-x-3">
-            <Input />
-            <Button variant="primary" className="px-4 py-2">
-              <Search size={16} />
-            </Button>
-          </div>
+                Thiết lập lại
+              </div>
+            </div>
+          </Stack>
         </div>
-      </Stack>
+        <div className="flex space-x-3 mt-6">
+          <Input />
+          <Button variant="primary" className="px-4 py-2">
+            <Search size={16} />
+          </Button>
+        </div>
+      </div>
       <div className="grid grid-cols-4 gap-x-5 gap-y-3">
         {courseEnrolled &&
           courseEnrolled.map((course, index) => {

@@ -27,7 +27,7 @@ export default function FlexibleSelect({
   items: SelectItem[];
 }) {
   return (
-    <FormControl sx={{ minWidth: minWidth }} size="small" className="">
+    <FormControl sx={{ minWidth: minWidth, maxWidth: 300 }} size="small">
       <Select
         value={value}
         onChange={(e) => handleValue(e.target.value)}
@@ -47,8 +47,17 @@ export default function FlexibleSelect({
           },
         }}
         MenuProps={{
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "left",
+          },
+          transformOrigin: {
+            vertical: "top",
+            horizontal: "left",
+          },
           PaperProps: {
             sx: {
+              maxHeight: "200px",
               "& .MuiMenuItem-root": {
                 fontSize: "0.875rem", // Giảm font size
                 "&:hover": {

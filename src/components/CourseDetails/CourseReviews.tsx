@@ -255,7 +255,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
           cursor !== undefined ? [...prev, ...res.data] : res.data
         );
       })
-      .catch(console.error);
+      .catch((err) => console.log(err));
 
     courseService
       .getTotalCourseReviews(
@@ -270,6 +270,9 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
   useEffect(() => {
     setNumberReviews(reviews.length);
   }, [reviews]);
+  useEffect(() => {
+    console.log(courseId);
+  }, [courseId]);
   return (
     <>
       {isLoading ? (

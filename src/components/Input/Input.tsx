@@ -31,7 +31,7 @@ export default function Input({
         onBlur={() => setEnabledBlock(true)}
         type="text"
         placeholder={placeholder}
-        className="w-full px-4 py-2 placeholder:text-slate-700 placeholder border border-gray-300 rounded hover:bg-gray-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        className="text-sm w-full px-4 py-2 placeholder:text-slate-700 placeholder border border-gray-300 rounded hover:bg-gray-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
       />
       {maxLength > 0 && (
         <div className="absolute top-0 right-0 py-2 px-4 text-slate-600">
