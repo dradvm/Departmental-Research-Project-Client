@@ -3,11 +3,24 @@ export interface PaymentQueryType {
     userId?: number;
     limit: number;
     skip: number;
+    startDate?: string;
+    endDate?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    userName?: string;
 }
 
 // POST method
 export interface PaymentDetailBodyType {
     courseId: number;
+}
+
+export interface PaymentFilter {
+    startDate?: string;
+    endDate?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    searchText?: string;
 }
 
 export interface PaymentBodyType {
@@ -23,7 +36,7 @@ export interface PaymentDetailType {
     courseThumbnail: string;
     courseTitle: string;
     price: string;
-    final_price: string;
+    finalPrice: string;
 }
 
 export interface PaymentType {
@@ -32,7 +45,9 @@ export interface PaymentType {
     userId: number;
     userName: string;
     couponId: number | null;
+    code: string | null;
+    originalPrice: string;
     totalPrice: string;
-    final_price: string;
+    finalPrice: string;
     paymentDetail: PaymentDetailType[];
 }

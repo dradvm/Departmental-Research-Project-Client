@@ -1,7 +1,8 @@
 import { CouponType } from "enums/coupon.enum";
 
-export interface ProductCouponType {
-  idCoupon: number;
+// use for POST: create a global coupon
+export interface GlobalCouponBody {
+  isGlobal: boolean;
   type: CouponType;
   value: number;
   startDate: string;
@@ -10,21 +11,62 @@ export interface ProductCouponType {
   appliedAmount: number;
   minRequire: number;
   maxValueDiscount: number;
-  idUser: number;
-  name: string;
-  idCourse: number;
-  title: string;
+  code: string;
+}
+
+// use for GET: get all normal coupon/ global coupon
+export interface CouponReq {
+  limit: number;
+  skip: number;
+  userId?: number;
+  startDate?: string,
+  endDate?: string,
+  minPrice?: number,
+  minPercent?: number,
+  searchText?: string,
+}
+
+export interface CouponFilterInput {
+  startDate?: string;
+  endDate?: string;
+  minPrice?: number;
+  minPercent?: number;
+  searchText?: string;
+}
+
+export interface NormalCouponType {
+  couponId: number;
+  type: string;
+  value: string;
+  startDate: string;
+  endDate: string;
+  quantity: string;
+  appliedAmount: string;
+  minRequire: string;
+  maxValueDiscount: string;
+  code: string;
+  isGlobal: boolean;
+  // status
+  isRunning: boolean;
+  isAccepted: boolean;
+  // course information
+  courseId: number;
+  coureTitle: string;
+  userId: number
+  userName: string;
 }
 
 export interface GlobalCouponType {
-  couponId?: number;
+  couponId: string;
+  userId: string;
+  isGlobal: boolean;
   type: CouponType;
-  value: number;
+  value: string;
   startDate: string;
   endDate: string;
-  quantity: number;
-  appliedAmount: number;
-  minRequire: number;
-  maxValueDiscount: number;
+  quantity: string;
+  appliedAmount: string;
+  minRequire: string;
+  maxValueDiscount: string;
   code: string;
 }
