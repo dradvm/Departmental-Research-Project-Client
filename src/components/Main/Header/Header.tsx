@@ -1,16 +1,23 @@
-'use client';
+"use client";
 
-import { Badge, Divider, LinearProgress, Stack, Menu, MenuItem } from '@mui/material';
-import { Button } from 'components/Button/Button';
-import { Bell, Heart, ShoppingCart } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
-import { useState } from 'react';
+import {
+  Badge,
+  Divider,
+  LinearProgress,
+  Stack,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import { Button } from "components/Button/Button";
+import { Bell, Heart, ShoppingCart } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import { useState } from "react";
 
 export default function Header() {
   const { data: session, status } = useSession();
-  const isLoggedIn = status === 'authenticated';
+  const isLoggedIn = status === "authenticated";
   const [isInstructor, setIsInstructor] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -26,13 +33,13 @@ export default function Header() {
 
   const handleLogout = async () => {
     handleClose();
-    await signOut({ callbackUrl: '/' });
+    await signOut({ callbackUrl: "/" });
   };
 
   return (
     <>
       <div className="flex items-center px-8 py-4 space-x-3">
-        <div>Udemy</div>
+        <Link href={"/"}>EduMarket</Link>
         <div className="relative font-sm  select-none h-10 cursor-pointer group hover:text-indigo-700">
           <div className="hover:bg-violet-100  w-full h-full flex items-center px-3 rounded before:content-[''] before:absolute before:bg-black before:w-full before:h-4 before:left-0 before:bottom-0 before:translate-y-4 before:bg-transparent">
             Khám phá
@@ -128,7 +135,7 @@ export default function Header() {
                 <Badge overlap="circular" color="error" variant="dot">
                   <div className="rounded-full w-8 h-8 overflow-hidden">
                     <Image
-                      src={session?.user?.image || '/default-avatar.jpg'}
+                      src={session?.user?.image || "/default-avatar.jpg"}
                       alt="avatar"
                       width={64}
                       height={64}
@@ -147,7 +154,7 @@ export default function Header() {
                   sx: {
                     mt: 1,
                     minWidth: 160,
-                    borderRadius: '10px',
+                    borderRadius: "10px",
                   },
                 }}
               >
@@ -163,18 +170,13 @@ export default function Header() {
           {!isLoggedIn && (
             <div className="flex items-center space-x-2">
               <Link href="/auth/login" passHref legacyBehavior>
-                <Button variant="primary">
-                  Đăng nhập
-                </Button>
+                <Button variant="primary">Đăng nhập</Button>
               </Link>
               <Link href="/auth/login" passHref legacyBehavior>
-                <Button variant="filled">
-                  Đăng ký
-                </Button>
+                <Button variant="filled">Đăng ký</Button>
               </Link>
             </div>
           )}
-
         </div>
       </div>
       <Divider />

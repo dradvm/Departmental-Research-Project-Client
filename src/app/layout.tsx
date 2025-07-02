@@ -7,6 +7,7 @@ import DynamicHeader from "components/Main/Header/DynamicHeader";
 import NextAuthWrapper from "lib/next.auth.wrapper";
 
 import { usePathname } from "next/navigation";
+import Footer from "components/Main/Footer/Footer";
 
 export default function RootLayout({
   children,
@@ -19,7 +20,9 @@ export default function RootLayout({
   const hiddenRoutes = ["/auth/login", "/auth/register", "/verify"];
 
   // Ẩn header nếu pathname khớp bất kỳ prefix nào trong hiddenRoutes
-  const shouldShowHeader = !hiddenRoutes.some((path) => pathname.startsWith(path));
+  const shouldShowHeader = !hiddenRoutes.some((path) =>
+    pathname.startsWith(path)
+  );
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -31,6 +34,7 @@ export default function RootLayout({
           {shouldShowHeader && <DynamicHeader />}
           {children}
         </NextAuthWrapper>
+        <Footer />
       </body>
     </html>
   );

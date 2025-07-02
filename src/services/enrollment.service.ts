@@ -5,7 +5,8 @@ const enrollmentService = {
     sort: string,
     categoryId: string | undefined,
     progress: string,
-    instructorId: string | undefined
+    instructorId: string | undefined,
+    search: string = ""
   ) =>
     axiosInstance.get("/enrollment", {
       params: {
@@ -13,6 +14,7 @@ const enrollmentService = {
         categoryId,
         progress,
         instructorId,
+        search,
       },
     }),
   updateLastAccessCourse: (courseId: number) =>

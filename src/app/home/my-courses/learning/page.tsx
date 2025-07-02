@@ -22,6 +22,7 @@ import enrollmentService from "services/enrollment.service";
 import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
 import { Category } from "types/category";
 import { StudyProgress } from "types/study-progress";
+import CourseLoading from "components/CourseDetails/CourseLoading";
 
 function CourseItem({ course }: { course: CourseEnrolled }) {
   const [lecture, setLecture] = useState<Lecture>();
@@ -153,7 +154,8 @@ export default function LearningPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [progressFilter, setProgressFilter] = useState<string>("");
   const [instructorFilter, setInstructorFilter] = useState<string>("");
-
+  const [search, setSearch] = useState<string>("");
+  const [searchValue, setSearchValue] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [instructors, setInstructors] = useState<
     {
@@ -161,6 +163,7 @@ export default function LearningPage() {
       name: string;
     }[]
   >([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const loadCourses = useCallback(() => {
     enrollmentService
@@ -168,19 +171,27 @@ export default function LearningPage() {
         sort,
         categoryFilter === "" ? undefined : categoryFilter,
         progressFilter,
-        instructorFilter === "" ? undefined : instructorFilter
+        instructorFilter === "" ? undefined : instructorFilter,
+        searchValue
       )
       .then((res) => {
+        setIsLoading(false);
         setCourseEnrolled(res.data);
       })
       .catch((err) => console.log(err));
-  }, [sort, categoryFilter, progressFilter, instructorFilter]);
+  }, [sort, categoryFilter, progressFilter, instructorFilter, searchValue]);
+
+  const handleSearch = useCallback(() => {
+    setSearchValue(search);
+  }, [search]);
 
   const clearFilter = () => {
     setSort("recentlyAccessed");
     setCategoryFilter("");
     setProgressFilter("");
     setInstructorFilter("");
+    setSearch("");
+    setSearchValue("");
   };
 
   useEffect(() => {
@@ -200,6 +211,7 @@ export default function LearningPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
+    setIsLoading(true);
     loadCourses();
   }, [loadCourses]);
 
@@ -319,18 +331,32 @@ export default function LearningPage() {
           </Stack>
         </div>
         <div className="flex space-x-3 mt-6">
-          <Input />
-          <Button variant="primary" className="px-4 py-2">
+          <Input
+            value={search}
+            handleValue={setSearch}
+            placeholder="Tìm khoá học"
+          />
+          <Button
+            variant="primary"
+            className="px-4 py-2"
+            onClick={handleSearch}
+          >
             <Search size={16} />
           </Button>
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-x-5 gap-y-3">
-        {courseEnrolled &&
-          courseEnrolled.map((course, index) => {
-            return <CourseItem key={index} course={course.Course} />;
-          })}
-      </div>
+      {isLoading ? (
+        <div className="py-16">
+          <CourseLoading />
+        </div>
+      ) : (
+        <div className="grid grid-cols-4 gap-x-5 gap-y-3">
+          {courseEnrolled &&
+            courseEnrolled.map((course, index) => {
+              return <CourseItem key={index} course={course.Course} />;
+            })}
+        </div>
+      )}
     </Stack>
   );
 }
