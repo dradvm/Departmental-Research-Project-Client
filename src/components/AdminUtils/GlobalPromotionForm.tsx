@@ -1,12 +1,14 @@
 import { CouponType } from "enums/coupon.enum";
-import { GlobalCouponType } from "types/coupon";
+import { GlobalCouponBody } from "types/coupon";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import couponService from "services/coupon.service";
 
-const schema: yup.ObjectSchema<GlobalCouponType> = yup.object({
+const schema: yup.ObjectSchema<GlobalCouponBody> = yup.object({
+  isGlobal: yup.boolean().default(true),
   couponId: yup.number().optional(),
   type: yup
     .mixed<CouponType>()
@@ -110,9 +112,15 @@ const schema: yup.ObjectSchema<GlobalCouponType> = yup.object({
 export default function GlobalPromotionForm({
   promotion,
   setPromotionInfor,
+  handleSuccessfulCreation,
+  handleFailedCreation,
+  handleInformIsExistingCode,
 }: {
-  promotion: GlobalCouponType;
-  setPromotionInfor: (acc: GlobalCouponType) => void;
+  promotion: GlobalCouponBody;
+  setPromotionInfor: (acc: GlobalCouponBody) => void;
+  handleSuccessfulCreation: () => void;
+  handleFailedCreation: () => void;
+  handleInformIsExistingCode: () => void;
 }) {
   const router = useRouter();
 
@@ -121,20 +129,36 @@ export default function GlobalPromotionForm({
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<GlobalCouponType>({
+  } = useForm<GlobalCouponBody>({
     defaultValues: promotion,
     resolver: yupResolver(schema),
   });
 
   useEffect(() => {
     const subscription = watch((value) => {
-      setPromotionInfor(value as GlobalCouponType);
+      setPromotionInfor(value as GlobalCouponBody);
     });
     return () => subscription.unsubscribe();
   }, [watch, setPromotionInfor]);
 
-  const onSubmit: SubmitHandler<GlobalCouponType> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<GlobalCouponBody> = async (data) => {
+    try {
+      const isExistingCode: boolean = (
+        await couponService.checkIsExistingCode(data.code)
+      ).data;
+      if (isExistingCode) handleInformIsExistingCode();
+      else {
+        data.startDate = new Date(data.startDate).toISOString();
+        data.endDate = new Date(data.endDate).toISOString();
+        await couponService.createGlobalCoupon(data);
+        handleSuccessfulCreation();
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        router.push("/admin/promotion/global");
+      }
+    } catch (e) {
+      handleFailedCreation();
+      console.log("Lỗi khi tạo global coupon", e);
+    }
   };
 
   return (
@@ -220,8 +244,7 @@ export default function GlobalPromotionForm({
                   id="maxValueDiscount"
                   type="number"
                   min={0}
-                  max={999999999}
-                  step={100000}
+                  max={10000000}
                   {...register("maxValueDiscount")}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
@@ -245,8 +268,7 @@ export default function GlobalPromotionForm({
                   id="minRequire"
                   type="number"
                   min={0}
-                  max={999999999}
-                  step={100000}
+                  max={10000000}
                   {...register("minRequire")}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
@@ -270,7 +292,7 @@ export default function GlobalPromotionForm({
                   id="appliedAmount"
                   type="number"
                   min={0}
-                  max={999999999}
+                  max={1000000}
                   {...register("appliedAmount")}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
@@ -294,7 +316,7 @@ export default function GlobalPromotionForm({
                   id="quantity"
                   type="number"
                   min={0}
-                  max={999999999}
+                  max={1000000}
                   {...register("quantity")}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
