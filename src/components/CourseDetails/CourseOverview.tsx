@@ -5,13 +5,9 @@ import { Button } from "components/Button/Button";
 import { CircleAlert, Globe } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { CourseDetail } from "types/course";
+import { Course } from "types/course";
 
-export default function CourseOverview({
-  course,
-}: {
-  course: CourseDetail | null;
-}) {
+export default function CourseOverview({ course }: { course: Course | null }) {
   return (
     <Stack className="space-y-4">
       <div className="text-2xl">{course?.title}</div>

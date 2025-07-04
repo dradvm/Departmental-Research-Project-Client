@@ -2,7 +2,8 @@ import { Stack } from "@mui/material";
 import { MessageSquare, User } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { LectureStudyProgress } from "types/lecture";
+import React from "react";
+import { Lecture } from "types/lecture";
 import Question from "types/question";
 import { getInitials } from "utils/text";
 import { getTimeAgo } from "utils/time";
@@ -15,14 +16,15 @@ export default function QuestionItem({
   setQuestion,
 }: {
   question: Question;
-  lectures: LectureStudyProgress[];
+  lectures: Lecture[];
   courseId: string;
   setCursor: (cursor: number | undefined) => void;
   setQuestion: (question: Question) => void;
 }) {
   const router = useRouter();
-
-  const handleLinkLecture = () => {
+  const handleLinkLecture = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     setCursor(undefined);
     router.push(`/course/${courseId}/learn/lecture/${question.lectureId}`);
   };
@@ -106,7 +108,7 @@ export default function QuestionItem({
             </div>
             <span className="text-indigo-600">{" · "}</span>
             <div
-              onClick={handleLinkLecture}
+              onClick={(e) => handleLinkLecture(e)}
               className="text-indigo-600 hover:text-indigo-800 text-xs font-thin"
             >
               Bài giảng số{" "}

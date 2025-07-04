@@ -9,14 +9,14 @@ import { ChevronDown, EllipsisVertical, Share2, Star } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import studyProgressService from "services/study-progress.service";
-import { CourseDetail, CourseStudyProgress } from "types/course";
-import { LectureStudyProgress } from "types/lecture";
+import { Course } from "types/course";
+import { Lecture } from "types/lecture";
 
 type LearnContextType = {
   enabledBlock: boolean;
   setEnabledBlock: React.Dispatch<React.SetStateAction<boolean>>;
-  course: CourseDetail | null;
-  lectures: LectureStudyProgress[];
+  course: Course | null;
+  lectures: Lecture[];
   handleSetTotalWatched: (checked: boolean) => void;
   currentTimeNote: number;
   setCurrentTimeNote: React.Dispatch<React.SetStateAction<number>>;
@@ -47,8 +47,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     courseId: string;
     lectureId: string;
   }>();
-  const [course, setCourse] = useState<CourseStudyProgress | null>(null);
-  const [lectures, setLectures] = useState<LectureStudyProgress[] | []>([]);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [lectures, setLectures] = useState<Lecture[] | []>([]);
   const [progress, setProgress] = useState<number>(0);
   const [totalWatched, setTotalWatched] = useState<number>(0);
   const [currentTimeNote, setCurrentTimeNote] = useState<number>(0);
@@ -56,17 +56,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     studyProgressService
       .getCourseStudyProgress(Number(courseId))
       .then((res) => {
-        const courseData = res.data as CourseStudyProgress;
-        const lecturesData = courseData.Section.flatMap(
-          (section) => section.Lecture
-        );
+        const courseData = res.data as Course;
+        const lecturesData =
+          courseData.Section?.flatMap((section) => section.Lecture) ?? [];
         setLectures(lecturesData);
         const studyProgressData = lecturesData.flatMap(
           (studyProgress) => studyProgress.StudyProgress
         );
         console.log(studyProgressData);
         const totalWatched = studyProgressData.reduce(
-          (total, studyProgress) => total + (studyProgress.isDone ? 1 : 0),
+          (total, studyProgress) =>
+            total + (studyProgress && studyProgress.isDone ? 1 : 0),
           0
         );
         setTotalWatched(totalWatched);

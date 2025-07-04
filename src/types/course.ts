@@ -1,5 +1,5 @@
 import { Review } from "./review";
-import { Section, SectionStudyProgress } from "./section";
+import { Section } from "./section";
 
 export interface Course {
   courseId: number;
@@ -7,26 +7,21 @@ export interface Course {
   title: string;
   subTitle: string;
   description: string;
-  price: string;
+  price: number;
   isPublic: boolean;
   isAccepted: boolean;
   thumbnail: string;
   requirement: string;
   targetAudience: string;
-  User: {
+  User?: {
     userId: number;
     name: string;
   };
-}
 
-export interface CourseDetail extends Course {
-  Section: Section[];
-}
+  Section?: Section[];
 
-export interface CourseStudyProgress extends CourseDetail {
-  Section: SectionStudyProgress[];
-}
-
-export interface CourseEnrolled extends CourseStudyProgress {
-  Review: Review[];
+  Review?: Review[];
+  _count?: {
+    Review?: number;
+  };
 }

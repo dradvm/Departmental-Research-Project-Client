@@ -41,7 +41,7 @@ export default function CourseQA() {
   const [isAsk, setIsAsk] = useState<boolean>(false);
   const { lectureId } = useLearnContext();
   return (
-    <div className="flex justify-around py-10">
+    <div className="flex justify-around">
       {isAsk ? (
         <AskQuestion setIsAsk={setIsAsk} lectureId={lectureId} />
       ) : question === null ? (

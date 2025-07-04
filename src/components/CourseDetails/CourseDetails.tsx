@@ -11,13 +11,9 @@ import CourseOverview from "./CourseOverview";
 import CourseReviews from "./CourseReviews";
 import CourseQA from "./CourseQA";
 import CourseNotes from "./CourseNotes";
-import { CourseDetail } from "types/course";
+import { Course } from "types/course";
 
-export default function CourseDetails({
-  course,
-}: {
-  course: CourseDetail | null;
-}) {
+export default function CourseDetails({ course }: { course: Course | null }) {
   const [value, setValue] = React.useState("1");
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
