@@ -14,7 +14,7 @@ import courseService from "services/course.service";
 import { Review, ReviewOverview } from "types/review";
 import { getTimeAgo } from "utils/time";
 import { getInitials } from "utils/text";
-import CourseLoading from "./CourseLoading";
+import Loading from "../Main/Loading/Loading";
 import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
 function BarReviews({
   stars,
@@ -276,7 +276,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
   return (
     <>
       {isLoading ? (
-        <CourseLoading />
+        <Loading />
       ) : reviewOverview?.average === null ? (
         <div className="flex w-full justify-center mt-3">
           <Button variant="primary">
@@ -404,7 +404,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
             </div>
             <div className="">
               {isLoadingReviews ? (
-                <CourseLoading />
+                <Loading />
               ) : (
                 reviews.length > 0 &&
                 reviews.map((review, index) => (

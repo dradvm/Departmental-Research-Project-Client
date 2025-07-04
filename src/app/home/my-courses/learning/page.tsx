@@ -15,21 +15,22 @@ import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Enrollment } from "types/enrollment";
-import { CourseEnrolled } from "types/course";
+import { Course } from "types/course";
 import { Lecture } from "types/lecture";
 import studyProgressSerivce from "services/study-progress.service";
 import enrollmentService from "services/enrollment.service";
 import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
 import { Category } from "types/category";
 import { StudyProgress } from "types/study-progress";
-import CourseLoading from "components/CourseDetails/CourseLoading";
+import Loading from "components/Main/Loading/Loading";
 
-function CourseItem({ course }: { course: CourseEnrolled }) {
+function CourseItem({ course }: { course: Course }) {
   const [lecture, setLecture] = useState<Lecture>();
   const progress = useMemo(() => {
-    const studyProgress: StudyProgress[] = course.Section.flatMap((section) =>
-      section.Lecture.flatMap((lecture) => lecture.StudyProgress)
-    );
+    const studyProgress: StudyProgress[] =
+      course.Section?.flatMap((section) =>
+        section.Lecture.flatMap((lecture) => lecture.StudyProgress)
+      ).filter((sp): sp is StudyProgress => sp !== undefined) || [];
     return Math.ceil(
       (studyProgress.reduce((total, sp) => total + (sp.isDone ? 1 : 0), 0) /
         studyProgress.length) *
@@ -37,11 +38,11 @@ function CourseItem({ course }: { course: CourseEnrolled }) {
     );
   }, [course]);
   const rating = useMemo(() => {
-    const reviews = course.Review;
+    const reviews = course.Review ?? [];
     return Number(
       (
         reviews.reduce((total, review) => total + review.rating, 0) /
-        reviews.length
+        (reviews.length || 1)
       ).toFixed(1)
     );
   }, [course]);
@@ -80,7 +81,7 @@ function CourseItem({ course }: { course: CourseEnrolled }) {
             style={{ border: "1px solid #999" }}
           >
             <Image
-              src={"/thumbnail.webp"}
+              src={course.thumbnail}
               fill
               alt="props"
               className="object-cover"
@@ -106,7 +107,7 @@ function CourseItem({ course }: { course: CourseEnrolled }) {
               {course.title}
             </div>
             <div className="text-slate-500 text-xs truncate">
-              {course.User.name}
+              {course.User?.name}
             </div>
           </Stack>
           <Stack className="mt-2 text-indigo-600">
@@ -150,6 +151,8 @@ function CourseItem({ course }: { course: CourseEnrolled }) {
 
 export default function LearningPage() {
   const [courseEnrolled, setCourseEnrolled] = useState<Enrollment[]>([]);
+  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
+  const [isHasCourseEnrolled, setIsHasCourseEnrolled] = useState<boolean>(true);
   const [sort, setSort] = useState<string>("recentlyAccessed");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [progressFilter, setProgressFilter] = useState<string>("");
@@ -177,6 +180,7 @@ export default function LearningPage() {
       .then((res) => {
         setIsLoading(false);
         setCourseEnrolled(res.data);
+        setIsFirstLoad(false);
       })
       .catch((err) => console.log(err));
   }, [sort, categoryFilter, progressFilter, instructorFilter, searchValue]);
@@ -195,6 +199,12 @@ export default function LearningPage() {
   };
 
   useEffect(() => {
+    if (!isFirstLoad) {
+      setIsHasCourseEnrolled(courseEnrolled.length > 0);
+    }
+  }, [isFirstLoad, courseEnrolled]);
+
+  useEffect(() => {
     enrollmentService
       .getCourseEnrolledCategories()
       .then((res) => {
@@ -210,153 +220,182 @@ export default function LearningPage() {
     loadCourses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {}, [courseEnrolled]);
+
   useEffect(() => {
     setIsLoading(true);
     loadCourses();
   }, [loadCourses]);
 
   return (
-    <Stack className="gap-y-8">
-      <div className="flex justify-between">
-        <div className="flex space-x-3">
-          <Stack className="gap-y-2">
-            <div className="text-xs font-bold">Sắp xếp theo</div>
-            <FlexibleSelect
-              value={sort}
-              handleValue={setSort}
-              items={[
-                {
-                  value: "recentlyAccessed",
-                  text: "Đã truy cập gần đây",
-                },
-                {
-                  value: "recentlyEnrolled",
-                  text: "Đã ghi danh gần đây",
-                },
-                {
-                  value: "titleAsc",
-                  text: "Tiêu đề: Từ A đến Z",
-                },
-                {
-                  value: "titleDesc",
-                  text: "Tiêu đề: Từ Z đến A",
-                },
-              ]}
-              minWidth={200}
-            />
-          </Stack>
-          <Stack className="gap-y-2">
-            <div className="text-xs font-bold">Lọc theo</div>
-            <div className="flex space-x-3 items-center ">
-              <FlexibleSelect
-                value={categoryFilter}
-                handleValue={setCategoryFilter}
-                minWidth={120}
-                items={categories.map((category) => {
-                  return {
-                    value: category.categoryId.toString(),
-                    text: category.categoryName,
-                  };
-                })}
-                handleRenderValue={(selected) => {
-                  if (selected === "") {
-                    return "Danh mục"; // placeholder hiển thị
-                  }
-                  return (
-                    categories.find(
-                      (category) => category.categoryId.toString() === selected
-                    )?.categoryName ?? ""
-                  );
-                }}
-              />
-              <FlexibleSelect
-                value={progressFilter}
-                handleValue={setProgressFilter}
-                minWidth={120}
-                items={[
-                  {
-                    value: "inProgress",
-                    text: "Đang tiến hành",
-                  },
-                  {
-                    value: "completed",
-                    text: "Đã hoàn thành",
-                  },
-                ]}
-                handleRenderValue={(selected) => {
-                  if (selected === "") {
-                    return "Tiến độ"; // placeholder hiển thị
-                  }
-                  const value = [
-                    {
-                      value: "inProgress",
-                      text: "Đang tiến hành",
-                    },
-                    {
-                      value: "completed",
-                      text: "Đã hoàn thành",
-                    },
-                  ];
-                  return value.find((item) => item.value === selected)?.text;
-                }}
-              />
-              <FlexibleSelect
-                value={instructorFilter}
-                handleValue={setInstructorFilter}
-                minWidth={120}
-                items={instructors.map((instructor) => {
-                  return {
-                    value: instructor.userId.toString(),
-                    text: instructor.name,
-                  };
-                })}
-                handleRenderValue={(selected) => {
-                  if (selected === "") {
-                    return "Giảng viên"; // placeholder hiển thị
-                  }
-                  return (
-                    instructors.find(
-                      (instructor) => instructor.userId.toString() === selected
-                    )?.name ?? ""
-                  );
-                }}
-              />
-              <div
-                onClick={clearFilter}
-                className="flex items-center text-sm font-medium cursor-pointer h-full hover:bg-gray-300 rounded px-1 text-middle"
-              >
-                Thiết lập lại
-              </div>
-            </div>
-          </Stack>
-        </div>
-        <div className="flex space-x-3 mt-6">
-          <Input
-            value={search}
-            handleValue={setSearch}
-            placeholder="Tìm khoá học"
-          />
-          <Button
-            variant="primary"
-            className="px-4 py-2"
-            onClick={handleSearch}
-          >
-            <Search size={16} />
-          </Button>
-        </div>
-      </div>
-      {isLoading ? (
-        <div className="py-16">
-          <CourseLoading />
+    <>
+      {isFirstLoad ? (
+        <div className="py-32">
+          <Loading />
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-x-5 gap-y-3">
-          {courseEnrolled &&
-            courseEnrolled.map((course, index) => {
-              return <CourseItem key={index} course={course.Course} />;
-            })}
-        </div>
+        <>
+          {isHasCourseEnrolled ? (
+            <Stack className="gap-y-8">
+              <div className="flex justify-between">
+                <div className="flex space-x-3">
+                  <Stack className="gap-y-2">
+                    <div className="text-xs font-bold">Sắp xếp theo</div>
+                    <FlexibleSelect
+                      value={sort}
+                      handleValue={setSort}
+                      items={[
+                        {
+                          value: "recentlyAccessed",
+                          text: "Đã truy cập gần đây",
+                        },
+                        {
+                          value: "recentlyEnrolled",
+                          text: "Đã ghi danh gần đây",
+                        },
+                        {
+                          value: "titleAsc",
+                          text: "Tiêu đề: Từ A đến Z",
+                        },
+                        {
+                          value: "titleDesc",
+                          text: "Tiêu đề: Từ Z đến A",
+                        },
+                      ]}
+                      minWidth={200}
+                    />
+                  </Stack>
+                  <Stack className="gap-y-2">
+                    <div className="text-xs font-bold">Lọc theo</div>
+                    <div className="flex space-x-3 items-center ">
+                      <FlexibleSelect
+                        value={categoryFilter}
+                        handleValue={setCategoryFilter}
+                        minWidth={120}
+                        items={categories.map((category) => {
+                          return {
+                            value: category.categoryId.toString(),
+                            text: category.categoryName,
+                          };
+                        })}
+                        handleRenderValue={(selected) => {
+                          if (selected === "") {
+                            return "Danh mục"; // placeholder hiển thị
+                          }
+                          return (
+                            categories.find(
+                              (category) =>
+                                category.categoryId.toString() === selected
+                            )?.categoryName ?? ""
+                          );
+                        }}
+                      />
+                      <FlexibleSelect
+                        value={progressFilter}
+                        handleValue={setProgressFilter}
+                        minWidth={120}
+                        items={[
+                          {
+                            value: "inProgress",
+                            text: "Đang tiến hành",
+                          },
+                          {
+                            value: "completed",
+                            text: "Đã hoàn thành",
+                          },
+                        ]}
+                        handleRenderValue={(selected) => {
+                          if (selected === "") {
+                            return "Tiến độ"; // placeholder hiển thị
+                          }
+                          const value = [
+                            {
+                              value: "inProgress",
+                              text: "Đang tiến hành",
+                            },
+                            {
+                              value: "completed",
+                              text: "Đã hoàn thành",
+                            },
+                          ];
+                          return (
+                            value.find((item) => item.value === selected)
+                              ?.text ?? ""
+                          );
+                        }}
+                      />
+                      <FlexibleSelect
+                        value={instructorFilter}
+                        handleValue={setInstructorFilter}
+                        minWidth={120}
+                        items={instructors.map((instructor) => {
+                          return {
+                            value: instructor.userId.toString(),
+                            text: instructor.name,
+                          };
+                        })}
+                        handleRenderValue={(selected) => {
+                          if (selected === "") {
+                            return "Giảng viên"; // placeholder hiển thị
+                          }
+                          return (
+                            instructors.find(
+                              (instructor) =>
+                                instructor.userId.toString() === selected
+                            )?.name ?? ""
+                          );
+                        }}
+                      />
+                      <div
+                        onClick={clearFilter}
+                        className="flex items-center text-sm font-medium cursor-pointer h-full hover:bg-gray-300 rounded px-1 text-middle"
+                      >
+                        Thiết lập lại
+                      </div>
+                    </div>
+                  </Stack>
+                </div>
+                <div className="flex space-x-3 mt-6">
+                  <Input
+                    value={search}
+                    handleValue={setSearch}
+                    placeholder="Tìm khoá học"
+                  />
+                  <Button
+                    variant="primary"
+                    className="px-4 py-2"
+                    onClick={handleSearch}
+                  >
+                    <Search size={16} />
+                  </Button>
+                </div>
+              </div>
+              {isLoading ? (
+                <div className="py-20">
+                  <Loading />
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-x-5 gap-y-3 min-h-64">
+                  {courseEnrolled.map((course, index) => {
+                    return <CourseItem key={index} course={course.Course} />;
+                  })}
+                </div>
+              )}
+            </Stack>
+          ) : (
+            <div className="py-32 flex justify-around">
+              <Stack className="gap-y-3 items-center">
+                <Link href={"/"}>
+                  <Button variant="filled" size="lg">
+                    Xem ngay các khoá học
+                  </Button>
+                </Link>
+              </Stack>
+            </div>
+          )}
+        </>
       )}
-    </Stack>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material";
 import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import { Button } from "components/Button/Button";
-import CourseLoading from "components/CourseDetails/CourseLoading";
+import Loading from "components/Main/Loading/Loading";
 import FlexibleSelect, {
   FlexibleSelectWithCheckbox,
 } from "components/FlexibleSelect/FlexibleSelect";
@@ -153,7 +153,7 @@ export default function CourseQuestions({
   return (
     <>
       {isLoading ? (
-        <CourseLoading />
+        <Loading />
       ) : (
         <Stack className="gap-y-5 w-[800px]">
           <div
@@ -235,7 +235,7 @@ export default function CourseQuestions({
           </Stack>
           <Stack className="gap-y-3">
             {isLoadingQuestions ? (
-              <CourseLoading />
+              <Loading />
             ) : (
               <>
                 {totalQuestion > 0 ? (

@@ -11,13 +11,13 @@ import { TvMinimalPlay } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useCallback } from "react";
 import studyProgressService from "services/study-progress.service";
-import { LectureStudyProgress } from "types/lecture";
+import { Lecture } from "types/lecture";
 import { formatDuration } from "utils/time";
 
 type Props = {
-  lecture: LectureStudyProgress;
-  lecturesStudyProgress: LectureStudyProgress[];
-  setLectures: React.Dispatch<React.SetStateAction<LectureStudyProgress[]>>;
+  lecture: Lecture;
+  lecturesStudyProgress: Lecture[];
+  setLectures: React.Dispatch<React.SetStateAction<Lecture[]>>;
 };
 
 export default function CourseLecture({
@@ -29,7 +29,11 @@ export default function CourseLecture({
     lectureId: string;
   }>();
   const router = useRouter();
-  const [checked, setChecked] = React.useState(lecture.StudyProgress[0].isDone);
+  const [checked, setChecked] = React.useState(
+    lecture.StudyProgress && lecture.StudyProgress[0]
+      ? lecture.StudyProgress[0].isDone
+      : false
+  );
   const { handleSetTotalWatched, lectures } = useLearnContext();
   const handleLink = useCallback(() => {
     router.push(`./${lecture.lectureId}`);
@@ -53,7 +57,9 @@ export default function CourseLecture({
             ...lec,
             StudyProgress: [
               {
-                ...lec.StudyProgress[0],
+                ...(lec.StudyProgress && lec.StudyProgress[0]
+                  ? lec.StudyProgress[0]
+                  : {}),
                 isDone: checked,
               },
             ],

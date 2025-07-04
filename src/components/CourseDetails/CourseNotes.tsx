@@ -12,10 +12,10 @@ import Editor from "components/Editor/Editor";
 import { CirclePlus, Pencil, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import noteService from "services/note.service";
-import { LectureStudyProgress } from "types/lecture";
+import { Lecture } from "types/lecture";
 import { Note } from "types/note";
 import { formatTime } from "utils/time";
-import CourseLoading from "./CourseLoading";
+import Loading from "../Main/Loading/Loading";
 import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
 import { useRouter } from "next/navigation";
 import studyProgressService from "services/study-progress.service";
@@ -31,7 +31,7 @@ const NoteItem = ({
   setIsDisplayMain,
 }: {
   note: Note;
-  lectures: LectureStudyProgress[];
+  lectures: Lecture[];
   loadNotes: () => void;
   handleDeleteNote: (noteId: number) => void;
   isDisplayMain: boolean;
@@ -296,7 +296,7 @@ export default function CourseNotes() {
   }, [loadNotes]);
 
   return isLoading ? (
-    <CourseLoading />
+    <Loading />
   ) : (
     <div className="flex justify-around py-10">
       <Stack className="w-[800px] gap-y-3">
@@ -355,7 +355,7 @@ export default function CourseNotes() {
           />
         </div>
         {isLoadingNotes ? (
-          <CourseLoading />
+          <Loading />
         ) : notes.length > 0 ? (
           <Stack className="gap-y-8 mt-10">
             {notes.map((note) => (

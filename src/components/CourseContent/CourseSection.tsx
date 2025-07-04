@@ -7,19 +7,17 @@ import React, { useState } from "react";
 import List from "@mui/material/List";
 import CourseLecture from "./CourseLecture";
 import { Divider } from "@mui/material";
-import { SectionStudyProgress } from "types/section";
+import { Section } from "types/section";
 import { formatDuration } from "utils/time";
-import { LectureStudyProgress } from "types/lecture";
+import { Lecture } from "types/lecture";
 
 type Props = {
-  section: SectionStudyProgress;
+  section: Section;
 };
 
 export default function CourseSection({ section }: Props) {
   const [open, setOpen] = React.useState(true);
-  const [lectures, setLectures] = useState<LectureStudyProgress[]>(
-    section.Lecture
-  );
+  const [lectures, setLectures] = useState<Lecture[]>(section.Lecture);
   const handleClick = () => {
     setOpen(!open);
   };
@@ -31,7 +29,7 @@ export default function CourseSection({ section }: Props) {
           primary={`Phần ${section.order}: ` + section.nameSection}
           secondary={`${lectures.reduce(
             (total, lecture) =>
-              total + (lecture.StudyProgress[0].isDone ? 1 : 0),
+              total + (lecture.StudyProgress?.[0]?.isDone ? 1 : 0),
             0
           )}/${section.Lecture.length} | ${formatDuration(
             section.Lecture.reduce((total, lecture) => total + lecture.time, 0)
