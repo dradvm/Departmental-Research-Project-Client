@@ -4,6 +4,7 @@ export interface Message {
   userReceiverId?: number;
   message: string;
   timeSend: string | Date;
+  seenAt: string | Date | null;
 }
 export interface Thread {
   userId: number;
@@ -12,4 +13,5 @@ export interface Thread {
   isActive: boolean;
   isDeleted: boolean;
   Message_Message_userSenderIdToUser: Message[];
+  Message_Message_userReceiverIdToUser: Message[];
 }

@@ -93,14 +93,14 @@ const MessageItem = ({
         <div className={clsx(isThreadUser ? "text-left" : "text-right")}>
           <div
             className={clsx(
-              "inline-block px-4 py-2 text-sm max-w-md rounded-3xl",
+              "inline-block px-4 py-2 text-sm max-w-md rounded-3xl whitespace-pre-line",
               isThreadUser
-                ? "bg-gray-100 text-gray-900 rounded-tl-lg rounded-bl-lg"
-                : "bg-indigo-600 text-white rounded-tr-lg rounded-br-lg",
-              isGroupMessageStart &&
-                (isThreadUser ? "rounded-tl-3xl" : "rounded-tr-3xl"),
-              isGroupMessageEnd &&
-                (isThreadUser ? "rounded-bl-3xl" : "rounded-br-3xl")
+                ? "bg-gray-100 text-gray-900"
+                : "bg-indigo-600 text-white",
+              !isGroupMessageStart &&
+                (isThreadUser ? "rounded-tl-lg" : "rounded-tr-lg"),
+              !isGroupMessageEnd &&
+                (isThreadUser ? "rounded-bl-lg" : "rounded-br-lg")
             )}
             style={{
               marginTop: 1,
@@ -176,12 +176,24 @@ export default function ThreadPage() {
 
   useEffect(() => {
     socket?.on("receiveMessage", (message: Message) => {
-      console.log(message);
       setMessages((prev) => [...prev, message]);
     });
   }, [socket]);
 
   useEffect(() => console.log(messages), [messages]);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        console.log("Enter");
+      }
+    };
+
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, []);
 
   return (
     <Stack className="h-full">
@@ -246,7 +258,12 @@ export default function ThreadPage() {
           </div>
           {/* Input */}
           <div className="px-8 py-4 border-t border-gray-200 flex gap-3 items-center">
-            <TextField value={input} handleValue={setInput} placeholder="Aa" />
+            <TextField
+              value={input}
+              handleValue={setInput}
+              placeholder="Aa"
+              handleSubmit={handleSendMessage}
+            />
             <Button variant="filled" size="lg" onClick={handleSendMessage}>
               Gửi
             </Button>
