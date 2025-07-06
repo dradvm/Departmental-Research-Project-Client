@@ -81,7 +81,6 @@ export default function DashboardLayoutAccount(props: DemoProps) {
   const { window } = props;
   const { data: sessions, status } = useSession();
 
-
   const [session, setSession] = React.useState<Session | null>(null);
 
   // Cập nhật session sau khi load xong và có dữ liệu
