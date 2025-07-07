@@ -1,5 +1,7 @@
 "use client";
-
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import "react-quill-new/dist/quill.snow.css";
 import "./globals.css";
 

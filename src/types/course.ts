@@ -1,3 +1,4 @@
+import { Lecture } from "types/lecture";
 import { Review } from "./review";
 import { Section } from "./section";
 
@@ -24,4 +25,7 @@ export interface Course {
   _count?: {
     Review?: number;
   };
+  LastLectureStudy?: {
+    Lecture: Lecture;
+  }[];
 }

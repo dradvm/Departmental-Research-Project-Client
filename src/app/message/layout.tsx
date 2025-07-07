@@ -1,11 +1,8 @@
 "use client";
 import { useState, useEffect, ReactNode, useContext, useMemo } from "react";
-import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
 import clsx from "clsx";
 import { Stack } from "@mui/material";
-import { getInitials } from "utils/text";
-import { User } from "lucide-react";
 import { Message, Thread } from "types/message";
 import messageService from "services/message.service";
 import { getTimeAgo } from "utils/time";
@@ -15,6 +12,7 @@ import { Socket } from "socket.io-client";
 import { getSocket } from "utils/socket";
 import { createContext } from "react";
 import { useSession } from "next-auth/react";
+import MyAvatar from "components/Avatar/Avatar";
 
 type MessageContextType = {
   socket: Socket | null;
@@ -37,7 +35,7 @@ const ThreadItem = ({
   handleClick: () => void;
   selectedUserId: number | undefined;
   thread: Thread;
-  userId: number;
+  userId: number | undefined;
 }) => {
   const message: Message = useMemo(() => {
     if (
@@ -58,21 +56,7 @@ const ThreadItem = ({
         selectedUserId === thread.userId ? "bg-gray-200" : "hover:bg-gray-100"
       )}
     >
-      <Avatar
-        src={
-          !thread.isDeleted && thread.isActive
-            ? (thread.img ?? undefined)
-            : undefined
-        }
-        alt="image"
-        sx={{ width: 48, height: 48, bgcolor: "black", fontSize: "1.125rem" }} // fontSize = text-lg
-      >
-        {!thread.isDeleted && thread.isActive ? (
-          getInitials(thread.name)
-        ) : (
-          <User size={20} color="white" />
-        )}
-      </Avatar>
+      <MyAvatar user={thread} />
       <Stack className="grow">
         <div className="font-semibold text-base">{thread.name}</div>
         <div className="flex justify-between">
