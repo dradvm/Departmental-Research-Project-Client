@@ -3,15 +3,9 @@
 import { PostType } from "types/post";
 import { useEffect, useState } from "react";
 import { posts } from "app/data";
-import {
-  Video,
-  Clock4,
-  CircleUser,
-  ArrowBigRight,
-  ArrowBigLeft,
-  Search,
-  Funnel,
-} from "lucide-react";
+import { Video, Clock4, CircleUser, Search, Funnel } from "lucide-react";
+import { Pagination } from "components/AdminUtils/Pagination";
+import NoDataFound from "components/AdminUtils/NoDataFound";
 
 export default function Post() {
   const [page, setPage] = useState<number>(1);
@@ -38,21 +32,16 @@ export default function Post() {
     console.log(filter);
   }, [filter]);
 
+  const limit = 4;
+
   useEffect(() => {
-    const limit = 4;
     const skip = (page - 1) * limit;
     const data = posts.slice(skip, skip + limit);
     setInfors(data);
   }, [page]);
 
   return (
-    <div className="h-[600px] flex flex-col">
-      {/* Block 1: Title Page */}
-      <div className="h-[10%]">
-        <h1 className="text-[24px] font-bold text-blue-600">
-          Danh sách các bài đăng
-        </h1>
-      </div>
+    <div className="h-[600px] mt-4 flex flex-col gap-4">
       {/* Block 2: Filter Utility */}
       <div className="h-[10%] flex">
         <div className="w-[70%] flex gap-2">
@@ -164,7 +153,7 @@ export default function Post() {
       </div>
       {/* Block 3: Content */}
       {!infors || infors.length === 0 ? (
-        <div>Không có bài đăng nào</div>
+        <NoDataFound message="Không có bài đăng"></NoDataFound>
       ) : (
         <div className="h-[70%] p-[8px] grid grid-cols-4 grid-rows-1 gap-x-[8px]">
           {infors.map((post, index) => (
@@ -230,29 +219,12 @@ export default function Post() {
         </div>
       )}
       {/* Blokc 4: Button Pagination */}
-      <div className="h-[10%] flex gap-[8px] justify-center">
-        <button
-          className="h-fit mt-[8px] p-[4px]"
-          onClick={() => {
-            if (page !== 1) setPage((curr) => curr - 1);
-          }}
-          title="Quay lại trang trước"
-        >
-          <ArrowBigLeft size={32} />
-        </button>
-        <button className="h-fit mt-[8px] p-[4px] text-[20px]">
-          Trang {page}
-        </button>
-        <button
-          className="h-fit mt-[8px] p-[4px]"
-          onClick={() => {
-            if (infors?.length === 4) setPage((curr) => curr + 1);
-          }}
-          title="Trang tiếp theo"
-        >
-          <ArrowBigRight size={32} />
-        </button>
-      </div>
+      <Pagination
+        page={page}
+        setPage={setPage}
+        dataLength={infors ? infors.length : 0}
+        limit={limit}
+      ></Pagination>
     </div>
   );
 }

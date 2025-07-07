@@ -1,20 +1,30 @@
 "use client";
 
-import { CouponType } from "enums/coupon.enum";
 import { CouponFilterInput, CouponReq, NormalCouponType } from "types/coupon";
 import { ChangeEvent, useEffect, useState } from "react";
-import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import couponService from "services/coupon.service";
-import { formatVND } from "utils/money";
-import { getDateFormat } from "utils/date-format";
 import { couponCourseService } from "services/couponcourse.service";
 import { toast, ToastContainer } from "react-toastify";
 import CouponFilter from "components/AdminUtils/CouponFilter";
 import NoDataFound from "components/AdminUtils/NoDataFound";
+import { Pagination } from "components/AdminUtils/Pagination";
+import NormalCouponTable from "components/AdminUtils/NormalCouponTable";
+import { Modal } from "@mui/material";
+import NormalCouponDetailModal from "components/AdminUtils/NormalCouponDetailModal";
 
 export default function NormalPromotion() {
   const [page, setPage] = useState<number>(1);
   const [normalCoupons, setNormalCoupons] = useState<NormalCouponType[]>();
+  // close and open modal
+  const [open, setOpen] = useState<boolean>(false);
+  function handleOpen() {
+    setOpen(true);
+  }
+  function handleClose() {
+    setOpen(false);
+  }
+  // seletedCoupon
+  const [selectedCoupon, setSelectedCoupon] = useState<NormalCouponType>();
   const [filter, setFilter] = useState<CouponFilterInput>({
     startDate: undefined,
     endDate: undefined,
@@ -32,9 +42,10 @@ export default function NormalPromotion() {
     }));
   }
 
+  const limit = 4;
+
   async function fetchData(page: number, fil: CouponFilterInput) {
     try {
-      const limit = 4;
       const skip = (page - 1) * limit;
       const req: CouponReq = {
         skip,
@@ -140,126 +151,36 @@ export default function NormalPromotion() {
       {!normalCoupons || normalCoupons.length === 0 ? (
         <NoDataFound message="Danh sách mã khuyến mãi khóa học trống" />
       ) : (
-        <div className="h-[100%] grid grid-cols-4 grid-rows-1 gap-4">
-          {normalCoupons.map((coupon, index) => {
-            let typeTitile: string = "";
-            let valueTitle: string = "";
-            if (coupon.type === CouponType.DISCOUNT) {
-              typeTitile = coupon.type;
-              valueTitle = `Giảm ${coupon.value}%`;
-            } else if (coupon.type === CouponType.VOUCHER) {
-              typeTitile = coupon.type;
-              valueTitle = `Giảm ${formatVND(parseInt(coupon.value))}`;
-            }
-            if (coupon.isAccepted && coupon.isRunning)
-              valueTitle += ` (Đang áp dụng)`;
-            return (
-              <div
-                key={index}
-                className="h-[90%] p-2 flex flex-col gap-2 justify-center rounded-[8px] shadow-lg shadow-green-200"
-              >
-                <h1 className=" text-[24px] uppercase font-bold text-center">
-                  #{coupon.couponId} {typeTitile}
-                </h1>
-                <h1 className="font-bold text-red-500">{valueTitle}</h1>
-                <h2>
-                  Giảm tối đa:{" "}
-                  {formatVND(parseInt(coupon.maxValueDiscount))}{" "}
-                </h2>
-                <h2>Cho đơn từ: {formatVND(parseInt(coupon.minRequire))}</h2>
-                <h2 className="font-bold text-red-600">{coupon.coureTitle}</h2>
-                <h2 className="font-bold text-blue-600">
-                  Giảng viên: {coupon.userName}
-                </h2>
-                <h2>Bắt đầu: {getDateFormat(coupon.startDate)}</h2>
-                <h2>Kết thúc: {getDateFormat(coupon.endDate)}</h2>
-                <h2>
-                  Đã áp dụng: {coupon.appliedAmount}/ {coupon.quantity}{" "}
-                </h2>
-                <div className="flex gap-[8px] justify-center">
-                  {/* case 1: not accepted and not running */}
-                  {!coupon.isAccepted && !coupon.isRunning && (
-                    <button
-                      className="p-[4px] mt-4 bg-green-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white"
-                      title="Duyệt mã khuyến mãi này, nhưng chưa kích hoạt cho khóa học"
-                      onClick={() =>
-                        acceptACouponCourse(coupon.couponId, coupon.courseId)
-                      }
-                    >
-                      Duyệt ngay
-                    </button>
-                  )}
-                  {!coupon.isAccepted && !coupon.isRunning && (
-                    <button
-                      className="p-[4px] mt-4 bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white"
-                      title="Duyệt và kích hoạt ngay mã khuyến mãi cho khóa học"
-                      onClick={() =>
-                        acceptAndActivateCouponCourse(
-                          coupon.couponId,
-                          coupon.courseId
-                        )
-                      }
-                    >
-                      Kích hoạt ngay
-                    </button>
-                  )}
-                  {/* case 2: accepted and running */}
-                  {coupon.isAccepted && coupon.isRunning && (
-                    <button
-                      className="p-[4px] mt-4 bg-red-700 shadow-md shadow-red-700 rounded-[8px] font-bold text-white"
-                      title="Hủy kích hoạt mã khuyến mãi cho khóa học này, có thể kích hoạt lại sau"
-                      onClick={() =>
-                        deactivateCouponCourse(coupon.couponId, coupon.courseId)
-                      }
-                    >
-                      Hủy kích hoạt
-                    </button>
-                  )}
-                  {/* case 3: accepted but not running */}
-                  {coupon.isAccepted && !coupon.isRunning && (
-                    <button
-                      className="p-[4px] mt-4 bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white"
-                      title="Mã này đã duyệt, kích hoạt để hiệu lực với khóa học này"
-                      onClick={() =>
-                        acceptAndActivateCouponCourse(
-                          coupon.couponId,
-                          coupon.courseId
-                        )
-                      }
-                    >
-                      Kích hoạt ngay
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <NormalCouponTable
+          normalCoupons={normalCoupons}
+          handleOpen={handleOpen}
+          setSelectedCoupon={setSelectedCoupon}
+          acceptACouponCourse={acceptACouponCourse}
+          deactivateCouponCourse={deactivateCouponCourse}
+          acceptAndActivateCouponCourse={acceptAndActivateCouponCourse}
+        ></NormalCouponTable>
       )}
       {/* Pagination */}
-      <div className="h-[10%] flex gap-[8px] justify-center">
-        <button
-          className="h-fit mt-[8px] p-[4px]"
-          onClick={() => {
-            if (page !== 1) setPage((curr) => curr - 1);
-          }}
-          title="Quay lại trang trước"
-        >
-          <ArrowBigLeft size={32} />
-        </button>
-        <button className="h-fit mt-[8px] p-[4px] text-[20px]">
-          Trang {page}
-        </button>
-        <button
-          className="h-fit mt-[8px] p-[4px]"
-          onClick={() => {
-            if (normalCoupons?.length === 4) setPage((curr) => curr + 1);
-          }}
-          title="Trang tiếp theo"
-        >
-          <ArrowBigRight size={32} />
-        </button>
-      </div>
+      <Pagination
+        page={page}
+        setPage={setPage}
+        dataLength={normalCoupons ? normalCoupons.length : 0}
+        limit={limit}
+      ></Pagination>
+      {/* Normal Coupon Detail Modal */}
+      <Modal open={open} onClose={handleClose}>
+        {selectedCoupon ? (
+          <NormalCouponDetailModal
+            normalCoupon={selectedCoupon}
+            handleClose={handleClose}
+            acceptACouponCourse={acceptACouponCourse}
+            deactivateCouponCourse={deactivateCouponCourse}
+            acceptAndActivateCouponCourse={acceptAndActivateCouponCourse}
+          ></NormalCouponDetailModal>
+        ) : (
+          <h1>Không có mã khuyến mãi khóa học nào được chọn</h1>
+        )}
+      </Modal>
       {/* Toast Message */}
       <ToastContainer />
     </div>
