@@ -11,7 +11,7 @@ interface CouponFilterProps {
 
 export default function CouponFilter(props: CouponFilterProps) {
   return (
-    <div className="h-[10%]">
+    <div className="h-fit my-4">
       <div className="flex gap-8">
         {/* Block 1: Filter icon */}
         <div
@@ -69,33 +69,31 @@ export default function CouponFilter(props: CouponFilterProps) {
           </div>
         </div>
         {/* Block 4: Add button and search input */}
-        <div className="px-1 flex flex-col gap-2">
-          {/* only show for global coupon page */}
-          {props.isGlobalCouponPage && (
-            <div className="my-auto">
-              <Link
-                href="/admin/promotion/global/add"
-                className="p-[4px] bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white"
-              >
-                Thêm mới
-              </Link>
-            </div>
-          )}
-          {/* only show for normal coupon page */}
-          {!props.isGlobalCouponPage && (
-            <div className="flex gap-2 justify-center items-center">
-              <Search size={32} />
-              <input
-                type="text"
-                className="h-fit px-2 py-1 border-2 rounded-[20px]"
-                placeholder="Khóa học, giảng viên"
-                name="searchText"
-                value={props.filter.searchText ?? ""}
-                onChange={props.onChangeFilterInput}
-              />
-            </div>
-          )}
-        </div>
+        {/* only show for global coupon page */}
+        {props.isGlobalCouponPage && (
+          <div className="my-auto">
+            <Link
+              href="/admin/promotion/global/add"
+              className="p-[4px] bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white"
+            >
+              Thêm mới
+            </Link>
+          </div>
+        )}
+        {/* only show for normal coupon page */}
+        {!props.isGlobalCouponPage && (
+          <div className="flex gap-2 justify-center items-center">
+            <Search size={32} />
+            <input
+              type="text"
+              className="h-fit px-2 py-1 border-2 rounded-[20px]"
+              placeholder="Khóa học, giảng viên"
+              name="searchText"
+              value={props.filter.searchText ?? ""}
+              onChange={props.onChangeFilterInput}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
