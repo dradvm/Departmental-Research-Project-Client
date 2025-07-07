@@ -5,17 +5,16 @@ import {
   faStar as solidStar,
 } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
-import { Search, User, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "components/Button/Button";
-import Image from "next/image";
 import Input from "components/Input/Input";
 import courseService from "services/course.service";
 import { Review, ReviewOverview } from "types/review";
 import { getTimeAgo } from "utils/time";
-import { getInitials } from "utils/text";
 import Loading from "../Main/Loading/Loading";
 import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
+import MyAvatar from "components/Avatar/Avatar";
 function BarReviews({
   stars,
   barReviewSelect,
@@ -115,26 +114,7 @@ function ReviewItem({
       <div className="flex space-x-5">
         <div className="flex">
           <div className="rounded-full w-12 h-12 overflow-hidden">
-            {!review.User.isDeleted && review.User.isActive ? (
-              review.User.img ? (
-                <Image
-                  src={review.User.img}
-                  alt="image"
-                  width={64}
-                  height={64}
-                />
-              ) : (
-                <div className="bg-black h-full w-full flex items-center justify-around">
-                  <div className="text-white font-medium text-lg">
-                    {getInitials(review.User.name)}
-                  </div>
-                </div>
-              )
-            ) : (
-              <div className="bg-black h-full w-full flex items-center justify-around">
-                <User size={20} color="white" />
-              </div>
-            )}
+            <MyAvatar user={review.User} />
           </div>
         </div>
         <Stack className="gap-y-1">

@@ -1,4 +1,4 @@
-import { CourseEnrolled } from "./course";
+import { Course } from "./course";
 
 export interface Enrollment {
   userId: number;
@@ -6,5 +6,5 @@ export interface Enrollment {
   dateRegister: Date;
   finishStatus: boolean;
   progress: number;
-  Course: CourseEnrolled;
+  Course: Course;
 }

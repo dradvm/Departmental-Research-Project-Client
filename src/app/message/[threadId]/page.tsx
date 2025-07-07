@@ -1,20 +1,17 @@
 "use client";
-import { Avatar, Paper, Stack } from "@mui/material";
+import { Paper, Stack } from "@mui/material";
 import clsx from "clsx";
 import { Button } from "components/Button/Button";
-import Input from "components/Input/Input";
 import TextField from "components/TextField/TextField";
-import { User } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import messageService from "services/message.service";
 import { Message, Thread } from "types/message";
-import { getSocket } from "utils/socket";
-import { getInitials } from "utils/text";
 import { formatMessageTime, isWithinTwoMinutes } from "utils/time";
 import { useMessageContext } from "../layout";
 import { useSession } from "next-auth/react";
+import MyAvatar from "components/Avatar/Avatar";
 
 const MessageItem = ({
   message,
@@ -81,10 +78,11 @@ const MessageItem = ({
         {isThreadUser && (
           <div className="w-8">
             {isGroupMessageEnd && (
-              <Avatar
-                src={thread.img}
-                alt=""
-                sx={{ width: 32, height: 32, boxShadow: 1 }}
+              <MyAvatar
+                user={thread}
+                width={32}
+                height={32}
+                fontSize="0.875rem"
               />
             )}
           </div>
@@ -119,8 +117,6 @@ export default function ThreadPage() {
   const [thread, setThread] = useState<Thread | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { socket } = useMessageContext();
   const [socketId, setSocketId] = useState<string | undefined>(undefined);
@@ -204,26 +200,7 @@ export default function ThreadPage() {
             square
             className="flex items-center gap-4 px-8 py-4 z-10"
           >
-            <Avatar
-              src={
-                !thread.isDeleted && thread.isActive
-                  ? (thread.img ?? undefined)
-                  : undefined
-              }
-              alt="image"
-              sx={{
-                width: 42,
-                height: 42,
-                bgcolor: "black",
-                fontSize: "1.125rem",
-              }} // fontSize = text-lg
-            >
-              {!thread.isDeleted && thread.isActive ? (
-                getInitials(thread.name)
-              ) : (
-                <User size={20} color="white" />
-              )}
-            </Avatar>
+            <MyAvatar user={thread} width={42} height={42} fontSize="1rem" />
             <div>
               <Link
                 href={"/"}

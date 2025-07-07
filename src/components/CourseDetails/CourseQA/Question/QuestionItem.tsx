@@ -1,11 +1,10 @@
 import { Stack } from "@mui/material";
-import { MessageSquare, User } from "lucide-react";
-import Image from "next/image";
+import MyAvatar from "components/Avatar/Avatar";
+import { MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { Lecture } from "types/lecture";
 import Question from "types/question";
-import { getInitials } from "utils/text";
 import { getTimeAgo } from "utils/time";
 
 export default function QuestionItem({
@@ -49,28 +48,7 @@ export default function QuestionItem({
       onClick={handleQuestion}
     >
       <div className="">
-        <div className="rounded-full w-8 h-8 overflow-hidden">
-          {!question.User.isDeleted && question.User.isActive ? (
-            question.User.img ? (
-              <Image
-                src={question.User.img}
-                alt="image"
-                width={64}
-                height={64}
-              />
-            ) : (
-              <div className="bg-black h-full w-full flex items-center justify-around">
-                <div className="text-white font-medium text-lg">
-                  {getInitials(question.User.name)}
-                </div>
-              </div>
-            )
-          ) : (
-            <div className="bg-black h-full w-full flex items-center justify-around">
-              <User size={20} color="white" />
-            </div>
-          )}
-        </div>
+        <MyAvatar user={question.User} />
       </div>
       <div className="grow">
         <Stack className="gap-y-7">

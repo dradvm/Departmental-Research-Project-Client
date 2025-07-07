@@ -62,7 +62,7 @@ export default function Header() {
                 <div className="hover:bg-violet-100  w-full h-full flex items-center px-3 rounded before:content-[''] before:absolute before:bg-black before:w-full before:h-4 before:left-0 before:bottom-0 before:translate-y-4 before:bg-transparent">
                   Giảng dạy trên EduMarket
                 </div>
-                <Stack className="gap-y-3 p-4 absolute right-0 bottom-0 translate-y-[110%] w-64 bg-white border border-gray-200 invisible opacity-0 rounded-lg shadow-lg group-hover:visible group-hover:opacity-100 transition-all duration-100 scale-95 group-hover:scale-100">
+                <Stack className="z-10 gap-y-3 p-4 absolute right-0 bottom-0 translate-y-[110%] w-64 bg-white border border-gray-200 invisible opacity-0 rounded-lg shadow-lg group-hover:visible group-hover:opacity-100 transition-all duration-100 scale-95 group-hover:scale-100">
                   <div className="text-black text-center font-medium">
                     Biến kiến thức của bạn thành cơ hội và tiếp cận với hàng
                     triệu người trên thế giới.
@@ -80,7 +80,7 @@ export default function Header() {
             >
               Học tập
             </Link>
-            <Stack className="absolute right-0 bottom-0 translate-y-[110%] bg-white border border-gray-200 invisible opacity-0 rounded-lg shadow-lg group-hover:visible group-hover:opacity-100 transition-all duration-100 scale-95 group-hover:scale-100">
+            <Stack className="z-10 absolute right-0 bottom-0 translate-y-[110%] bg-white border border-gray-200 invisible opacity-0 rounded-lg shadow-lg group-hover:visible group-hover:opacity-100 transition-all duration-100 scale-95 group-hover:scale-100">
               <div className="">
                 <div className="flex space-x-3 p-4">
                   <div className="rounded overflow-hidden w-16 h-16">

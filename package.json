@@ -50,6 +50,7 @@
     "recharts": "^2.15.3",
     "screenfull": "^6.0.2",
     "socket.io-client": "^4.8.1",
+    "swiper": "^11.2.10",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
     "yup": "^1.6.1",

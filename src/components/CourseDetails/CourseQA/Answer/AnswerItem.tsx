@@ -1,13 +1,13 @@
 import { Menu, MenuItem, Stack } from "@mui/material";
 import Image from "next/image";
-import { getInitials } from "utils/text";
 import { getTimeAgo } from "utils/time";
 import Answer from "types/answer";
-import { EllipsisVertical, User } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 import AnswerForm from "./AnswerForm";
 import { useState } from "react";
 import qaService from "services/qa.service";
 import { useSession } from "next-auth/react";
+import MyAvatar from "components/Avatar/Avatar";
 export default function AnswerItem({
   answer,
   handleSave,
@@ -67,22 +67,8 @@ export default function AnswerItem({
   };
   return (
     <div className="flex space-x-3">
-      <div className="rounded-full w-12 h-12 overflow-hidden flex-shrink-0">
-        {!answer.User.isDeleted && answer.User.isActive ? (
-          answer.User.img ? (
-            <Image src={answer.User.img} alt="image" width={64} height={64} />
-          ) : (
-            <div className="bg-black h-full w-full flex items-center justify-around">
-              <div className="text-white font-medium text-lg">
-                {getInitials(answer.User.name)}
-              </div>
-            </div>
-          )
-        ) : (
-          <div className="bg-black h-full w-full flex items-center justify-around">
-            <User size={20} color="white" />
-          </div>
-        )}
+      <div className="flex-shrink-0">
+        <MyAvatar user={answer.User} />
       </div>
       <Stack className="gap-y-1 grow">
         <div className="font-medium flex space-x-3">

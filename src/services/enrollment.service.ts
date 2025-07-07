@@ -18,10 +18,11 @@ const enrollmentService = {
       },
     }),
   updateLastAccessCourse: (courseId: number) =>
-    axiosInstance.patch(`/enrollment/${courseId}`),
+    axiosInstance.patch(`/enrollment/lastAccess/${courseId}`),
   getCourseEnrolledCategories: () =>
     axiosInstance.get("/enrollment/categories"),
   getCourseEnrolledInstructors: () =>
     axiosInstance.get("/enrollment/instructors"),
+  getCourseEnrolledWithLastStudy: () => axiosInstance.get("/enrollment/home"),
 };
 export default enrollmentService;

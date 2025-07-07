@@ -8,6 +8,7 @@ import CourseDetails from "components/CourseDetails/CourseDetails";
 import { ChevronDown, EllipsisVertical, Share2, Star } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import enrollmentService from "services/enrollment.service";
 import studyProgressService from "services/study-progress.service";
 import { Course } from "types/course";
 import { Lecture } from "types/lecture";
@@ -78,6 +79,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         setCourse(courseData);
       })
       .catch((err) => console.log(err));
+    enrollmentService.updateLastAccessCourse(Number(courseId)).then().catch();
   }, [courseId]);
 
   const handleSetTotalWatched = (checked: boolean) => {
