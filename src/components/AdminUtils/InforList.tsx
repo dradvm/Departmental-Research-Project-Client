@@ -8,7 +8,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
+  Chip,
+  Stack,
 } from "@mui/material";
+import { Button } from "components/Button/Button";
 
 interface InforListProps {
   infors: UserType[] | undefined;
@@ -24,66 +28,96 @@ export default function InforList({
   deleteAccount,
 }: InforListProps) {
   return (
-    <div>
+    <>
       {!infors || infors.length === 0 ? (
-        <NoDataFound message="Danh sách người dùng trống"></NoDataFound>
+        <NoDataFound message="Danh sách người dùng trống" />
       ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} elevation={3}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Họ và tên</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Giới tính</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Địa chỉ email</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>
-                  Trạng thái tài khoản
+                <TableCell sx={{ fontWeight: "bold" }} align="center">
+                  Giới tính
                 </TableCell>
-                <TableCell></TableCell>
-                <TableCell></TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }} align="center">
+                  Trạng thái
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold" }} align="center">
+                  Hành động
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {infors.map((infor) => {
-                return (
-                  <TableRow key={infor.userId}>
-                    <TableCell>{infor.name}</TableCell>
-                    <TableCell>{infor.gender}</TableCell>
-                    <TableCell>{infor.email}</TableCell>
-                    {infor.isActive ? (
-                      <TableCell>Đã kích hoạt</TableCell>
-                    ) : (
-                      <TableCell sx={{ color: "red" }}>
-                        Chưa kích hoạt
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <button
-                        className="px-2 py-1 rounded-[8px] bg-red-500 text-white"
-                        onClick={() => {
-                          deleteAccount(infor.userId);
-                        }}
-                      >
-                        Xóa tài khoản
-                      </button>
-                    </TableCell>
-                    <TableCell>
-                      <button
-                        className="px-2 py-1 rounded-[8px] bg-purple-500 text-white"
+              {infors.map((infor) => (
+                <TableRow key={infor.userId} hover>
+                  <TableCell>
+                    <Typography>{infor.name}</Typography>
+                  </TableCell>
+
+                  {/* Giới tính dưới dạng Chip */}
+                  <TableCell align="center">
+                    <Chip
+                      label={
+                        infor.gender === "male"
+                          ? "Nam"
+                          : infor.gender === "female"
+                            ? "Nữ"
+                            : "Khác"
+                      }
+                      color={
+                        infor.gender === "male"
+                          ? "info"
+                          : infor.gender === "female"
+                            ? "secondary"
+                            : "default"
+                      }
+                      variant="outlined"
+                    />
+                  </TableCell>
+
+                  <TableCell>
+                    <Typography>{infor.email}</Typography>
+                  </TableCell>
+
+                  {/* Trạng thái tài khoản dưới dạng Chip */}
+                  <TableCell align="center">
+                    <Chip
+                      label={infor.isActive ? "Đã kích hoạt" : "Chưa kích hoạt"}
+                      color={infor.isActive ? "success" : "error"}
+                      variant="outlined"
+                    />
+                  </TableCell>
+
+                  {/* Hành động gộp chung cột */}
+                  <TableCell align="center">
+                    <Stack direction="row" spacing={1} justifyContent="center">
+                      <Button
+                        variant="filled"
+                        size="sm"
                         onClick={() => {
                           setSelectedItem(infor);
                           handleOpen();
                         }}
                       >
-                        Xem & Cập nhật
-                      </button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                        Cập nhật
+                      </Button>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => deleteAccount(infor.userId)}
+                      >
+                        Xóa
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
       )}
-    </div>
+    </>
   );
 }

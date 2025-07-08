@@ -90,12 +90,14 @@ export default function Payment() {
           <NoDataFound message="Không có hóa đơn nào được tìm thấy"></NoDataFound>
         )}
         {/* Block 3: Pagination */}
-        <Pagination
-          page={page}
-          setPage={setPage}
-          dataLength={infors ? infors.length : 0}
-          limit={limit}
-        ></Pagination>
+        <div className="flex items-center justify-around">
+          <Pagination
+            page={page}
+            setPage={setPage}
+            dataLength={infors ? infors.length : 0}
+            limit={limit}
+          ></Pagination>
+        </div>
       </div>
       {/* modal for payment detail */}
       <Modal open={open} onClose={handleClose}>

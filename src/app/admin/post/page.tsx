@@ -6,8 +6,50 @@ import { posts } from "app/data";
 import { Video, Clock4, CircleUser, Search, Funnel } from "lucide-react";
 import { Pagination } from "components/AdminUtils/Pagination";
 import NoDataFound from "components/AdminUtils/NoDataFound";
+import { Box } from "@mui/material";
+import Image from "next/image";
+import { Button } from "components/Button/Button";
 
-export default function Post() {
+export function PostItem({ post }: { post: PostType }) {
+  return (
+    <div className="flex items-center bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition w-full max-w-xl overflow-hidden">
+      {/* Ảnh đại diện */}
+      <div className="w-32 h-36 flex-shrink-0 overflow-hidden">
+        <Image
+          src={post.thumbnail ?? "/thumbnail.webp"}
+          alt={post.title}
+          width={128}
+          height={128}
+          className="object-cover w-full h-full"
+        />
+      </div>
+
+      {/* Nội dung khóa học */}
+      <div className="flex flex-col justify-between p-3 grow gap-1">
+        <h1 className="text-base font-semibold text-indigo-600 truncate">
+          {post.title}
+        </h1>
+
+        <div className="flex items-center gap-1 text-sm text-blue-700">
+          <CircleUser size={14} />
+          <span className="truncate">{post.teacherName ?? "Chưa rõ"}</span>
+        </div>
+
+        <h3 className="text-sm font-bold text-red-600">
+          {post.price ? `Học phí: ${post.price} VNĐ` : "Miễn phí"}
+        </h3>
+
+        <div className="flex justify-end">
+          <Button variant="filled" size="sm">
+            Xem chi tiết
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CoursePage() {
   const [page, setPage] = useState<number>(1);
   const [infors, setInfors] = useState<PostType[]>();
   const [filter, setFilter] = useState({
@@ -43,178 +85,152 @@ export default function Post() {
   return (
     <div className="h-[600px] mt-4 flex flex-col gap-4">
       {/* Block 2: Filter Utility */}
-      <div className="h-[10%] flex">
-        <div className="w-[70%] flex gap-2">
-          <div
-            className="w-[6%] flex items-center justify-center"
-            title="Lọc các bài đăng"
-          >
-            <Funnel size={32} />
-          </div>
-          <div className="w-[30%] px-1 flex flex-col gap-2">
-            <h1 className="font-bold">Học phí (VNĐ)</h1>
-            <div className="flex gap-2">
-              <div className="flex gap-2">
-                <label htmlFor="">Từ: </label>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          width: "100%",
+          mb: 2,
+        }}
+      >
+        {/* Hàng 1: Học phí & Số lượng bài học */}
+        <Box sx={{ display: "flex", gap: 2, width: "100%", flexWrap: "wrap" }}>
+          {/* Học phí */}
+          <Box sx={{ flex: 1, minWidth: 300 }}>
+            <strong className="block mb-1">Học phí (VNĐ):</strong>
+            <Box sx={{ display: "flex", gap: 1.5 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
+              >
+                <label className="w-[30px]">Từ</label>
                 <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
                   type="number"
                   min={0}
                   step={100000}
                   name="minTuition"
                   value={filter.minTuition ?? ""}
                   onChange={onChangeFilter}
+                  className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-600"
                 />
-              </div>
-              <div className="flex gap-2">
-                <label htmlFor="">đến: </label>
+              </Box>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
+              >
+                <label className="w-[30px]">Đến</label>
                 <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
                   type="number"
                   min={0}
                   step={100000}
                   name="maxTuition"
                   value={filter.maxTuition ?? ""}
                   onChange={onChangeFilter}
+                  className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-600"
                 />
-              </div>
-            </div>
-          </div>
-          <div className="w-[30%] px-1 flex flex-col gap-2">
-            <h1 className="font-bold">Số lượng bài học (bài)</h1>
-            <div className="flex gap-2">
-              <div className="flex gap-2">
-                <label htmlFor="">Từ: </label>
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Số lượng bài học */}
+          <Box sx={{ flex: 1, minWidth: 300 }}>
+            <strong className="block mb-1">Số lượng bài học (bài):</strong>
+            <Box sx={{ display: "flex", gap: 1.5 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
+              >
+                <label className="w-[30px]">Từ</label>
                 <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
                   type="number"
                   min={0}
                   step={1}
                   name="minLessonCount"
                   value={filter.minLessonCount ?? ""}
                   onChange={onChangeFilter}
+                  className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-600"
                 />
-              </div>
-              <div className="flex gap-2">
-                <label htmlFor="">đến: </label>
+              </Box>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
+              >
+                <label className="w-[30px]">Đến</label>
                 <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
                   type="number"
                   min={0}
                   step={1}
                   name="maxLessonCount"
                   value={filter.maxLessonCount ?? ""}
                   onChange={onChangeFilter}
+                  className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-600"
                 />
-              </div>
-            </div>
-          </div>
-          <div className="w-[30%] px-1 flex flex-col gap-2">
-            <h1 className="font-bold">Thời lượng học (giờ)</h1>
-            <div className="flex gap-2">
-              <div className="flex gap-2">
-                <label htmlFor="">Từ: </label>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Hàng 2: Thời lượng học & Tìm kiếm */}
+        <Box sx={{ display: "flex", gap: 2, width: "100%", flexWrap: "wrap" }}>
+          {/* Thời lượng học */}
+          <Box sx={{ flex: 1, minWidth: 300 }}>
+            <strong className="block mb-1">Thời lượng học (giờ):</strong>
+            <Box sx={{ display: "flex", gap: 1.5 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
+              >
+                <label className="w-[30px]">Từ</label>
                 <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
                   type="number"
                   min={0}
                   step={1}
                   name="minDuration"
                   value={filter.minDuration ?? ""}
                   onChange={onChangeFilter}
+                  className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-600"
                 />
-              </div>
-              <div className="flex gap-2">
-                <label htmlFor="">đến: </label>
+              </Box>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
+              >
+                <label className="w-[30px]">Đến</label>
                 <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
                   type="number"
                   min={0}
                   step={1}
                   name="maxDuration"
                   value={filter.maxDuration ?? ""}
                   onChange={onChangeFilter}
+                  className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-600"
                 />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="w-[30%] flex gap-2 justify-center items-center">
-          <Search size={32} />
-          <input
-            type="text"
-            className="h-fit w-[70%] p-[8px] border-2 rounded-[40px]"
-            placeholder="Nội dung tìm kiếm"
-            name="searchText"
-            value={filter.searchText ?? ""}
-            onChange={onChangeFilter}
-          />
-        </div>
-      </div>
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Tìm kiếm */}
+          <Box sx={{ flex: 1, minWidth: 300 }}>
+            <strong className="block mb-1">Tìm kiếm bài đăng</strong>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Search size={20} className="text-slate-700" />
+              <input
+                type="text"
+                placeholder="Nội dung tìm kiếm"
+                name="searchText"
+                value={filter.searchText ?? ""}
+                onChange={onChangeFilter}
+                className="w-full rounded-full px-4 py-2 border border-gray-300 placeholder:text-slate-700 hover:bg-gray-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-600"
+              />
+            </Box>
+          </Box>
+        </Box>
+      </Box>
       {/* Block 3: Content */}
       {!infors || infors.length === 0 ? (
         <NoDataFound message="Không có bài đăng"></NoDataFound>
       ) : (
-        <div className="h-[70%] p-[8px] grid grid-cols-4 grid-rows-1 gap-x-[8px]">
-          {infors.map((post, index) => (
-            <div
-              key={index}
-              className="h-[95%] p-[8px] mt-[20px] hover:mt-[0px] rounded-[16px] shadow-xl"
-            >
-              <div className="h-[30%]">Khu vực ảnh</div>
-              <div className="h-[70%] flex flex-col gap-2">
-                {/* Title & Sub Title*/}
-                <div>
-                  <h1 className="text-[20px] font-bold text-green-700">
-                    {post.title}
-                  </h1>
-                  <h2 className="font-semibold text-pink-500">
-                    {post.subTitle}
-                  </h2>
-                </div>
-                {/* Teacher, Video Amount, Duration */}
-                <div className="flex gap-2 justify-center">
-                  <span
-                    className="inline-flex gap-1"
-                    title={`Giảng viên hướng dẫn: Lâm BF`}
-                  >
-                    <CircleUser color="blue" />{" "}
-                    <h2 className="font-bold text-blue-700">Lâm BF </h2>
-                  </span>
-                  <span
-                    className="inline-flex gap-1"
-                    title={`Số lượng video: 27`}
-                  >
-                    <Video /> 27
-                  </span>
-                  <span
-                    className="inline-flex gap-1"
-                    title={`Tổng thời lượng video: 6h20p`}
-                  >
-                    <Clock4 /> 6h20p
-                  </span>
-                </div>
-                {/* Tuition */}
-                <div>
-                  <h3 className="text-center text-[20px] font-bold text-red-600">
-                    Học phí: {post.price}
-                  </h3>
-                </div>
-                {/* Description */}
-                <div className="h-[50%] overflow-auto">
-                  <p>{post.description}</p>
-                </div>
-                {/* Combo Button */}
-                <div className="flex gap-[8px] justify-center">
-                  <button className="p-[4px] bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white">
-                    Duyệt
-                  </button>
-                  <button className="p-[4px] bg-red-700 shadow-md shadow-red-700 rounded-[8px] font-bold text-white">
-                    Không duyệt
-                  </button>
-                </div>
-              </div>
-            </div>
+        <div
+          className="
+        grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4"
+        >
+          {infors.map((post) => (
+            <PostItem key={post.idCourse} post={post} />
           ))}
         </div>
       )}

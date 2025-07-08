@@ -1,16 +1,25 @@
 "use client";
 
-import InforList from "./InforList";
-import InforForm from "./InforForm";
 import { ChangeEvent, useEffect, useState } from "react";
-import { UserType, UserUpdateBody } from "types/user";
+import { UserType, UserUpdateBody, UserReq } from "types/user";
 import { adminUiType } from "enums/admin.enum";
 import { Search, X } from "lucide-react";
-import { UserReq } from "types/user";
 import { userService } from "services/user.service";
-import { Modal } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Modal,
+  Paper,
+  TextField,
+  Typography,
+  IconButton,
+  InputBase,
+} from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
+import InforList from "./InforList";
+import InforForm from "./InforForm";
 import { Pagination } from "./Pagination";
+import Input from "components/Input/Input";
 
 export default function AccountManagement({
   type,
@@ -20,18 +29,19 @@ export default function AccountManagement({
   const [selectedAccount, setSelectedAccount] = useState<UserType>();
   const [open, setOpen] = useState<boolean>(false);
 
-  // open modal
-  function handleOpen() {
-    setOpen(true);
-  }
-  // close modal
-  function handleClose() {
-    setOpen(false);
-  }
-
   const [filter, setFilter] = useState({
     searchText: undefined,
   });
+
+  const limit = 5;
+
+  function handleOpen() {
+    setOpen(true);
+  }
+
+  function handleClose() {
+    setOpen(false);
+  }
 
   function onChangeFilterInput(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -41,8 +51,6 @@ export default function AccountManagement({
       [name]: value,
     }));
   }
-
-  const limit = 5;
 
   async function fetchData(
     page: number,
@@ -62,7 +70,7 @@ export default function AccountManagement({
       setInfors(dataDB);
     } catch (e) {
       toast.error("Có lỗi khi lấy dữ liệu người dùng!");
-      console.log("Lỗi lấy dữ liệu người dùng: ", e);
+      console.error("Lỗi lấy dữ liệu người dùng: ", e);
       setInfors([]);
     }
   }
@@ -71,7 +79,6 @@ export default function AccountManagement({
     fetchData(page, filter, type);
   }, [page, filter, type]);
 
-  // update an account
   async function updateAccount(
     userId: number,
     name?: string,
@@ -79,24 +86,17 @@ export default function AccountManagement({
     img?: string
   ) {
     try {
-      const bodyReq: UserUpdateBody = {
-        id: userId,
-        name,
-        biography,
-        img,
-      };
-      console.log(bodyReq);
+      const bodyReq: UserUpdateBody = { id: userId, name, biography, img };
       await userService.updateAccount(bodyReq);
       toast.success("Cập nhật tài khoản thành công!");
       handleClose();
       fetchData(page, filter, type);
     } catch (e) {
-      toast.error("Lỗi xảy ra khi cập nhật tài khỏan!");
-      console.log("Lỗi xảy ra khi cập nhật tài khoản: ", e);
+      toast.error("Lỗi xảy ra khi cập nhật tài khoản!");
+      console.error("Lỗi xảy ra khi cập nhật tài khoản: ", e);
     }
   }
 
-  // delete an account
   async function deleteAccount(userId: number) {
     if (confirm(`Xác nhận xóa tài khoản này?`))
       try {
@@ -105,68 +105,92 @@ export default function AccountManagement({
         await fetchData(page, filter, type);
       } catch (e) {
         toast.error("Có lỗi khi xóa tài khoản!", { autoClose: 3000 });
-        console.log("Lỗi khi xóa tài khoản người dùng: ", e);
+        console.error("Lỗi khi xóa tài khoản người dùng: ", e);
       }
   }
 
   return (
-    <div>
-      <div className="h-fit my-4 flex flex-col gap-4">
-        {/* Block 2: Filter Utility */}
-        <div className="h-fit flex">
-          <div className="w-full flex gap-2 justify-center items-center">
-            <Search size={32} />
-            <input
-              type="text"
-              className="h-fit w-[70%] p-[8px] border-2 rounded-[40px]"
-              placeholder="Nội dung tìm kiếm"
-              name="searchText"
-              value={filter.searchText ?? ""}
-              onChange={onChangeFilterInput}
-            />
-          </div>
-        </div>
-        {/* Block 3: Content */}
-        <div className="p-4 flex gap-20">
-          <div className="w-full">
-            <InforList
-              infors={infors}
-              setSelectedItem={setSelectedAccount}
-              handleOpen={handleOpen}
-              deleteAccount={deleteAccount}
-            ></InforList>
-          </div>
-        </div>
-        {/* Button Pagination */}
+    <Box sx={{ p: 4 }}>
+      {/* Filter Input */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          width: "100%",
+          mb: 2,
+        }}
+      >
+        <Search size={20} className="text-slate-700" />
+        <input
+          type="text"
+          placeholder="Tìm người dùng"
+          name="searchText"
+          value={filter.searchText ?? ""}
+          onChange={onChangeFilterInput}
+          className="grow rounded-full px-4 py-2 border border-gray-300 placeholder:text-slate-700 hover:bg-gray-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        />
+      </Box>
+
+      {/* Infor List */}
+      <Box mb={3}>
+        <InforList
+          infors={infors}
+          setSelectedItem={setSelectedAccount}
+          handleOpen={handleOpen}
+          deleteAccount={deleteAccount}
+        />
+      </Box>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-around">
         <Pagination
           page={page}
           setPage={setPage}
           dataLength={infors ? infors.length : 0}
           limit={limit}
-        ></Pagination>
+        />
       </div>
+
+      {/* Modal for Account Update */}
       <Modal open={open} onClose={handleClose}>
-        {selectedAccount ? (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-12 py-4 bg-white rounded-[8px]">
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: { xs: "90%", sm: 500 },
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            borderRadius: 2,
+            p: 4,
+            position: "relative",
+          }}
+        >
+          <IconButton
+            onClick={handleClose}
+            sx={{ position: "absolute", top: 8, right: 8 }}
+          >
+            <X />
+          </IconButton>
+
+          {selectedAccount ? (
             <InforForm
               account={selectedAccount}
               onChange={setSelectedAccount}
               handleClose={handleClose}
               updateAccount={updateAccount}
-            ></InforForm>
-            {/* exit button */}
-            <button
-              className="absolute right-0 top-0 px-4 py-1 rounded-[4px] hover:bg-red-600 hover:text-white"
-              onClick={handleClose}
-            >
-              <X />
-            </button>
-          </div>
-        ) : (
-          <h1>Không có người dùng nào được chọn cả</h1>
-        )}
+            />
+          ) : (
+            <Typography variant="h6">
+              Không có người dùng nào được chọn cả
+            </Typography>
+          )}
+        </Box>
       </Modal>
+
       <ToastContainer />
-    </div>
+    </Box>
   );
 }

@@ -22,6 +22,8 @@
     "@mui/joy": "^5.0.0-beta.52",
     "@mui/lab": "^7.0.0-beta.12",
     "@mui/material": "^7.1.0",
+    "@mui/material-nextjs": "^7.2.0",
+    "@mui/x-data-grid": "^8.7.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.4.0",

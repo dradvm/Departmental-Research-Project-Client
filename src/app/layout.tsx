@@ -8,7 +8,7 @@ import "./globals.css";
 import DynamicHeader from "components/Main/Header/DynamicHeader";
 import NextAuthWrapper from "lib/next.auth.wrapper";
 
-import Footer from "components/Main/Footer/Footer";
+import { DynamicFooter } from "components/Main/Footer/DynamicFooter";
 
 export default function RootLayout({
   children,
@@ -24,7 +24,7 @@ export default function RootLayout({
         <NextAuthWrapper>
           <DynamicHeader />
           {children}
-          <Footer />
+          <DynamicFooter />
         </NextAuthWrapper>
       </body>
     </html>
