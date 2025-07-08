@@ -1,5 +1,6 @@
-import { Funnel, Search } from "lucide-react";
 import { PaymentFilter } from "types/payment";
+import { Box } from "@mui/material";
+import { Funnel, Search } from "lucide-react";
 
 interface PaymentFilterProps {
   filter: PaymentFilter;
@@ -8,80 +9,124 @@ interface PaymentFilterProps {
 
 export function PaymentFilterUtils(props: PaymentFilterProps) {
   return (
-    <div className="h-fit flex">
-      <div className="w-[70%] flex gap-2">
-        <div
-          className="w-[6%] flex items-center justify-center"
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        mb: 2,
+      }}
+    >
+      {/* Dòng 1: 2 filter chia đều */}
+      <Box
+        sx={{ display: "flex", gap: 3, alignItems: "center", flexWrap: "wrap" }}
+      >
+        {/* Funnel icon */}
+        <Box
           title="Lọc các đơn hàng"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minWidth: 32,
+          }}
         >
-          <Funnel size={32} />
-        </div>
-        <div className="w-[50%] px-1 flex flex-col gap-2">
-          <h1 className="font-bold">Thời gian</h1>
-          <div className="flex gap-2">
-            <div className="flex gap-2">
-              <label htmlFor="">Từ: </label>
-              <input
-                className="w-[72%] px-1 border-2 rounded-[8px]"
-                type="date"
-                name="startDate"
-                value={props.filter.startDate ?? ""}
-                onChange={props.onChangeFilterInput}
-              />
-            </div>
-            <div className="flex gap-2">
-              <label htmlFor="">đến: </label>
-              <input
-                className="w-[72%] px-1 border-2 rounded-[8px]"
-                type="date"
-                name="endDate"
-                value={props.filter.endDate ?? ""}
-                onChange={props.onChangeFilterInput}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="w-[40%] px-1 flex flex-col gap-2">
-          <h1 className="font-bold">Tổng tiền</h1>
-          <div className="flex gap-2">
-            <div className="flex gap-2">
-              <label htmlFor="">Từ: </label>
-              <input
-                className="w-[70%] px-1 border-2 rounded-[8px]"
-                type="number"
-                min={0}
-                step={100000}
-                name="minPrice"
-                value={props.filter.minPrice ?? ""}
-                onChange={props.onChangeFilterInput}
-              />
-            </div>
-            <div className="flex gap-2">
-              <label htmlFor="">đến: </label>
-              <input
-                className="w-[70%] px-1 border-2 rounded-[8px]"
-                type="number"
-                min={0}
-                step={100000}
-                name="maxPrice"
-                value={props.filter.maxPrice ?? ""}
-                onChange={props.onChangeFilterInput}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="w-[30%] flex gap-2 justify-center items-center">
-        <Search size={32} />
+          <Funnel size={20} />
+        </Box>
+
+        {/* Thời gian (chiếm 50%) */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            flex: 1,
+            minWidth: 280,
+            flexWrap: "wrap",
+          }}
+        >
+          <strong>Thời gian:</strong>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <label>Từ</label>
+            <input
+              type="date"
+              name="startDate"
+              value={props.filter.startDate ?? ""}
+              onChange={props.onChangeFilterInput}
+              className="w-[140px] px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            />
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <label>đến</label>
+            <input
+              type="date"
+              name="endDate"
+              value={props.filter.endDate ?? ""}
+              onChange={props.onChangeFilterInput}
+              className="w-[140px] px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            />
+          </Box>
+        </Box>
+
+        {/* Tổng tiền (chiếm 50%) */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            flex: 1,
+            minWidth: 280,
+            flexWrap: "wrap",
+          }}
+        >
+          <strong>Tổng tiền:</strong>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <label>Từ</label>
+            <input
+              type="number"
+              min={0}
+              step={100000}
+              name="minPrice"
+              value={props.filter.minPrice ?? ""}
+              onChange={props.onChangeFilterInput}
+              className="w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            />
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <label>đến</label>
+            <input
+              type="number"
+              min={0}
+              step={100000}
+              name="maxPrice"
+              value={props.filter.maxPrice ?? ""}
+              onChange={props.onChangeFilterInput}
+              className="w-32 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            />
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Dòng 2: ô tìm kiếm khách hàng chiếm toàn bộ */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          width: "100%",
+        }}
+      >
+        <Search size={20} className="text-slate-700" />
         <input
           type="text"
-          className="h-fit w-[80%] p-[8px] border-2 rounded-[40px]"
           placeholder="Họ tên khách hàng"
           name="searchText"
           value={props.filter.searchText ?? ""}
           onChange={props.onChangeFilterInput}
+          className="w-full rounded-full px-4 py-2 border border-gray-300 placeholder:text-slate-700 hover:bg-gray-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

@@ -7,6 +7,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import { Button } from "components/Button/Button";
 import { PaymentType } from "types/payment";
 import { getDateFormat } from "utils/date-format";
 import { formatVND } from "utils/money";
@@ -21,53 +22,57 @@ interface PaymentTableProps {
 
 export default function PaymentTable(props: PaymentTableProps) {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{ boxShadow: 1 }}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell sx={{ fontWeight: "bold" }} align="left">
-              Khách hàng
-            </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} align="right">
+            <TableCell sx={{ fontWeight: "bold" }}>Khách hàng</TableCell>
+            <TableCell align="center" sx={{ fontWeight: "bold" }}>
               Ngày lập hóa đơn
             </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} align="center">
+            <TableCell align="center" sx={{ fontWeight: "bold" }}>
               Số lượng khóa học
             </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} align="right">
+            <TableCell align="center" sx={{ fontWeight: "bold" }}>
               Tổng tiền
             </TableCell>
-            <TableCell></TableCell>
+            <TableCell align="center" sx={{ fontWeight: "bold" }}>
+              Hành động
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.payments.map((payment) => {
-            return (
-              <TableRow key={payment.paymentId} className="hover:bg-gray-200">
-                <TableCell align="left">{payment.userName}</TableCell>
-                <TableCell align="right">
-                  {getDateFormat(payment.timePayment)}
-                </TableCell>
-                <TableCell align="center">
-                  {payment.paymentDetail.length}
-                </TableCell>
-                <TableCell align="right">
-                  {formatVND(parseInt(payment.finalPrice))}
-                </TableCell>
-                <TableCell
-                  align="right"
+          {props.payments.map((payment) => (
+            <TableRow
+              key={payment.paymentId}
+              sx={{
+                "&:hover": { backgroundColor: "#f3f4f6" }, // hover:bg-gray-100
+              }}
+            >
+              <TableCell>{payment.userName}</TableCell>
+              <TableCell align="center">
+                {getDateFormat(payment.timePayment)}
+              </TableCell>
+              <TableCell align="center">
+                {payment.paymentDetail.length}
+              </TableCell>
+              <TableCell align="center">
+                {formatVND(parseInt(payment.finalPrice))}
+              </TableCell>
+              <TableCell align="center">
+                <Button
+                  variant="filled"
+                  size="sm"
                   onClick={() => {
                     props.setSelectedPayment(payment);
                     props.handleOpen();
                   }}
                 >
-                  <button className="px-2 py-1 rounded-[4px] bg-purple-700 text-white">
-                    Xem chi tiết
-                  </button>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+                  Xem chi tiết
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </TableContainer>
