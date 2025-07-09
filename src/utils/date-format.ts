@@ -2,7 +2,10 @@ export function getDateFormat(dateString: string): string {
     let date = new Date(dateString);
     if (isNaN(date.getTime()))
         date = new Date();
-    return new Intl.DateTimeFormat("vi-VN").format(date);
+    return new Intl.DateTimeFormat("vi-VN", {
+        dateStyle: "short",
+        timeStyle: "short"
+    }).format(date);
 }
 
 export function getIsoStringDateFromDate(inputDate: string): string {

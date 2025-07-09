@@ -2,28 +2,17 @@
 
 import { ChangeEvent, useEffect, useState } from "react";
 import { UserType, UserUpdateBody, UserReq } from "types/user";
-import { adminUiType } from "enums/admin.enum";
 import { Search, X } from "lucide-react";
 import { userService } from "services/user.service";
-import {
-  Box,
-  Grid,
-  Modal,
-  Paper,
-  TextField,
-  Typography,
-  IconButton,
-  InputBase,
-} from "@mui/material";
+import { Box, Modal, Typography, IconButton } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import InforList from "./InforList";
 import InforForm from "./InforForm";
 import { Pagination } from "./Pagination";
-import Input from "components/Input/Input";
 
 export default function AccountManagement({
   type,
-}: Readonly<{ type: adminUiType }>) {
+}: Readonly<{ type: "USER" }>) {
   const [page, setPage] = useState<number>(1);
   const [infors, setInfors] = useState<UserType[]>();
   const [selectedAccount, setSelectedAccount] = useState<UserType>();
@@ -55,13 +44,13 @@ export default function AccountManagement({
   async function fetchData(
     page: number,
     filter: { searchText?: string },
-    type: adminUiType
+    type: "USER"
   ) {
     const skip = (page - 1) * limit;
     const params: UserReq = {
       limit,
       skip,
-      role: type === adminUiType.Student ? "USERS" : "USERS",
+      role: type === "USER" ? "USERS" : "USERS",
       searchText: filter.searchText,
     };
     try {
@@ -165,7 +154,6 @@ export default function AccountManagement({
             boxShadow: 24,
             borderRadius: 2,
             p: 4,
-            position: "relative",
           }}
         >
           <IconButton

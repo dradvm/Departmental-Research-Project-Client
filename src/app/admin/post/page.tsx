@@ -3,7 +3,7 @@
 import { PostType } from "types/post";
 import { useEffect, useState } from "react";
 import { posts } from "app/data";
-import { Video, Clock4, CircleUser, Search, Funnel } from "lucide-react";
+import { CircleUser, Search } from "lucide-react";
 import { Pagination } from "components/AdminUtils/Pagination";
 import NoDataFound from "components/AdminUtils/NoDataFound";
 import { Box } from "@mui/material";
@@ -234,13 +234,15 @@ export default function CoursePage() {
           ))}
         </div>
       )}
-      {/* Blokc 4: Button Pagination */}
-      <Pagination
-        page={page}
-        setPage={setPage}
-        dataLength={infors ? infors.length : 0}
-        limit={limit}
-      ></Pagination>
+      {/* Block 4: Button Pagination */}
+      <div className="flex items-center justify-around">
+        <Pagination
+          page={page}
+          setPage={setPage}
+          dataLength={infors ? infors.length : 0}
+          limit={limit}
+        ></Pagination>
+      </div>
     </div>
   );
 }

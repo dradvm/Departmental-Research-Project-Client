@@ -1,7 +1,6 @@
 "use client";
 
 import GlobalPromotionForm from "components/AdminUtils/GlobalPromotionForm";
-import { CouponType } from "enums/coupon.enum";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { GlobalCouponBody } from "types/coupon";
@@ -9,7 +8,7 @@ import { GlobalCouponBody } from "types/coupon";
 export default function AddGlobalPromotion() {
   const [promotionInfor, setPromotionInfor] = useState<GlobalCouponBody>({
     isGlobal: true,
-    type: CouponType.DISCOUNT,
+    type: "discount",
     value: 0,
     startDate: "",
     endDate: "",

@@ -56,12 +56,14 @@ export default function Report() {
         </TableContainer>
       )}
       {/* Button Pagination */}
-      <Pagination
-        page={page}
-        setPage={setPage}
-        dataLength={infors ? infors.length : 0}
-        limit={limit}
-      ></Pagination>
+      <div className="flex items-center justify-around">
+        <Pagination
+          page={page}
+          setPage={setPage}
+          dataLength={infors ? infors.length : 0}
+          limit={limit}
+        ></Pagination>
+      </div>
     </div>
   );
 }

@@ -10,6 +10,9 @@ const paymentService = {
     },
     createPaymentIntent: (body: { amount: number }) => {
         return axiosInstance.post(`/payment/create-intent`, body);
+    },
+    getAllMyTransaction: (params: PaymentQueryType) => {
+        return axiosInstance.get(`/payment/my-transaction`, { params });
     }
 }
 export default paymentService;

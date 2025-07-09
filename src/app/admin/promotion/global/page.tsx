@@ -65,7 +65,7 @@ export default function GlobalPromotion() {
   }, [page, filter]);
 
   return (
-    <div className="h-[100%] flex flex-col">
+    <div className="h-fit mt-4 flex flex-col gap-4">
       {/* Filter Utility */}
       <CouponFilter
         filter={filter}
@@ -84,12 +84,14 @@ export default function GlobalPromotion() {
         ></GlobalCouponTable>
       )}
       {/* Pagination */}
-      <Pagination
-        page={page}
-        setPage={setPage}
-        dataLength={globalCoupons ? globalCoupons.length : 0}
-        limit={limit}
-      ></Pagination>
+      <div className="flex items-center justify-around">
+        <Pagination
+          page={page}
+          setPage={setPage}
+          dataLength={globalCoupons ? globalCoupons.length : 0}
+          limit={limit}
+        ></Pagination>
+      </div>
       {/* Modal: Detail Global Coupon */}
       <Modal open={open} onClose={handleClose}>
         {selectedCoupon ? (
