@@ -140,7 +140,7 @@ export default function NormalPromotion() {
   }
 
   return (
-    <div className="h-[100%] flex flex-col">
+    <div className="h-fit mt-4 flex flex-col gap-4">
       {/* Filter Utility */}
       <CouponFilter
         filter={filter}
@@ -161,12 +161,14 @@ export default function NormalPromotion() {
         ></NormalCouponTable>
       )}
       {/* Pagination */}
-      <Pagination
-        page={page}
-        setPage={setPage}
-        dataLength={normalCoupons ? normalCoupons.length : 0}
-        limit={limit}
-      ></Pagination>
+      <div className="flex items-center justify-around">
+        <Pagination
+          page={page}
+          setPage={setPage}
+          dataLength={normalCoupons ? normalCoupons.length : 0}
+          limit={limit}
+        ></Pagination>
+      </div>
       {/* Normal Coupon Detail Modal */}
       <Modal open={open} onClose={handleClose}>
         {selectedCoupon ? (

@@ -1,9 +1,7 @@
-import { CouponType } from "enums/coupon.enum";
-
 // use for POST: create a global coupon
 export interface GlobalCouponBody {
   isGlobal: boolean;
-  type: CouponType;
+  type: "discount" | "voucher";
   value: number;
   startDate: string;
   endDate: string;
@@ -60,7 +58,7 @@ export interface GlobalCouponType {
   couponId: string;
   userId: string;
   isGlobal: boolean;
-  type: CouponType;
+  type: "discount" | "voucher";
   value: string;
   startDate: string;
   endDate: string;

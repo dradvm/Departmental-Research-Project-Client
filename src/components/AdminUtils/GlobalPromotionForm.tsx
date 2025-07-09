@@ -1,4 +1,3 @@
-import { CouponType } from "enums/coupon.enum";
 import { GlobalCouponBody } from "types/coupon";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -11,7 +10,7 @@ const schema: yup.ObjectSchema<GlobalCouponBody> = yup.object({
   isGlobal: yup.boolean().default(true),
   couponId: yup.number().optional(),
   type: yup
-    .mixed<CouponType>()
+    .mixed<"discount" | "voucher">()
     .required("Vui lòng chọn Loại khuyến mãi")
     .test(
       "check-type",
@@ -21,8 +20,8 @@ const schema: yup.ObjectSchema<GlobalCouponBody> = yup.object({
 
         if (!value) return true;
 
-        if (typeInput === CouponType.DISCOUNT) return value > 0 && value <= 100;
-        if (typeInput === CouponType.VOUCHER) return value > 0;
+        if (typeInput === "discount") return value > 0 && value <= 100;
+        if (typeInput === "voucher") return value > 0;
 
         return true;
       }
@@ -34,9 +33,8 @@ const schema: yup.ObjectSchema<GlobalCouponBody> = yup.object({
     .test("check-value", "Giá trị không hợp lệ", function (valueInput) {
       const { type } = this.parent;
 
-      if (type === CouponType.DISCOUNT)
-        return valueInput > 0 && valueInput <= 100;
-      if (type === CouponType.VOUCHER) return valueInput > 0;
+      if (type === "discount") return valueInput > 0 && valueInput <= 100;
+      if (type === "voucher") return valueInput > 0;
 
       return true;
     }),
@@ -183,8 +181,8 @@ export default function GlobalPromotionForm({
                   {...register("type")}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 >
-                  <option value={CouponType.DISCOUNT}>DISCOUNT</option>
-                  <option value={CouponType.VOUCHER}>VOUCHER</option>
+                  <option value={"discount"}>DISCOUNT</option>
+                  <option value={"voucher"}>VOUCHER</option>
                 </select>
                 {errors.type && (
                   <p className="text-red-500 text-sm">{errors.type.message}</p>
