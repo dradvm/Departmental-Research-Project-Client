@@ -2,8 +2,8 @@
 
 import { Button } from "components/Button/Button";
 import CircularIndeterminate from "components/CircularIndeterminate/CircularIndeterminate";
-import CourseContent from "components/CourseContent/CourseContent";
-import CourseDetails from "components/CourseDetails/CourseDetails";
+import CourseContent from "components/Course/CourseContent/CourseContent";
+import CourseDetails from "components/Course/CourseDetails/CourseDetails";
 
 import { ChevronDown, EllipsisVertical, Share2, Star } from "lucide-react";
 import { useParams } from "next/navigation";

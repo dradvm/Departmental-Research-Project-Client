@@ -1,7 +1,14 @@
 import { Lecture } from "types/lecture";
 import { Review } from "./review";
 import { Section } from "./section";
+import { Category } from "./category";
+import { Wishlist } from "./wishlist";
 
+export interface CourseCategory {
+  courseId: number;
+  categoryId: number;
+  Category?: Category;
+}
 export interface Course {
   courseId: number;
   userId: number;
@@ -23,9 +30,12 @@ export interface Course {
 
   Review?: Review[];
   _count?: {
+    Enrollment?: number;
     Review?: number;
   };
   LastLectureStudy?: {
     Lecture: Lecture;
   }[];
+  CourseCategory?: CourseCategory[];
+  Wishlist?: Wishlist[];
 }

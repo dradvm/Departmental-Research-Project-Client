@@ -12,7 +12,7 @@ import Input from "components/Input/Input";
 import courseService from "services/course.service";
 import { Review, ReviewOverview } from "types/review";
 import { getTimeAgo } from "utils/time";
-import Loading from "../Main/Loading/Loading";
+import Loading from "../../Main/Loading/Loading";
 import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
 import MyAvatar from "components/Avatar/Avatar";
 function BarReviews({

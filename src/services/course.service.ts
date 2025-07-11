@@ -27,6 +27,12 @@ const courseService = {
         search: search,
       },
     }),
+  getOtherCourses: (courseId: number, instructorId: number) =>
+    axiosInstance.get(`/courses/${courseId}/others`, {
+      params: {
+        instructorId,
+      },
+    }),
 };
 
 export default courseService;
