@@ -15,7 +15,7 @@ import noteService from "services/note.service";
 import { Lecture } from "types/lecture";
 import { Note } from "types/note";
 import { formatTime } from "utils/time";
-import Loading from "../Main/Loading/Loading";
+import Loading from "../../Main/Loading/Loading";
 import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
 import { useRouter } from "next/navigation";
 import studyProgressService from "services/study-progress.service";

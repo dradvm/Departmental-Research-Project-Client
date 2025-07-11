@@ -4,10 +4,10 @@ import { Divider } from "@mui/material";
 import { X } from "lucide-react";
 import CourseSection from "./CourseSection";
 import { useStickyObserver } from "hooks/useStickyObserver";
-import { SectionStudyProgress } from "types/section";
+import { Section } from "types/section";
 
 type Props = {
-  courseContent: SectionStudyProgress[];
+  courseContent: Section[];
 };
 
 export default function CourseContent({ courseContent }: Props) {
@@ -37,7 +37,7 @@ export default function CourseContent({ courseContent }: Props) {
           aria-labelledby="nested-list-subheader"
         >
           {courseContent.map((section, index) => (
-            <CourseSection key={index} section={section} />
+            <CourseSection key={index} section={section}></CourseSection>
           ))}
         </List>
       </div>
