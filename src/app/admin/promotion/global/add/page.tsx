@@ -1,12 +1,12 @@
 "use client";
 
-import GlobalPromotionForm from "components/AdminUtils/GlobalPromotionForm";
+import PromotionForm from "components/AdminUtils/PromotionForm";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
-import { GlobalCouponBody } from "types/coupon";
+import { CouponBody } from "types/coupon";
 
 export default function AddGlobalPromotion() {
-  const [promotionInfor, setPromotionInfor] = useState<GlobalCouponBody>({
+  const [promotionInfor, setPromotionInfor] = useState<CouponBody>({
     isGlobal: true,
     type: "discount",
     value: 0,
@@ -35,13 +35,14 @@ export default function AddGlobalPromotion() {
 
   return (
     <div className="w-[60%] mx-auto mt-4 p-2 shadow-xl shadow-blue-200 rounded-[12px]">
-      <GlobalPromotionForm
+      <PromotionForm
         promotion={promotionInfor}
         setPromotionInfor={setPromotionInfor}
         handleSuccessfulCreation={handleSuccessfulCreation}
         handleFailedCreation={handleFailedCreation}
         handleInformIsExistingCode={handleInformIsExistingCode}
-      ></GlobalPromotionForm>
+        isGlobal={true}
+      ></PromotionForm>
       <ToastContainer></ToastContainer>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PaymentType } from "types/payment";
+import { PaymentDB, PaymentType } from "types/payment";
 import paymentService from "services/payment.service";
 import { Modal } from "@mui/material";
 import NoDataFound from "components/AdminUtils/NoDataFound";
@@ -13,6 +13,7 @@ export default function Payment() {
   const [selectedPayment, setSelectedPayment] = useState<PaymentType>();
   const [infors, setInfors] = useState<PaymentType[]>();
   const [page, setPage] = useState<number>(1);
+  const [dataLen, setDataLen] = useState<number>(0);
 
   const [open, setOpen] = useState<boolean>(false);
   // open modal
@@ -30,10 +31,11 @@ export default function Payment() {
     const fetchPayment = async () => {
       try {
         const skip = (page - 1) * limit;
-        const paymentsDB: PaymentType[] = (
+        const paymentsDB: PaymentDB = (
           await paymentService.getAllMyTransaction({ limit, skip })
         ).data;
-        setInfors(paymentsDB);
+        setDataLen(paymentsDB.length);
+        setInfors(paymentsDB.payments);
       } catch (e) {
         console.log("Lỗi khi lấy dữ liệu payment: ", e);
         setInfors([]);
@@ -60,7 +62,7 @@ export default function Payment() {
           <Pagination
             page={page}
             setPage={setPage}
-            dataLength={infors ? infors.length : 0}
+            dataLength={dataLen}
             limit={limit}
           ></Pagination>
         </div>

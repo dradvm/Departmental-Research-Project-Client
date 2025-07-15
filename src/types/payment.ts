@@ -51,3 +51,8 @@ export interface PaymentType {
     finalPrice: string;
     paymentDetail: PaymentDetailType[];
 }
+
+export interface PaymentDB {
+    payments: PaymentType[];
+    length: number;
+}

@@ -1,5 +1,4 @@
 import { ReportType } from "types/report";
-import { PostType } from "types/post";
 
 export const reports: Array<ReportType> = [
   {
@@ -128,97 +127,5 @@ export const reports: Array<ReportType> = [
     contentReport: "Nội dung mang tính lý thuyết, thiếu thực tiễn.",
     idUser: 1147,
     name: "Nguyễn Thị Cẩm Tú",
-  },
-];
-
-export const posts: Array<PostType> = [
-  {
-    idCourse: 1,
-    title: "Lập trình JavaScript cơ bản",
-    subTitle: "Học JavaScript từ con số 0",
-    description:
-      "Khóa học dành cho người mới bắt đầu tìm hiểu về JavaScript và phát triển web.",
-    price: 199000,
-    isAccept: true,
-  },
-  {
-    idCourse: 2,
-    title: "ReactJS cho người mới",
-    subTitle: "Xây dựng ứng dụng với React",
-    description:
-      "Học cách tạo giao diện người dùng hiện đại bằng React và các thư viện phổ biến.",
-    price: 249000,
-    isAccept: true,
-  },
-  {
-    idCourse: 3,
-    title: "NodeJS và Express",
-    subTitle: "Lập trình backend với NodeJS",
-    description: "Xây dựng API mạnh mẽ và hiệu quả sử dụng Express và NodeJS.",
-    price: 299000,
-    isAccept: false,
-  },
-  {
-    idCourse: 4,
-    title: "HTML & CSS Pro",
-    subTitle: "Thiết kế web chuyên nghiệp",
-    description:
-      "Tạo giao diện người dùng đẹp mắt với HTML5 và CSS3, responsive và mobile-first.",
-    price: 149000,
-    isAccept: true,
-  },
-  {
-    idCourse: 5,
-    title: "MongoDB cho người mới bắt đầu",
-    subTitle: "Cơ sở dữ liệu NoSQL",
-    description:
-      "Tìm hiểu cách lưu trữ và truy xuất dữ liệu với MongoDB trong các ứng dụng thực tế.",
-    price: 179000,
-    isAccept: true,
-  },
-  {
-    idCourse: 6,
-    title: "TypeScript nâng cao",
-    subTitle: "Tăng cường JavaScript với TypeScript",
-    description:
-      "Viết mã dễ bảo trì và có kiểm tra kiểu mạnh mẽ bằng TypeScript.",
-    price: 229000,
-    isAccept: false,
-  },
-  {
-    idCourse: 7,
-    title: "Python cho Data Science",
-    subTitle: "Phân tích và trực quan hóa dữ liệu",
-    description:
-      "Khóa học tập trung vào sử dụng Python trong phân tích dữ liệu, pandas, matplotlib, và numpy.",
-    price: 269000,
-    isAccept: false,
-  },
-  {
-    idCourse: 8,
-    title: "Khóa học Next.js từ A-Z",
-    subTitle: "Fullstack với React & Next.js",
-    description:
-      "Tạo các ứng dụng web nhanh, tối ưu SEO và tích hợp server-side rendering với Next.js.",
-    price: 299000,
-    isAccept: true,
-  },
-  {
-    idCourse: 9,
-    title: "Git và GitHub chuyên sâu",
-    subTitle: "Quản lý mã nguồn hiệu quả",
-    description:
-      "Nắm vững quy trình làm việc với Git, GitHub và cách hợp tác nhóm hiệu quả.",
-    price: 99000,
-    isAccept: false,
-  },
-  {
-    idCourse: 10,
-    title: "Docker cho Developer",
-    subTitle: "Triển khai ứng dụng dễ dàng",
-    description:
-      "Khóa học giúp bạn hiểu và sử dụng Docker để phát triển, kiểm thử và triển khai ứng dụng.",
-    price: 189000,
-    isAccept: true,
   },
 ];

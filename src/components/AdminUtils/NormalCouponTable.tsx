@@ -18,8 +18,7 @@ interface NormalCouponTableProps {
   >;
   handleOpen: () => void;
   acceptACouponCourse: (couponId: number, courseId: number) => void;
-  deactivateCouponCourse: (couponId: number, courseId: number) => void;
-  acceptAndActivateCouponCourse: (couponId: number, courseId: number) => void;
+  deleteCouponCourse: (couponId: number, courseId: number) => void;
 }
 
 export default function NormalCouponTable(props: NormalCouponTableProps) {
@@ -80,24 +79,10 @@ export default function NormalCouponTable(props: NormalCouponTableProps) {
                   </button>
                 </TableCell>
                 <TableCell>
-                  {!nCoupon.isAccepted && !nCoupon.isRunning && (
-                    <button
-                      className="px-2 py-1 bg-blue-700 rounded-[4px] text-white"
-                      title="Duyệt và kích hoạt ngay mã khuyến mãi cho khóa học"
-                      onClick={() =>
-                        props.acceptAndActivateCouponCourse(
-                          nCoupon.couponId,
-                          nCoupon.courseId
-                        )
-                      }
-                    >
-                      Kích hoạt ngay
-                    </button>
-                  )}
-                  {!nCoupon.isAccepted && !nCoupon.isRunning && (
+                  {!nCoupon.isAccepted && (
                     <button
                       className="px-2 py-1 ml-4 bg-green-700 rounded-[4px] text-white"
-                      title="Duyệt mã khuyến mãi này, nhưng chưa kích hoạt cho khóa học"
+                      title="Duyệt mã khuyến mãi này và kích hoạt cho khóa học"
                       onClick={() =>
                         props.acceptACouponCourse(
                           nCoupon.couponId,
@@ -108,34 +93,18 @@ export default function NormalCouponTable(props: NormalCouponTableProps) {
                       Duyệt ngay
                     </button>
                   )}
-                  {/* case 2: accepted and running */}
-                  {nCoupon.isAccepted && nCoupon.isRunning && (
+                  {nCoupon.isAccepted && !nCoupon.isDeleted && (
                     <button
                       className="px-2 py-1 bg-red-700 rounded-[4px] text-white"
-                      title="Hủy kích hoạt mã khuyến mãi cho khóa học này, có thể kích hoạt lại sau"
+                      title="Hủy kích hoạt mã khuyến mãi cho khóa học này"
                       onClick={() =>
-                        props.deactivateCouponCourse(
+                        props.deleteCouponCourse(
                           nCoupon.couponId,
                           nCoupon.courseId
                         )
                       }
                     >
                       Hủy kích hoạt
-                    </button>
-                  )}
-                  {/* case 3: accepted but not running */}
-                  {nCoupon.isAccepted && !nCoupon.isRunning && (
-                    <button
-                      className="px-2 py-1 bg-blue-700 rounded-[4px] text-white"
-                      title="Mã này đã duyệt, kích hoạt để hiệu lực với khóa học này"
-                      onClick={() =>
-                        props.acceptAndActivateCouponCourse(
-                          nCoupon.couponId,
-                          nCoupon.courseId
-                        )
-                      }
-                    >
-                      Kích hoạt ngay
                     </button>
                   )}
                 </TableCell>

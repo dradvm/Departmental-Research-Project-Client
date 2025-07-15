@@ -1,4 +1,4 @@
-import { GlobalCouponBody } from "types/coupon";
+import { CouponBody } from "types/coupon";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import couponService from "services/coupon.service";
 
-const schema: yup.ObjectSchema<GlobalCouponBody> = yup.object({
+const schema: yup.ObjectSchema<CouponBody> = yup.object({
   isGlobal: yup.boolean().default(true),
   couponId: yup.number().optional(),
   type: yup
@@ -107,18 +107,20 @@ const schema: yup.ObjectSchema<GlobalCouponBody> = yup.object({
     ),
 });
 
-export default function GlobalPromotionForm({
+export default function PromotionForm({
   promotion,
   setPromotionInfor,
   handleSuccessfulCreation,
   handleFailedCreation,
   handleInformIsExistingCode,
+  isGlobal,
 }: {
-  promotion: GlobalCouponBody;
-  setPromotionInfor: (acc: GlobalCouponBody) => void;
+  promotion: CouponBody;
+  setPromotionInfor: (acc: CouponBody) => void;
   handleSuccessfulCreation: () => void;
   handleFailedCreation: () => void;
   handleInformIsExistingCode: () => void;
+  isGlobal: boolean;
 }) {
   const router = useRouter();
 
@@ -127,19 +129,19 @@ export default function GlobalPromotionForm({
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<GlobalCouponBody>({
+  } = useForm<CouponBody>({
     defaultValues: promotion,
     resolver: yupResolver(schema),
   });
 
   useEffect(() => {
     const subscription = watch((value) => {
-      setPromotionInfor(value as GlobalCouponBody);
+      setPromotionInfor(value as CouponBody);
     });
     return () => subscription.unsubscribe();
   }, [watch, setPromotionInfor]);
 
-  const onSubmit: SubmitHandler<GlobalCouponBody> = async (data) => {
+  const onSubmit: SubmitHandler<CouponBody> = async (data) => {
     try {
       const isExistingCode: boolean = (
         await couponService.checkIsExistingCode(data.code)
@@ -148,7 +150,8 @@ export default function GlobalPromotionForm({
       else {
         data.startDate = new Date(data.startDate).toISOString();
         data.endDate = new Date(data.endDate).toISOString();
-        await couponService.createGlobalCoupon(data);
+        if (!isGlobal) data.isGlobal = false;
+        await couponService.createCoupon(data);
         handleSuccessfulCreation();
         await new Promise((resolve) => setTimeout(resolve, 3000));
         router.push("/admin/promotion/global");

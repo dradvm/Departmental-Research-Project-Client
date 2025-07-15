@@ -6,8 +6,7 @@ import { formatVND } from "utils/money";
 interface NormalCouponDetailModalProps {
   normalCoupon: NormalCouponType;
   acceptACouponCourse: (couponId: number, courseId: number) => void;
-  deactivateCouponCourse: (couponId: number, courseId: number) => void;
-  acceptAndActivateCouponCourse: (couponId: number, courseId: number) => void;
+  deleteCouponCourse: (couponId: number, courseId: number) => void;
   handleClose: () => void;
 }
 export default function NormalCouponDetailModal(
@@ -51,10 +50,10 @@ export default function NormalCouponDetailModal(
 
       <div className="flex gap-[8px] justify-end">
         {/* case 1: not accepted and not running */}
-        {!props.normalCoupon.isAccepted && !props.normalCoupon.isRunning && (
+        {!props.normalCoupon.isAccepted && (
           <button
             className="p-[4px] mt-4 bg-green-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white"
-            title="Duyệt mã khuyến mãi này, nhưng chưa kích hoạt cho khóa học"
+            title="Duyệt mã khuyến mãi này và kích hoạt cho khóa học"
             onClick={() =>
               props.acceptACouponCourse(
                 props.normalCoupon.couponId,
@@ -65,48 +64,19 @@ export default function NormalCouponDetailModal(
             Duyệt ngay
           </button>
         )}
-        {!props.normalCoupon.isAccepted && !props.normalCoupon.isRunning && (
-          <button
-            className="p-[4px] mt-4 bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white"
-            title="Duyệt và kích hoạt ngay mã khuyến mãi cho khóa học"
-            onClick={() =>
-              props.acceptAndActivateCouponCourse(
-                props.normalCoupon.couponId,
-                props.normalCoupon.courseId
-              )
-            }
-          >
-            Kích hoạt ngay
-          </button>
-        )}
         {/* case 2: accepted and running */}
-        {props.normalCoupon.isAccepted && props.normalCoupon.isRunning && (
+        {props.normalCoupon.isAccepted && !props.normalCoupon.isDeleted && (
           <button
             className="p-[4px] mt-4 bg-red-700 shadow-md shadow-red-700 rounded-[8px] font-bold text-white"
-            title="Hủy kích hoạt mã khuyến mãi cho khóa học này, có thể kích hoạt lại sau"
+            title="Hủy kích hoạt mã khuyến mãi cho khóa học này"
             onClick={() =>
-              props.deactivateCouponCourse(
+              props.deleteCouponCourse(
                 props.normalCoupon.couponId,
                 props.normalCoupon.courseId
               )
             }
           >
             Hủy kích hoạt
-          </button>
-        )}
-        {/* case 3: accepted but not running */}
-        {props.normalCoupon.isAccepted && !props.normalCoupon.isRunning && (
-          <button
-            className="p-[4px] mt-4 bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white"
-            title="Mã này đã duyệt, kích hoạt để hiệu lực với khóa học này"
-            onClick={() =>
-              props.acceptAndActivateCouponCourse(
-                props.normalCoupon.couponId,
-                props.normalCoupon.courseId
-              )
-            }
-          >
-            Kích hoạt ngay
           </button>
         )}
       </div>

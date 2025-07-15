@@ -105,3 +105,9 @@ export function formatMessageTime(isoString: Date | string) {
     return `${time} ${day} Tháng ${month}, ${year}`;
   }
 }
+
+export function getHourFormSecond(s: number) {
+  if (isNaN(s))
+    return 0;
+  return (Math.round((s / 3600) * 10)) / 10;
+}

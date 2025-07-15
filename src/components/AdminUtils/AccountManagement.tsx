@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, useEffect, useState } from "react";
-import { UserType, UserUpdateBody, UserReq } from "types/user";
+import { UserType, UserReq, UserDB } from "types/user";
 import { Search, X } from "lucide-react";
 import { userService } from "services/user.service";
 import { Box, Modal, Typography, IconButton } from "@mui/material";
@@ -12,8 +12,9 @@ import { Pagination } from "./Pagination";
 
 export default function AccountManagement({
   type,
-}: Readonly<{ type: "USER" }>) {
+}: Readonly<{ type: "USERS" | "INSTRUCTOR" }>) {
   const [page, setPage] = useState<number>(1);
+  const [dataLen, setDataLen] = useState<number>(0);
   const [infors, setInfors] = useState<UserType[]>();
   const [selectedAccount, setSelectedAccount] = useState<UserType>();
   const [open, setOpen] = useState<boolean>(false);
@@ -44,19 +45,19 @@ export default function AccountManagement({
   async function fetchData(
     page: number,
     filter: { searchText?: string },
-    type: "USER"
+    type: "USERS" | "INSTRUCTOR"
   ) {
     const skip = (page - 1) * limit;
     const params: UserReq = {
       limit,
       skip,
-      role: type === "USER" ? "USERS" : "USERS",
+      role: type === "USERS" ? "USERS" : "INSTRUCTOR",
       searchText: filter.searchText,
     };
     try {
-      const dataDB: UserType[] = (await userService.getAllUser(params)).data
-        .data;
-      setInfors(dataDB);
+      const dataDB: UserDB = (await userService.getAllUser(params)).data.data;
+      setDataLen(dataDB.length);
+      setInfors(dataDB.users);
     } catch (e) {
       toast.error("Có lỗi khi lấy dữ liệu người dùng!");
       console.error("Lỗi lấy dữ liệu người dùng: ", e);
@@ -68,33 +69,32 @@ export default function AccountManagement({
     fetchData(page, filter, type);
   }, [page, filter, type]);
 
-  async function updateAccount(
-    userId: number,
-    name?: string,
-    biography?: string,
-    img?: string
-  ) {
-    try {
-      const bodyReq: UserUpdateBody = { id: userId, name, biography, img };
-      await userService.updateAccount(bodyReq);
-      toast.success("Cập nhật tài khoản thành công!");
-      handleClose();
-      fetchData(page, filter, type);
-    } catch (e) {
-      toast.error("Lỗi xảy ra khi cập nhật tài khoản!");
-      console.error("Lỗi xảy ra khi cập nhật tài khoản: ", e);
-    }
-  }
-
   async function deleteAccount(userId: number) {
-    if (confirm(`Xác nhận xóa tài khoản này?`))
+    if (confirm(`Xác nhận vô hiệu hóa tài khoản này?`))
       try {
         await userService.deleteAccount(userId);
-        toast.success("Xóa tài khoản thành công!", { autoClose: 3000 });
+        toast.success("Vô hiệu hóa tài khoản thành công!", { autoClose: 3000 });
         await fetchData(page, filter, type);
       } catch (e) {
-        toast.error("Có lỗi khi xóa tài khoản!", { autoClose: 3000 });
-        console.error("Lỗi khi xóa tài khoản người dùng: ", e);
+        toast.error("Có lỗi khi vô hiệu hóa tài khoản!", { autoClose: 3000 });
+        console.error("Lỗi khi vô hiệu hóa tài khoản người dùng: ", e);
+      }
+  }
+
+  async function enableAccount(userId: number) {
+    if (confirm(`Xác nhận hủy vô hiệu hóa tài khoản này?`))
+      try {
+        console.log("yêu hủy vô hiệu hóa tk của id: ", userId);
+        await userService.enableAccount(userId);
+        toast.success("Hủy vô hiệu hóa tài khoản thành công!", {
+          autoClose: 3000,
+        });
+        await fetchData(page, filter, type);
+      } catch (e) {
+        toast.error("Có lỗi khi hủy vô hiệu hóa tài khoản!", {
+          autoClose: 3000,
+        });
+        console.error("Lỗi khi hủy vô hiệu hóa tài khoản người dùng: ", e);
       }
   }
 
@@ -128,6 +128,7 @@ export default function AccountManagement({
           setSelectedItem={setSelectedAccount}
           handleOpen={handleOpen}
           deleteAccount={deleteAccount}
+          enableAccount={enableAccount}
         />
       </Box>
 
@@ -136,7 +137,7 @@ export default function AccountManagement({
         <Pagination
           page={page}
           setPage={setPage}
-          dataLength={infors ? infors.length : 0}
+          dataLength={dataLen}
           limit={limit}
         />
       </div>
@@ -164,12 +165,7 @@ export default function AccountManagement({
           </IconButton>
 
           {selectedAccount ? (
-            <InforForm
-              account={selectedAccount}
-              onChange={setSelectedAccount}
-              handleClose={handleClose}
-              updateAccount={updateAccount}
-            />
+            <InforForm account={selectedAccount} />
           ) : (
             <Typography variant="h6">
               Không có người dùng nào được chọn cả
