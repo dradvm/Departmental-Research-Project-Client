@@ -4,8 +4,8 @@ import { useSession } from 'next-auth/react'
 import { UserCircleIcon } from '@heroicons/react/24/solid'
 import { useRef, useState, useEffect } from 'react'
 import axios from 'axios'
-import { ToastContainer, toast, Bounce } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast, Bounce } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 export default function ProfileForm() {
     const { data: session, update } = useSession()
@@ -13,6 +13,7 @@ export default function ProfileForm() {
     const [file, setFile] = useState<File | null>(null)
     const [name, setName] = useState('')
     const [biography, setBiography] = useState('')
+    const [nameError, setNameError] = useState('')
     const avatarUrl = session?.user?.image || ''
 
     useEffect(() => {
@@ -32,6 +33,14 @@ export default function ProfileForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        // Validation
+        if (name.trim() === '') {
+            setNameError('Name is required')
+            return
+        } else {
+            setNameError('')
+        }
+
         if (!session?.user?.access_token) {
             alert('Session not available or expired.')
             return
@@ -49,12 +58,14 @@ export default function ProfileForm() {
                 formData,
                 {
                     headers: {
-                        'Authorization': `Bearer ${accessToken}`,
+                        Authorization: `Bearer ${accessToken}`,
                         'Content-Type': 'multipart/form-data',
                     },
                 }
             )
+
             const updatedImage = response.data?.data?.image || session.user?.image
+
             await update({
                 name,
                 biography,
@@ -62,7 +73,7 @@ export default function ProfileForm() {
             })
 
             toast.success('Profile updated!')
-            setFile(null) // reset file preview
+            setFile(null)
         } catch (err) {
             console.error('Update error:', err)
             toast.error('Update failed.')
@@ -76,7 +87,7 @@ export default function ProfileForm() {
                 autoClose={4000}
                 hideProgressBar={false}
                 newestOnTop={false}
-                closeOnClick={true}
+                closeOnClick
                 rtl={false}
                 pauseOnFocusLoss
                 draggable
@@ -108,8 +119,14 @@ export default function ProfileForm() {
                                 name="name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="mt-2 block w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                                className={`mt-2 block w-full rounded-lg border px-4 py-2 text-gray-900 shadow-sm sm:text-sm ${nameError
+                                        ? 'border-red-500 focus:ring-red-500'
+                                        : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
+                                    }`}
                             />
+                            {nameError && (
+                                <p className="mt-1 text-sm text-red-600">{nameError}</p>
+                            )}
                         </div>
                     </div>
 
@@ -125,7 +142,7 @@ export default function ProfileForm() {
                                 />
                             ) : avatarUrl ? (
                                 <img
-                                    src={`${avatarUrl}?v=${Date.now()}`} // <-- fix: tránh cache ảnh
+                                    src={`${avatarUrl}?v=${Date.now()}`}
                                     alt="User Avatar"
                                     className="h-14 w-14 rounded-full object-cover ring-1 ring-gray-300"
                                 />

@@ -24,6 +24,8 @@ export default function Editor({
   warningMessageMinLength = "",
   saveButtonMessage = "",
   maxLength = 500,
+  hideActions = false, //
+  hideWarnings = false, //
 }: {
   isDisplay: boolean;
   value?: string;
@@ -35,6 +37,8 @@ export default function Editor({
   warningMessageMinLength?: string;
   saveButtonMessage?: string;
   maxLength: number;
+  hideActions?: boolean; //
+  hideWarnings?: boolean; //
 }) {
   const [mounted, setMounted] = useState(false);
   const { setEnabledBlock } = useLearnContext();
@@ -87,38 +91,42 @@ export default function Editor({
           onBlur={handleBlur}
           modules={modules}
           formats={formats}
-          className={`break-words whitespace-pre-wrap rounded ${
-            isFocus ? "border border-indigo-600 border-2" : "border border-2"
-          } `}
+          className={`break-words whitespace-pre-wrap rounded ${isFocus ? "border border-indigo-600 border-2" : "border border-2"
+            } `}
         />
         <div className="absolute top-0 right-0 py-2 px-4 text-slate-600">
           {remainingLength}
         </div>
       </div>
-      {remainingLength < 0 && (
+      {!hideWarnings && remainingLength < 0 && (
         <Alert severity="warning">{warningMessageMaxLength}</Alert>
       )}
-      {value.replace(/<\/?[^>]+(>|$)/g, "").trim().length === 0 && (
-        <Alert severity="warning">{warningMessageMinLength}</Alert>
-      )}
-      <div className="flex justify-end">
-        <div className="flex space-x-3">
-          <Button variant="primary" onClick={handleCancel}>
-            Huỷ
-          </Button>
-          <Button
-            variant="filled"
-            onClick={handleSave}
-            disabled={
-              isDisabled ||
-              remainingLength < 0 ||
-              value.replace(/<\/?[^>]+(>|$)/g, "").trim().length === 0
-            }
-          >
-            {saveButtonMessage}
-          </Button>
+
+      {!hideWarnings &&
+        value.replace(/<\/?[^>]+(>|$)/g, "").trim().length === 0 && (
+          <Alert severity="warning">{warningMessageMinLength}</Alert>
+        )}
+
+      {!hideActions && (
+        <div className="flex justify-end">
+          <div className="flex space-x-3">
+            <Button variant="primary" onClick={handleCancel}>
+              Huỷ
+            </Button>
+            <Button
+              variant="filled"
+              onClick={handleSave}
+              disabled={
+                isDisabled ||
+                remainingLength < 0 ||
+                value.replace(/<\/?[^>]+(>|$)/g, "").trim().length === 0
+              }
+            >
+              {saveButtonMessage}
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </Stack>
   );
 }

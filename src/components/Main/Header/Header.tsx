@@ -7,11 +7,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { useState } from 'react';
+import { useUser } from '../../../../context/UserContext';
 
 export default function Header() {
   const { data: session, status } = useSession();
   const isLoggedIn = status === 'authenticated';
   const [isInstructor, setIsInstructor] = useState(false);
+  const { user } = useUser();
+
+  if (!user) return null;
+  const token = user?.access_token;
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -27,6 +32,26 @@ export default function Header() {
   const handleLogout = async () => {
     handleClose();
     await signOut({ callbackUrl: '/' });
+  };
+
+  const handleRoleChange = async () => {
+    try {
+      const res = await fetch(`http://localhost:3001/api/users/${user.userId}/role/instructor`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.access_token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to update role");
+
+      const data = await res.json();
+      alert(`Cập nhật role thành công, Vui long đăng nhập lại để thấy thay đổi!`);
+      // Optional: thông báo UI, redirect, hoặc reload
+    } catch (err) {
+      console.error("Lỗi khi cập nhật role:", err);
+    }
   };
 
   return (
@@ -60,7 +85,9 @@ export default function Header() {
                     Biến kiến thức của bạn thành cơ hội và tiếp cận với hàng
                     triệu người trên thế giới.
                   </div>
-                  <Button variant="filled">Tìm hiểu thêm</Button>
+                  <Button variant="filled" onClick={handleRoleChange}>
+                    Đăng ký ngay
+                  </Button>
                 </Stack>
               </>
             )}

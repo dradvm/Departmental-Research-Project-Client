@@ -7,6 +7,8 @@ import DynamicHeader from "components/Main/Header/DynamicHeader";
 import NextAuthWrapper from "lib/next.auth.wrapper";
 
 import { usePathname } from "next/navigation";
+import { SessionProvider } from "next-auth/react";
+import { UserProvider } from "../../context/UserContext";
 
 export default function RootLayout({
   children,
@@ -28,8 +30,13 @@ export default function RootLayout({
       </head>
       <body>
         <NextAuthWrapper>
-          {shouldShowHeader && <DynamicHeader />}
-          {children}
+
+          <SessionProvider>
+            <UserProvider>
+              {shouldShowHeader && <DynamicHeader />}
+              {children}
+            </UserProvider>
+          </SessionProvider>
         </NextAuthWrapper>
       </body>
     </html>

@@ -3,19 +3,24 @@
 import { useState } from 'react'
 import { sendRequest } from 'utils/api'
 import { useHasMounted } from 'utils/customHook'
-import { ToastContainer, toast, Bounce } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 
 export default function ModalResetPassword({ isModalOpen, setIsModalOpen }: any) {
     const hasMounted = useHasMounted()
+
     const [step, setStep] = useState(1)
     const [email, setEmail] = useState('')
     const [code, setCode] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    const [userId, setUserId] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+    const [errors, setErrors] = useState<{
+        email?: string
+        code?: string
+        newPassword?: string
+        confirmPassword?: string
+    }>({})
 
     if (!hasMounted) return null
 
@@ -26,44 +31,73 @@ export default function ModalResetPassword({ isModalOpen, setIsModalOpen }: any)
         setCode('')
         setNewPassword('')
         setConfirmPassword('')
-        setUserId('')
+        setErrors({})
     }
 
-
     const handleNextStep1 = async () => {
+        const newErrors: typeof errors = {}
+
+        if (!email.trim()) {
+            newErrors.email = 'Vui lòng nhập email.'
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            newErrors.email = 'Email không hợp lệ.'
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            return
+        }
+
+        setErrors({})
+
         const res = await sendRequest<IBackendRes<any>>({
             url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/retry-password`,
             method: 'POST',
             body: { email },
         })
+
         if (res?.data) {
             setEmail(res.data.email)
             setStep(2)
+        } else {
+            setErrors({ email: res?.message || 'Không thể gửi mã xác nhận.' })
         }
-        // else {
-        //     toast.error(res.message || 'Không thể gửi mã xác nhận.')
-        // }
     }
 
     const handleNextStep2 = async () => {
-        if (newPassword !== confirmPassword) {
-            toast.error('Mật khẩu xác nhận không khớp')
+        const newErrors: typeof errors = {}
+
+        if (!code.trim()) newErrors.code = 'Vui lòng nhập mã xác nhận.'
+        if (!newPassword.trim()) newErrors.newPassword = 'Vui lòng nhập mật khẩu mới.'
+        else if (newPassword.length < 6) newErrors.newPassword = 'Mật khẩu phải có ít nhất 6 ký tự.'
+        if (!confirmPassword.trim()) newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu.'
+        else if (newPassword !== confirmPassword)
+            newErrors.confirmPassword = 'Mật khẩu xác nhận không khớp.'
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
             return
         }
+
+        setErrors({})
 
         const res = await sendRequest<IBackendRes<any>>({
             url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/change-password`,
             method: 'POST',
             body: { code, password: newPassword, confirmPassword, email },
         })
+
         if (res?.data) {
             setStep(3)
         } else {
-            toast.error(res.message || 'Mã xác nhận không đúng.')
+            setErrors({ code: res?.message || 'Mã xác nhận không đúng hoặc đã hết hạn.' })
         }
     }
 
-    const handleBack = () => setStep(prev => Math.max(prev - 1, 1))
+    const handleBack = () => {
+        setStep(prev => Math.max(prev - 1, 1))
+        setErrors({})
+    }
 
     const stepTitle = ['Email', 'Verification', 'Success']
 
@@ -79,31 +113,37 @@ export default function ModalResetPassword({ isModalOpen, setIsModalOpen }: any)
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                             placeholder="Nhập email để lấy lại mật khẩu"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'
+                                } rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500`}
                         />
+                        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                     </>
                 )
             case 2:
                 return (
                     <>
                         <h2 className="text-lg font-semibold text-gray-900 mb-2">Nhập mã xác nhận</h2>
+
                         <label className="block text-sm text-gray-700 mb-1">Mã xác nhận</label>
                         <input
                             type="text"
                             value={code}
                             onChange={e => setCode(e.target.value)}
                             placeholder="Mã xác nhận đã gửi qua email"
-                            className="w-full px-3 py-2 mb-4 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className={`w-full px-3 py-2 mb-1 border ${errors.code ? 'border-red-500' : 'border-gray-300'
+                                } rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500`}
                         />
+                        {errors.code && <p className="text-red-500 text-sm mb-3">{errors.code}</p>}
 
                         <label className="block text-sm text-gray-700 mb-1">Mật khẩu mới</label>
                         <div className="relative">
                             <input
-                                type={showPassword ? "text" : "password"}
+                                type={showPassword ? 'text' : 'password'}
                                 value={newPassword}
                                 onChange={e => setNewPassword(e.target.value)}
                                 placeholder="Nhập mật khẩu mới"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className={`w-full px-3 py-2 border ${errors.newPassword ? 'border-red-500' : 'border-gray-300'
+                                    } rounded-md text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500`}
                             />
                             <button
                                 type="button"
@@ -113,15 +153,17 @@ export default function ModalResetPassword({ isModalOpen, setIsModalOpen }: any)
                                 {showPassword ? 'Ẩn' : 'Hiện'}
                             </button>
                         </div>
+                        {errors.newPassword && <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>}
 
                         <label className="block text-sm text-gray-700 mt-4 mb-1">Xác nhận mật khẩu</label>
                         <div className="relative">
                             <input
-                                type={showConfirmPassword ? "text" : "password"}
+                                type={showConfirmPassword ? 'text' : 'password'}
                                 value={confirmPassword}
                                 onChange={e => setConfirmPassword(e.target.value)}
                                 placeholder="Nhập lại mật khẩu mới"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className={`w-full px-3 py-2 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                                    } rounded-md text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500`}
                             />
                             <button
                                 type="button"
@@ -131,6 +173,9 @@ export default function ModalResetPassword({ isModalOpen, setIsModalOpen }: any)
                                 {showConfirmPassword ? 'Ẩn' : 'Hiện'}
                             </button>
                         </div>
+                        {errors.confirmPassword && (
+                            <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+                        )}
                     </>
                 )
             case 3:
@@ -149,7 +194,6 @@ export default function ModalResetPassword({ isModalOpen, setIsModalOpen }: any)
 
     return (
         <>
-            <ToastContainer transition={Bounce} />
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 sm:mx-0">
@@ -159,7 +203,15 @@ export default function ModalResetPassword({ isModalOpen, setIsModalOpen }: any)
                                     const isActive = step === idx + 1
                                     const isCompleted = step > idx + 1
                                     return (
-                                        <li key={idx} className={`flex items-center ${isCompleted ? 'text-green-600' : isActive ? 'text-indigo-600' : 'text-gray-400'} after:mx-4 after:hidden sm:after:inline-block after:w-full after:h-1 after:border-b after:border-gray-200`}>
+                                        <li
+                                            key={idx}
+                                            className={`flex items-center ${isCompleted
+                                                    ? 'text-green-600'
+                                                    : isActive
+                                                        ? 'text-indigo-600'
+                                                        : 'text-gray-400'
+                                                } after:mx-4 after:hidden sm:after:inline-block after:w-full after:h-1 after:border-b after:border-gray-200`}
+                                        >
                                             <span className="flex items-center">
                                                 {isCompleted ? (
                                                     <svg className="w-4 h-4 me-2.5" fill="currentColor" viewBox="0 0 20 20">
