@@ -22,7 +22,6 @@ export default function Chart() {
       const bestSeller: BestSellerCourse[] = (
         await overviewService.getBestSellerCourses()
       ).data;
-      console.log(bestSeller);
       setRevenueReport(revuenue);
       setBestSellerCourses(bestSeller);
     } catch (e) {

@@ -1,5 +1,5 @@
-// use for POST: create a global coupon
-export interface GlobalCouponBody {
+// use for POST: create a coupon
+export interface CouponBody {
   isGlobal: boolean;
   type: "discount" | "voucher";
   value: number;
@@ -45,8 +45,8 @@ export interface NormalCouponType {
   code: string;
   isGlobal: boolean;
   // status
-  isRunning: boolean;
   isAccepted: boolean;
+  isDeleted: boolean;
   // course information
   courseId: number;
   coureTitle: string;
@@ -67,4 +67,14 @@ export interface GlobalCouponType {
   minRequire: string;
   maxValueDiscount: string;
   code: string;
+}
+
+export interface NormalCouponDB {
+  normalCoupons: NormalCouponType[];
+  length: number;
+}
+
+export interface GlobalCouponDB {
+  globalCoupons: GlobalCouponType[];
+  length: number;
 }

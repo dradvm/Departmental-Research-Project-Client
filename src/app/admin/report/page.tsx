@@ -18,12 +18,14 @@ import {
 export default function Report() {
   const [page, setPage] = useState<number>(1);
   const [infors, setInfors] = useState<ReportType[]>();
+  const [dataLen, setDataLen] = useState<number>(0);
 
   const limit = 6;
 
   useEffect(() => {
     const skip = (page - 1) * limit;
     const data = reports.slice(skip, skip + limit);
+    setDataLen(reports.length);
     setInfors(data);
   }, [page]);
 
@@ -60,7 +62,7 @@ export default function Report() {
         <Pagination
           page={page}
           setPage={setPage}
-          dataLength={infors ? infors.length : 0}
+          dataLength={dataLen}
           limit={limit}
         ></Pagination>
       </div>

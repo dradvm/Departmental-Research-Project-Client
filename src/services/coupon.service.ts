@@ -1,11 +1,11 @@
-import { CouponReq, GlobalCouponBody } from "types/coupon";
+import { CouponReq, CouponBody } from "types/coupon";
 import axiosInstance from "./http";
 
 const couponService = {
     checkIsExistingCode: (code: string) => {
         return axiosInstance.get(`/coupon/isExisting/${encodeURIComponent(code)}`);
     },
-    createGlobalCoupon: (body: GlobalCouponBody) => {
+    createCoupon: (body: CouponBody) => {
         return axiosInstance.post("/coupon", body);
     },
     // userId which is also teacherId, is a option

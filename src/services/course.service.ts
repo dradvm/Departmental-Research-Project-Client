@@ -1,3 +1,4 @@
+import { CourseAdminQueryType } from "types/course";
 import axiosInstance from "./http";
 
 const courseService = {
@@ -33,6 +34,16 @@ const courseService = {
         instructorId,
       },
     }),
+
+  // for admin functions
+  getAllCourse: (params: CourseAdminQueryType) => {
+    return axiosInstance.get('/courses', { params });
+  },
+
+  // accept a course
+  acceptCourse: (courseId: number) => {
+    return axiosInstance.put(`/courses/accept/${courseId}`);
+  }
 };
 
 export default courseService;

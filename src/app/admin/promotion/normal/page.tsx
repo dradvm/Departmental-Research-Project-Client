@@ -1,6 +1,11 @@
 "use client";
 
-import { CouponFilterInput, CouponReq, NormalCouponType } from "types/coupon";
+import {
+  CouponFilterInput,
+  CouponReq,
+  NormalCouponDB,
+  NormalCouponType,
+} from "types/coupon";
 import { ChangeEvent, useEffect, useState } from "react";
 import couponService from "services/coupon.service";
 import { couponCourseService } from "services/couponcourse.service";
@@ -15,6 +20,7 @@ import NormalCouponDetailModal from "components/AdminUtils/NormalCouponDetailMod
 export default function NormalPromotion() {
   const [page, setPage] = useState<number>(1);
   const [normalCoupons, setNormalCoupons] = useState<NormalCouponType[]>();
+  const [dataLen, setDataLen] = useState<number>(0);
   // close and open modal
   const [open, setOpen] = useState<boolean>(false);
   function handleOpen() {
@@ -52,10 +58,10 @@ export default function NormalPromotion() {
         limit,
         ...fil,
       };
-      const data: NormalCouponType[] = (
-        await couponService.getAllNormalCoupon(req)
-      ).data;
-      setNormalCoupons(data);
+      const data: NormalCouponDB = (await couponService.getAllNormalCoupon(req))
+        .data;
+      setDataLen(data.length);
+      setNormalCoupons(data.normalCoupons);
     } catch (e) {
       toast.error("Lỗi khi lấy dữ liệu khuyến mãi của khóa học", {
         autoClose: 2000,
@@ -69,8 +75,7 @@ export default function NormalPromotion() {
   }, [page, filter]);
 
   // For button "Duyệt ngay"
-  // only accept, not set isRunning
-  // isRunning: false
+  // isDeleted: false
   // isAccepted: false => true
   async function acceptACouponCourse(couponId: number, courseId: number) {
     try {
@@ -78,12 +83,9 @@ export default function NormalPromotion() {
         couponId,
         courseId,
       });
-      toast.success(
-        "Đã duyệt nhưng chưa kích hoạt mã khuyến mãi cho khóa học!",
-        {
-          autoClose: 2000,
-        }
-      );
+      toast.success("Đã duyệt và kích hoạt mã khuyến mãi cho khóa học!", {
+        autoClose: 2000,
+      });
       await fetchData(page, filter);
     } catch (e) {
       console.log("Có lỗi xảy ra khi duyệt mã khuyến mãi cho khóa học!", e);
@@ -93,39 +95,12 @@ export default function NormalPromotion() {
     }
   }
 
-  // For button "Kích hoạt ngay"
-  // isRunning: false => true
-  // isAccepted: false => true / true => true
-  async function acceptAndActivateCouponCourse(
-    couponId: number,
-    courseId: number
-  ) {
-    try {
-      await couponCourseService.acceptAndActiveACouponCourse({
-        couponId,
-        courseId,
-      });
-      toast.success("Đã duyệt và kích hoạt mã khuyến mãi cho khóa học!", {
-        autoClose: 2000,
-      });
-      await fetchData(page, filter);
-    } catch (e) {
-      console.log(
-        "Có lỗi xảy ra khi duyệt và kích hoạt mã khuyến mãi cho khóa học!",
-        e
-      );
-      toast.error("Lỗi khi duyệt và kích hoạt mã khuyến mãi cho khóa học!", {
-        autoClose: 2000,
-      });
-    }
-  }
-
   // For button "Hủy kích hoạt"
   // isRunning: true => false
   // isAccepted: true
-  async function deactivateCouponCourse(couponId: number, courseId: number) {
+  async function deleteCouponCourse(couponId: number, courseId: number) {
     try {
-      await couponCourseService.deactivateACouponCourse({ couponId, courseId });
+      await couponCourseService.deleteACouponCourse({ couponId, courseId });
       toast.success("Đã hủy kích hoạt mã khuyến mãi cho khóa học!", {
         autoClose: 2000,
       });
@@ -156,8 +131,7 @@ export default function NormalPromotion() {
           handleOpen={handleOpen}
           setSelectedCoupon={setSelectedCoupon}
           acceptACouponCourse={acceptACouponCourse}
-          deactivateCouponCourse={deactivateCouponCourse}
-          acceptAndActivateCouponCourse={acceptAndActivateCouponCourse}
+          deleteCouponCourse={deleteCouponCourse}
         ></NormalCouponTable>
       )}
       {/* Pagination */}
@@ -165,7 +139,7 @@ export default function NormalPromotion() {
         <Pagination
           page={page}
           setPage={setPage}
-          dataLength={normalCoupons ? normalCoupons.length : 0}
+          dataLength={dataLen}
           limit={limit}
         ></Pagination>
       </div>
@@ -176,8 +150,7 @@ export default function NormalPromotion() {
             normalCoupon={selectedCoupon}
             handleClose={handleClose}
             acceptACouponCourse={acceptACouponCourse}
-            deactivateCouponCourse={deactivateCouponCourse}
-            acceptAndActivateCouponCourse={acceptAndActivateCouponCourse}
+            deleteCouponCourse={deleteCouponCourse}
           ></NormalCouponDetailModal>
         ) : (
           <h1>Không có mã khuyến mãi khóa học nào được chọn</h1>
