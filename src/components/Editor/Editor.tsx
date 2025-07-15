@@ -17,33 +17,35 @@ export default function Editor({
   setValue = (val: string) => {
     console.log(val);
   },
-  handleCancel,
-  handleSave,
+  handleCancel = () => { },
+  handleSave = () => { },
   isDisabled,
   warningMessageMaxLength = "",
   warningMessageMinLength = "",
   saveButtonMessage = "",
   maxLength = 500,
-  hideActions = false, //
-  hideWarnings = false, //
+  minLength = 1,
+  isButton = true,
+  isFocusEditor = true,
 }: {
   isDisplay: boolean;
   value?: string;
   setValue?: (val: string) => void;
-  handleCancel: () => void;
-  handleSave: () => void;
+  handleCancel?: () => void;
+  handleSave?: () => void;
   isDisabled: boolean;
   warningMessageMaxLength?: string;
   warningMessageMinLength?: string;
   saveButtonMessage?: string;
-  maxLength: number;
-  hideActions?: boolean; //
-  hideWarnings?: boolean; //
+  maxLength?: number;
+  minLength?: number;
+  isButton?: boolean;
+  isFocusEditor?: boolean;
 }) {
   const [mounted, setMounted] = useState(false);
   const { setEnabledBlock } = useLearnContext();
   const [remainingLength, setRemainingLength] = useState(maxLength);
-  const [isFocus, setIsFocus] = useState<boolean>(isDisplay);
+  const [isFocus, setIsFocus] = useState<boolean>(isFocusEditor);
   const handleFocus = () => {
     setEnabledBlock(false);
     setIsFocus(true);
@@ -74,7 +76,6 @@ export default function Editor({
   }, []); // 👈 chạy sau khi component mount
 
   useEffect(() => {
-    setIsFocus(isDisplay);
     if (isDisplay) {
       setRemainingLength(maxLength);
     }
@@ -98,16 +99,13 @@ export default function Editor({
           {remainingLength}
         </div>
       </div>
-      {!hideWarnings && remainingLength < 0 && (
+      {remainingLength < 0 && (
         <Alert severity="warning">{warningMessageMaxLength}</Alert>
       )}
-
-      {!hideWarnings &&
-        value.replace(/<\/?[^>]+(>|$)/g, "").trim().length === 0 && (
-          <Alert severity="warning">{warningMessageMinLength}</Alert>
-        )}
-
-      {!hideActions && (
+      {value.replace(/<\/?[^>]+(>|$)/g, "").trim().length < minLength && (
+        <Alert severity="warning">{warningMessageMinLength}</Alert>
+      )}
+      {isButton ? (
         <div className="flex justify-end">
           <div className="flex space-x-3">
             <Button variant="primary" onClick={handleCancel}>
@@ -126,6 +124,8 @@ export default function Editor({
             </Button>
           </div>
         </div>
+      ) : (
+        <></>
       )}
     </Stack>
   );

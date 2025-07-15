@@ -1,12 +1,10 @@
 import axios from "axios";
-import { create } from "lodash";
 import { getSession } from "next-auth/react";
-import { IUser } from "types/next-auth";
 
 const createAxios = (
   route = "",
   contentType = "application/json",
-  timeout = 5000
+  timeout = 30000
 ) => {
   //--------------
 

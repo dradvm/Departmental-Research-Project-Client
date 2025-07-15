@@ -1,5 +1,7 @@
 "use client";
-
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import "react-quill-new/dist/quill.snow.css";
 import "./globals.css";
 
@@ -9,20 +11,13 @@ import NextAuthWrapper from "lib/next.auth.wrapper";
 import { usePathname } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
 import { UserProvider } from "../../context/UserContext";
+import { DynamicFooter } from "components/Main/Footer/DynamicFooter";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-
-  // Danh sách các route cần ẩn header
-  const hiddenRoutes = ["/auth/login", "/auth/register", "/verify"];
-
-  // Ẩn header nếu pathname khớp bất kỳ prefix nào trong hiddenRoutes
-  const shouldShowHeader = !hiddenRoutes.some((path) => pathname.startsWith(path));
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -33,10 +28,13 @@ export default function RootLayout({
 
           <SessionProvider>
             <UserProvider>
-              {shouldShowHeader && <DynamicHeader />}
+              {<DynamicHeader />}
               {children}
             </UserProvider>
           </SessionProvider>
+          <DynamicHeader />
+          {children}
+          <DynamicFooter />
         </NextAuthWrapper>
       </body>
     </html>

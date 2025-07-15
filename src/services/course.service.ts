@@ -1,3 +1,4 @@
+import { CourseAdminQueryType } from "types/course";
 import axiosInstance from "./http";
 
 const courseService = {
@@ -20,17 +21,29 @@ const courseService = {
         cursor: cursor,
       },
     }),
-  getNumberCourseReviews: (
-    courseId: string,
-    rating?: number,
-    search?: string
-  ) =>
-    axiosInstance.get(`/courses/${courseId}/reviews/number`, {
+  getTotalCourseReviews: (courseId: string, rating?: number, search?: string) =>
+    axiosInstance.get(`/courses/${courseId}/reviews/total`, {
       params: {
         rating: rating,
         search: search,
       },
     }),
+  getOtherCourses: (courseId: number, instructorId: number) =>
+    axiosInstance.get(`/courses/${courseId}/others`, {
+      params: {
+        instructorId,
+      },
+    }),
+
+  // for admin functions
+  getAllCourse: (params: CourseAdminQueryType) => {
+    return axiosInstance.get('/courses', { params });
+  },
+
+  // accept a course
+  acceptCourse: (courseId: number) => {
+    return axiosInstance.put(`/courses/accept/${courseId}`);
+  }
 };
 
 export default courseService;

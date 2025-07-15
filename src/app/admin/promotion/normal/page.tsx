@@ -1,15 +1,37 @@
 "use client";
 
-import { productCoupon } from "app/data";
-import { CouponType } from "enums/coupon.enum";
-import { ProductCouponType } from "types/coupon";
+import {
+  CouponFilterInput,
+  CouponReq,
+  NormalCouponDB,
+  NormalCouponType,
+} from "types/coupon";
 import { ChangeEvent, useEffect, useState } from "react";
-import { Funnel, Search, ArrowBigLeft, ArrowBigRight } from "lucide-react";
+import couponService from "services/coupon.service";
+import { couponCourseService } from "services/couponcourse.service";
+import { toast, ToastContainer } from "react-toastify";
+import CouponFilter from "components/AdminUtils/CouponFilter";
+import NoDataFound from "components/AdminUtils/NoDataFound";
+import { Pagination } from "components/AdminUtils/Pagination";
+import NormalCouponTable from "components/AdminUtils/NormalCouponTable";
+import { Modal } from "@mui/material";
+import NormalCouponDetailModal from "components/AdminUtils/NormalCouponDetailModal";
 
 export default function NormalPromotion() {
   const [page, setPage] = useState<number>(1);
-  const [productCoupons, setproductCoupons] = useState<ProductCouponType[]>();
-  const [filter, setFilter] = useState({
+  const [normalCoupons, setNormalCoupons] = useState<NormalCouponType[]>();
+  const [dataLen, setDataLen] = useState<number>(0);
+  // close and open modal
+  const [open, setOpen] = useState<boolean>(false);
+  function handleOpen() {
+    setOpen(true);
+  }
+  function handleClose() {
+    setOpen(false);
+  }
+  // seletedCoupon
+  const [selectedCoupon, setSelectedCoupon] = useState<NormalCouponType>();
+  const [filter, setFilter] = useState<CouponFilterInput>({
     startDate: undefined,
     endDate: undefined,
     minPrice: undefined,
@@ -19,178 +41,123 @@ export default function NormalPromotion() {
 
   function onChangeFilterInput(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
+    setPage(1);
     setFilter((preFilter) => ({
       ...preFilter,
       [name]: value,
     }));
   }
 
-  useEffect(() => {
-    console.log(filter);
-  }, [filter]);
+  const limit = 4;
+
+  async function fetchData(page: number, fil: CouponFilterInput) {
+    try {
+      const skip = (page - 1) * limit;
+      const req: CouponReq = {
+        skip,
+        limit,
+        ...fil,
+      };
+      const data: NormalCouponDB = (await couponService.getAllNormalCoupon(req))
+        .data;
+      setDataLen(data.length);
+      setNormalCoupons(data.normalCoupons);
+    } catch (e) {
+      toast.error("Lỗi khi lấy dữ liệu khuyến mãi của khóa học", {
+        autoClose: 2000,
+      });
+      console.log("Lỗi khi lấy dữ liệu khuyến mãi của khóa học", e);
+    }
+  }
 
   useEffect(() => {
-    const limit = 4;
-    const skip = (page - 1) * limit;
-    const data = productCoupon.slice(skip, skip + limit);
-    setproductCoupons(data);
-  }, [page]);
+    fetchData(page, filter);
+  }, [page, filter]);
+
+  // For button "Duyệt ngay"
+  // isDeleted: false
+  // isAccepted: false => true
+  async function acceptACouponCourse(couponId: number, courseId: number) {
+    try {
+      await couponCourseService.acceptACouponCourse({
+        couponId,
+        courseId,
+      });
+      toast.success("Đã duyệt và kích hoạt mã khuyến mãi cho khóa học!", {
+        autoClose: 2000,
+      });
+      await fetchData(page, filter);
+    } catch (e) {
+      console.log("Có lỗi xảy ra khi duyệt mã khuyến mãi cho khóa học!", e);
+      toast.error("Lỗi khi duyệt mã khuyến mãi cho khóa học!", {
+        autoClose: 2000,
+      });
+    }
+  }
+
+  // For button "Hủy kích hoạt"
+  // isRunning: true => false
+  // isAccepted: true
+  async function deleteCouponCourse(couponId: number, courseId: number) {
+    try {
+      await couponCourseService.deleteACouponCourse({ couponId, courseId });
+      toast.success("Đã hủy kích hoạt mã khuyến mãi cho khóa học!", {
+        autoClose: 2000,
+      });
+      await fetchData(page, filter);
+    } catch (e) {
+      console.log(
+        "Có lỗi xảy ra khi HỦY KÍCH HOẠT mã khuyến mãi cho khóa học!",
+        e
+      );
+      toast.error("Lỗi khi hủy kích hoạt mã khuyến mãi!", { autoClose: 2000 });
+    }
+  }
 
   return (
-    <div className="h-[100%] flex flex-col">
+    <div className="h-fit mt-4 flex flex-col gap-4">
       {/* Filter Utility */}
-      <div className="h-[10%] flex">
-        <div className="w-[70%] flex gap-2">
-          <div
-            className="w-[6%] flex items-center justify-center"
-            title="Lọc các mã khuyến mãi"
-          >
-            <Funnel size={32} />
-          </div>
-          <div className="w-[45%] px-1 flex flex-col gap-2">
-            <h1 className="font-bold">Thời gian hiệu lực</h1>
-            <div className="flex gap-2">
-              <div className="flex gap-2">
-                <label htmlFor="">Từ: </label>
-                <input
-                  className="w-[72%] px-1 border-2 rounded-[8px]"
-                  type="date"
-                  name="startDate"
-                  value={filter.startDate ?? ""}
-                  onChange={onChangeFilterInput}
-                />
-              </div>
-              <div className="flex gap-2">
-                <label htmlFor="">đến: </label>
-                <input
-                  className="w-[72%] px-1 border-2 rounded-[8px]"
-                  type="date"
-                  name="endDate"
-                  value={filter.endDate ?? ""}
-                  onChange={onChangeFilterInput}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="w-[45%] px-1 flex flex-col gap-2">
-            <h1 className="font-bold">Giá trị</h1>
-            <div className="flex gap-2">
-              <div className="flex gap-2">
-                <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
-                  type="number"
-                  min={0}
-                  max={10000000}
-                  step={100000}
-                  name="minPrice"
-                  value={filter.minPrice ?? ""}
-                  onChange={onChangeFilterInput}
-                />
-                <span> VNĐ</span>
-              </div>
-              <div className="flex gap-2">
-                <label htmlFor="">hoặc </label>
-                <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
-                  type="number"
-                  min={0}
-                  max={100}
-                  step={1}
-                  name="minPercent"
-                  value={filter.minPercent ?? ""}
-                  onChange={onChangeFilterInput}
-                />
-                <span> %</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="w-[30%] flex gap-2 justify-center items-center">
-          <Search size={32} />
-          <input
-            type="text"
-            className="h-fit w-[70%] p-[8px] border-2 rounded-[40px]"
-            placeholder="Nội dung tìm kiếm"
-            name="searchText"
-            value={filter.searchText ?? ""}
-            onChange={onChangeFilterInput}
-          />
-        </div>
-      </div>
+      <CouponFilter
+        filter={filter}
+        onChangeFilterInput={onChangeFilterInput}
+        isGlobalCouponPage={false}
+      ></CouponFilter>
       {/* Content */}
-      <div className="h-[100%] grid grid-cols-4 grid-rows-1 gap-4">
-        {!productCoupons || productCoupons.length === 0 ? (
-          <div>Danh sách mã khuyến mãi khóa học trống</div>
-        ) : (
-          productCoupons.map((gCoupon, index) => {
-            let typeTitile: string = "";
-            let valueTitle: string = "";
-            if (gCoupon.type === CouponType.DISCOUNT) {
-              typeTitile = gCoupon.type;
-              valueTitle = `Giảm ${gCoupon.value}%`;
-            } else if (gCoupon.type === CouponType.VOUCHER) {
-              typeTitile = gCoupon.type;
-              valueTitle = `Giảm ${gCoupon.value} VNĐ`;
-            }
-            return (
-              <div
-                key={index}
-                className="h-[90%] p-2 flex flex-col gap-2 justify-center rounded-[8px] shadow-lg shadow-green-200"
-              >
-                <h1 className="uppercase font-bold text-center">
-                  #{gCoupon.idCoupon} {typeTitile}
-                </h1>
-                <h1 className="font-bold text-red-500">{valueTitle}</h1>
-                <h2>Giảm tối đa: {gCoupon.maxValueDiscount} VNĐ</h2>
-                <h2>Cho đơn từ: {gCoupon.minRequire} VNĐ</h2>
-                <h2 className="font-bold text-red-600">
-                  Cho khóa học: {gCoupon.title}
-                </h2>
-                <h2 className="font-bold text-blue-600">
-                  Giảng viên: {gCoupon.name}
-                </h2>
-                <h2>Bắt đầu: {gCoupon.startDate.slice(0, 10)}</h2>
-                <h2>Kết thúc: {gCoupon.endDate.slice(0, 10)}</h2>
-                <h2>
-                  Đã áp dụng: {gCoupon.appliedAmount}/ {gCoupon.quantity}{" "}
-                </h2>
-                <div className="flex gap-[8px] justify-center">
-                  <button className="p-[4px] bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white">
-                    Duyệt
-                  </button>
-                  <button className="p-[4px] bg-red-700 shadow-md shadow-red-700 rounded-[8px] font-bold text-white">
-                    Không duyệt
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+      {!normalCoupons || normalCoupons.length === 0 ? (
+        <NoDataFound message="Danh sách mã khuyến mãi khóa học trống" />
+      ) : (
+        <NormalCouponTable
+          normalCoupons={normalCoupons}
+          handleOpen={handleOpen}
+          setSelectedCoupon={setSelectedCoupon}
+          acceptACouponCourse={acceptACouponCourse}
+          deleteCouponCourse={deleteCouponCourse}
+        ></NormalCouponTable>
+      )}
       {/* Pagination */}
-      <div className="h-[10%] flex gap-[8px] justify-center">
-        <button
-          className="h-fit mt-[8px] p-[4px]"
-          onClick={() => {
-            if (page !== 1) setPage((curr) => curr - 1);
-          }}
-          title="Quay lại trang trước"
-        >
-          <ArrowBigLeft size={32} />
-        </button>
-        <button className="h-fit mt-[8px] p-[4px] text-[20px]">
-          Trang {page}
-        </button>
-        <button
-          className="h-fit mt-[8px] p-[4px]"
-          onClick={() => {
-            if (productCoupons?.length === 4) setPage((curr) => curr + 1);
-          }}
-          title="Trang tiếp theo"
-        >
-          <ArrowBigRight size={32} />
-        </button>
+      <div className="flex items-center justify-around">
+        <Pagination
+          page={page}
+          setPage={setPage}
+          dataLength={dataLen}
+          limit={limit}
+        ></Pagination>
       </div>
+      {/* Normal Coupon Detail Modal */}
+      <Modal open={open} onClose={handleClose}>
+        {selectedCoupon ? (
+          <NormalCouponDetailModal
+            normalCoupon={selectedCoupon}
+            handleClose={handleClose}
+            acceptACouponCourse={acceptACouponCourse}
+            deleteCouponCourse={deleteCouponCourse}
+          ></NormalCouponDetailModal>
+        ) : (
+          <h1>Không có mã khuyến mãi khóa học nào được chọn</h1>
+        )}
+      </Modal>
+      {/* Toast Message */}
+      <ToastContainer />
     </div>
   );
 }

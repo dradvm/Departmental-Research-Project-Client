@@ -1,79 +1,147 @@
-import { useEffect, useState } from "react";
-import { teachers, students } from "app/data";
-import { adminUiType } from "enums/admin.enum";
-import { Account } from "types/account";
-import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
+import { UserType } from "types/user";
+import NoDataFound from "./NoDataFound";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Chip,
+  Stack,
+} from "@mui/material";
+import { Button } from "components/Button/Button";
 
 interface InforListProps {
-  setSelectedItem: (account: Account) => void;
-  type: adminUiType;
+  infors: UserType[] | undefined;
+  setSelectedItem: (account: UserType) => void;
+  handleOpen: () => void;
+  deleteAccount: (userId: number) => void;
+  enableAccount: (userId: number) => void;
 }
 
-export default function InforList({ setSelectedItem, type }: InforListProps) {
-  const [activatedItem, setActivatedItem] = useState<number>();
-  const [page, setPage] = useState<number>(1);
-  const [infors, setInfors] = useState<Account[]>();
-
-  useEffect(() => {
-    const limit = 10;
-    const skip = (page - 1) * limit;
-    let data: Account[] = [];
-    if (type === adminUiType.Student) data = teachers;
-    else if (type === adminUiType.Teacher) data = students;
-    const newData = data.slice(skip, skip + limit);
-    setInfors(newData);
-  }, [page, type]);
-
+export default function InforList({
+  infors,
+  setSelectedItem,
+  handleOpen,
+  deleteAccount,
+  enableAccount,
+}: InforListProps) {
   return (
-    <div>
+    <>
       {!infors || infors.length === 0 ? (
-        <div>Danh sách trống</div>
+        <NoDataFound message="Danh sách người dùng trống" />
       ) : (
-        <ul>
-          {infors.map((infor, index) => {
-            return (
-              <li
-                key={index}
-                className={`px-6 py-2 border-b hover:underline cursor-pointer
-               ${infor.idUser === activatedItem ? "bg-blue-100" : ""} 
-            `}
-                onClick={() => {
-                  if (infor.idUser !== activatedItem) {
-                    setSelectedItem(infor);
-                    setActivatedItem(infor.idUser);
-                  }
-                }}
-              >
-                {infor.idUser + ". " + infor.name}
-              </li>
-            );
-          })}
-        </ul>
+        <TableContainer component={Paper} elevation={3}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>Họ và tên</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }} align="center">
+                  Giới tính
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }} align="center">
+                  Trạng thái
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold" }} align="center">
+                  Hành động
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {infors.map((infor) => (
+                <TableRow key={infor.userId} hover>
+                  <TableCell>
+                    <Typography>{infor.name}</Typography>
+                  </TableCell>
+
+                  {/* Giới tính dưới dạng Chip */}
+                  <TableCell align="center">
+                    <Chip
+                      label={
+                        infor.gender === "male"
+                          ? "Nam"
+                          : infor.gender === "female"
+                            ? "Nữ"
+                            : "Khác"
+                      }
+                      color={
+                        infor.gender === "male"
+                          ? "info"
+                          : infor.gender === "female"
+                            ? "secondary"
+                            : "default"
+                      }
+                      variant="outlined"
+                    />
+                  </TableCell>
+
+                  <TableCell>
+                    <Typography>{infor.email}</Typography>
+                  </TableCell>
+
+                  {/* Trạng thái tài khoản dưới dạng Chip */}
+                  <TableCell align="center">
+                    {!infor.isDeleted && (
+                      <Chip
+                        label={
+                          infor.isActive ? "Đã kích hoạt" : "Chưa kích hoạt"
+                        }
+                        color={infor.isActive ? "success" : "error"}
+                        variant="outlined"
+                      />
+                    )}
+                    {infor.isDeleted && (
+                      <Chip
+                        label={"Bị vô hiệu hóa"}
+                        color={"error"}
+                        variant="outlined"
+                      />
+                    )}
+                  </TableCell>
+
+                  {/* Hành động gộp chung cột */}
+                  <TableCell align="center">
+                    <Stack direction="row" spacing={1} justifyContent="center">
+                      <Button
+                        variant="filled"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedItem(infor);
+                          handleOpen();
+                        }}
+                      >
+                        Xem chi tiết
+                      </Button>
+                      {infor.isDeleted && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => enableAccount(infor.userId)}
+                        >
+                          Hủy vô hiệu hóa
+                        </Button>
+                      )}
+                      {!infor.isDeleted && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => deleteAccount(infor.userId)}
+                        >
+                          Vô hiệu hóa
+                        </Button>
+                      )}
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-      {/* Button Pagination */}
-      <div className="h-[10%] flex gap-[8px] justify-center">
-        <button
-          className="h-fit mt-[8px] p-[4px]"
-          onClick={() => {
-            if (page !== 1) setPage((curr) => curr - 1);
-          }}
-          title="Quay lại trang trước"
-        >
-          <ArrowBigLeft size={32} />
-        </button>
-        <button className="h-fit mt-[8px] p-[4px] text-[20px]">
-          Trang {page}
-        </button>
-        <button
-          className="h-fit mt-[8px] p-[4px]"
-          onClick={() => {
-            if (infors?.length === 10) setPage((curr) => curr + 1);
-          }}
-          title="Trang tiếp theo"
-        >
-          <ArrowBigRight size={32} />
-        </button>
-      </div>
-    </div>
+    </>
   );
 }

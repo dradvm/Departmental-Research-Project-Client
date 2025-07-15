@@ -1,258 +1,143 @@
 "use client";
 
-import { PostType } from "types/post";
 import { useEffect, useState } from "react";
-import { posts } from "app/data";
+import { Pagination } from "components/AdminUtils/Pagination";
+import NoDataFound from "components/AdminUtils/NoDataFound";
+import courseService from "services/course.service";
 import {
-  Video,
-  Clock4,
-  CircleUser,
-  ArrowBigRight,
-  ArrowBigLeft,
-  Search,
-  Funnel,
-} from "lucide-react";
+  CourseAdminFilter,
+  CourseAdminQueryType,
+  CourseAdminUI,
+  CourseResAdminUI,
+} from "types/course";
+import PostFilter from "components/AdminUtils/PostFilter";
+import { PostItem } from "components/AdminUtils/PostItem";
+import { Modal } from "@mui/material";
+import PostDetailModal from "components/AdminUtils/PostDetailModal";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function Post() {
   const [page, setPage] = useState<number>(1);
-  const [infors, setInfors] = useState<PostType[]>();
-  const [filter, setFilter] = useState({
-    minTuition: undefined,
-    maxTuition: undefined,
-    minLessonCount: undefined,
-    maxLessonCount: undefined,
-    minDuration: undefined,
-    maxDuration: undefined,
+  const [infors, setInfors] = useState<CourseAdminUI[]>();
+  const [selectedPost, setSelectedPost] = useState<CourseAdminUI>();
+  const [dataLen, setDataLen] = useState<number>(0);
+  const [open, setOpen] = useState<boolean>(false);
+  const [filter, setFilter] = useState<CourseAdminFilter>({
+    minPrice: undefined,
+    maxPrice: undefined,
+    minLectureCount: undefined,
+    maxLectureCount: undefined,
+    minTime: undefined,
+    maxTime: undefined,
     searchText: undefined,
   });
 
+  // open/ close modal
+  function handleOpen() {
+    setOpen(true);
+  }
+  function handleClose() {
+    setOpen(false);
+  }
+
+  // filter change
   function onChangeFilter(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
+    setPage(1);
     setFilter((preFilter) => ({
       ...preFilter,
       [name]: value,
     }));
   }
 
-  useEffect(() => {
-    console.log(filter);
-  }, [filter]);
+  // get data with page and filter
+  const limit = 4;
+
+  async function fetchData(page: number, filter: CourseAdminFilter) {
+    const skip = (page - 1) * limit;
+    const req: CourseAdminQueryType = {
+      limit,
+      skip,
+      minPrice: filter.minPrice ? parseInt(filter.minPrice) : undefined,
+      maxPrice: filter.maxPrice ? parseInt(filter.maxPrice) : undefined,
+      minLectureCount: filter.minLectureCount
+        ? parseInt(filter.minLectureCount)
+        : undefined,
+      maxLectureCount: filter.maxLectureCount
+        ? parseInt(filter.maxLectureCount)
+        : undefined,
+      minTime: filter.minTime ? parseInt(filter.minTime) * 3600 : undefined,
+      maxTime: filter.maxTime ? parseInt(filter.maxTime) * 3600 : undefined,
+      searchText: filter.searchText ? filter.searchText : undefined,
+    };
+    const dataRespone: CourseResAdminUI = (
+      await courseService.getAllCourse(req)
+    ).data;
+    setDataLen(dataRespone.length);
+    setInfors(dataRespone.courses);
+  }
 
   useEffect(() => {
-    const limit = 4;
-    const skip = (page - 1) * limit;
-    const data = posts.slice(skip, skip + limit);
-    setInfors(data);
-  }, [page]);
+    fetchData(page, filter);
+  }, [page, filter]);
+
+  // accept a course
+  async function acceptCourse(courseId: number) {
+    try {
+      if (confirm(`Xác nhận duyệt khóa học này?`)) {
+        await courseService.acceptCourse(courseId);
+        await fetchData(page, filter);
+        toast.success("Duyệt khóa học thành công!", { autoClose: 2000 });
+      }
+    } catch (e) {
+      console.log("Lỗi duyệt khóa học thất bại: ", e);
+      toast.error("Xảy ra lỗi khi duyệt khóa học", { autoClose: 2000 });
+    }
+  }
 
   return (
-    <div className="h-[600px] flex flex-col">
-      {/* Block 1: Title Page */}
-      <div className="h-[10%]">
-        <h1 className="text-[24px] font-bold text-blue-600">
-          Danh sách các bài đăng
-        </h1>
-      </div>
-      {/* Block 2: Filter Utility */}
-      <div className="h-[10%] flex">
-        <div className="w-[70%] flex gap-2">
-          <div
-            className="w-[6%] flex items-center justify-center"
-            title="Lọc các bài đăng"
-          >
-            <Funnel size={32} />
-          </div>
-          <div className="w-[30%] px-1 flex flex-col gap-2">
-            <h1 className="font-bold">Học phí (VNĐ)</h1>
-            <div className="flex gap-2">
-              <div className="flex gap-2">
-                <label htmlFor="">Từ: </label>
-                <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
-                  type="number"
-                  min={0}
-                  step={100000}
-                  name="minTuition"
-                  value={filter.minTuition ?? ""}
-                  onChange={onChangeFilter}
-                />
-              </div>
-              <div className="flex gap-2">
-                <label htmlFor="">đến: </label>
-                <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
-                  type="number"
-                  min={0}
-                  step={100000}
-                  name="maxTuition"
-                  value={filter.maxTuition ?? ""}
-                  onChange={onChangeFilter}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="w-[30%] px-1 flex flex-col gap-2">
-            <h1 className="font-bold">Số lượng bài học (bài)</h1>
-            <div className="flex gap-2">
-              <div className="flex gap-2">
-                <label htmlFor="">Từ: </label>
-                <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
-                  type="number"
-                  min={0}
-                  step={1}
-                  name="minLessonCount"
-                  value={filter.minLessonCount ?? ""}
-                  onChange={onChangeFilter}
-                />
-              </div>
-              <div className="flex gap-2">
-                <label htmlFor="">đến: </label>
-                <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
-                  type="number"
-                  min={0}
-                  step={1}
-                  name="maxLessonCount"
-                  value={filter.maxLessonCount ?? ""}
-                  onChange={onChangeFilter}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="w-[30%] px-1 flex flex-col gap-2">
-            <h1 className="font-bold">Thời lượng học (giờ)</h1>
-            <div className="flex gap-2">
-              <div className="flex gap-2">
-                <label htmlFor="">Từ: </label>
-                <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
-                  type="number"
-                  min={0}
-                  step={1}
-                  name="minDuration"
-                  value={filter.minDuration ?? ""}
-                  onChange={onChangeFilter}
-                />
-              </div>
-              <div className="flex gap-2">
-                <label htmlFor="">đến: </label>
-                <input
-                  className="w-[70%] px-1 border-2 rounded-[8px]"
-                  type="number"
-                  min={0}
-                  step={1}
-                  name="maxDuration"
-                  value={filter.maxDuration ?? ""}
-                  onChange={onChangeFilter}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="w-[30%] flex gap-2 justify-center items-center">
-          <Search size={32} />
-          <input
-            type="text"
-            className="h-fit w-[70%] p-[8px] border-2 rounded-[40px]"
-            placeholder="Nội dung tìm kiếm"
-            name="searchText"
-            value={filter.searchText ?? ""}
-            onChange={onChangeFilter}
-          />
-        </div>
-      </div>
-      {/* Block 3: Content */}
+    <div className="h-[600px] mt-4 flex flex-col gap-4">
+      {/* Block 1: Filter Utility */}
+      <PostFilter filter={filter} onChangeFilter={onChangeFilter}></PostFilter>
+      {/* Block 2: Content */}
       {!infors || infors.length === 0 ? (
-        <div>Không có bài đăng nào</div>
+        <NoDataFound message="Không có bài đăng"></NoDataFound>
       ) : (
-        <div className="h-[70%] p-[8px] grid grid-cols-4 grid-rows-1 gap-x-[8px]">
-          {infors.map((post, index) => (
-            <div
-              key={index}
-              className="h-[95%] p-[8px] mt-[20px] hover:mt-[0px] rounded-[16px] shadow-xl"
-            >
-              <div className="h-[30%]">Khu vực ảnh</div>
-              <div className="h-[70%] flex flex-col gap-2">
-                {/* Title & Sub Title*/}
-                <div>
-                  <h1 className="text-[20px] font-bold text-green-700">
-                    {post.title}
-                  </h1>
-                  <h2 className="font-semibold text-pink-500">
-                    {post.subTitle}
-                  </h2>
-                </div>
-                {/* Teacher, Video Amount, Duration */}
-                <div className="flex gap-2 justify-center">
-                  <span
-                    className="inline-flex gap-1"
-                    title={`Giảng viên hướng dẫn: Lâm BF`}
-                  >
-                    <CircleUser color="blue" />{" "}
-                    <h2 className="font-bold text-blue-700">Lâm BF </h2>
-                  </span>
-                  <span
-                    className="inline-flex gap-1"
-                    title={`Số lượng video: 27`}
-                  >
-                    <Video /> 27
-                  </span>
-                  <span
-                    className="inline-flex gap-1"
-                    title={`Tổng thời lượng video: 6h20p`}
-                  >
-                    <Clock4 /> 6h20p
-                  </span>
-                </div>
-                {/* Tuition */}
-                <div>
-                  <h3 className="text-center text-[20px] font-bold text-red-600">
-                    Học phí: {post.price}
-                  </h3>
-                </div>
-                {/* Description */}
-                <div className="h-[50%] overflow-auto">
-                  <p>{post.description}</p>
-                </div>
-                {/* Combo Button */}
-                <div className="flex gap-[8px] justify-center">
-                  <button className="p-[4px] bg-blue-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white">
-                    Duyệt
-                  </button>
-                  <button className="p-[4px] bg-red-700 shadow-md shadow-red-700 rounded-[8px] font-bold text-white">
-                    Không duyệt
-                  </button>
-                </div>
-              </div>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+          {infors.map((post) => (
+            <PostItem
+              key={post.courseId}
+              post={post}
+              handleOpen={handleOpen}
+              setSelectedPost={setSelectedPost}
+              acceptCourse={acceptCourse}
+            />
           ))}
         </div>
       )}
-      {/* Blokc 4: Button Pagination */}
-      <div className="h-[10%] flex gap-[8px] justify-center">
-        <button
-          className="h-fit mt-[8px] p-[4px]"
-          onClick={() => {
-            if (page !== 1) setPage((curr) => curr - 1);
-          }}
-          title="Quay lại trang trước"
-        >
-          <ArrowBigLeft size={32} />
-        </button>
-        <button className="h-fit mt-[8px] p-[4px] text-[20px]">
-          Trang {page}
-        </button>
-        <button
-          className="h-fit mt-[8px] p-[4px]"
-          onClick={() => {
-            if (infors?.length === 4) setPage((curr) => curr + 1);
-          }}
-          title="Trang tiếp theo"
-        >
-          <ArrowBigRight size={32} />
-        </button>
+      {/* Block 3: Button Pagination */}
+      <div className="flex items-center justify-around">
+        <Pagination
+          page={page}
+          setPage={setPage}
+          dataLength={dataLen}
+          limit={limit}
+        ></Pagination>
       </div>
+      {/* Modal */}
+      <Modal open={open} onClose={handleClose}>
+        {selectedPost ? (
+          <PostDetailModal
+            postDetail={selectedPost}
+            handleClose={handleClose}
+            acceptCourse={acceptCourse}
+          />
+        ) : (
+          <h1>Không có bài đăng nào được chọn cả</h1>
+        )}
+      </Modal>
+      {/* Toast container */}
+      <ToastContainer />
     </div>
   );
 }
