@@ -17,8 +17,8 @@ export default function Editor({
   setValue = (val: string) => {
     console.log(val);
   },
-  handleCancel = () => {},
-  handleSave = () => {},
+  handleCancel = () => { },
+  handleSave = () => { },
   isDisabled,
   warningMessageMaxLength = "",
   warningMessageMinLength = "",
@@ -92,9 +92,8 @@ export default function Editor({
           onBlur={handleBlur}
           modules={modules}
           formats={formats}
-          className={`break-words whitespace-pre-wrap rounded ${
-            isFocus ? "border border-indigo-600 border-2" : "border border-2"
-          } `}
+          className={`break-words whitespace-pre-wrap rounded ${isFocus ? "border border-indigo-600 border-2" : "border border-2"
+            } `}
         />
         <div className="absolute top-0 right-0 py-2 px-4 text-slate-600">
           {remainingLength}

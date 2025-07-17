@@ -5,7 +5,7 @@ import { useMemo } from "react";
 export function DynamicFooter() {
   const pathname = usePathname();
 
-  const hiddenRoutes = useMemo(() => ["/admin"], []);
+  const hiddenRoutes = useMemo(() => ["/admin", "/auth", "/verify", "/instructor"], []);
 
   const isFooterHidden = useMemo(() => {
     return hiddenRoutes.some((path) => pathname.startsWith(path));

@@ -8,6 +8,9 @@ import "./globals.css";
 import DynamicHeader from "components/Main/Header/DynamicHeader";
 import NextAuthWrapper from "lib/next.auth.wrapper";
 
+import { usePathname } from "next/navigation";
+import { SessionProvider } from "next-auth/react";
+import { UserProvider } from "../../context/UserContext";
 import { DynamicFooter } from "components/Main/Footer/DynamicFooter";
 
 export default function RootLayout({
@@ -22,9 +25,14 @@ export default function RootLayout({
       </head>
       <body>
         <NextAuthWrapper>
-          <DynamicHeader />
-          {children}
-          <DynamicFooter />
+
+          <SessionProvider>
+            <UserProvider>
+              {<DynamicHeader />}
+              {children}
+              <DynamicFooter />
+            </UserProvider>
+          </SessionProvider>
         </NextAuthWrapper>
       </body>
     </html>

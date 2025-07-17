@@ -37,7 +37,7 @@ const LoginPage = () => {
       toast.error(`${res?.error}`);
     } else {
       //redirect to home
-      router.push("/dashboard");
+      router.push("/instructor");
     }
 
     // Gửi dữ liệu tới API hoặc xử lý logic đăng nhập ở đây
