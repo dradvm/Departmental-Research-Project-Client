@@ -30,6 +30,8 @@ export default function CourseForm(props: CourseFormProps) {
     const [price, setPrice] = useState('');
     const [isPublic, setIsPublic] = useState(true);
     const [targetAudience, setTargetAudience] = useState("");
+    const [categoryIds, setCategoryIds] = useState<number[]>([]);
+    const [allCategories, setAllCategories] = useState<{ categoryId: number, categoryName: string }[]>([]);
 
     useEffect(() => {
         if (mode === 'edit' && courseData && sections.length === 1 && sections[0].lectures.length === 1 && sections[0].lectures[0].contents.length === 0) {
@@ -64,6 +66,20 @@ export default function CourseForm(props: CourseFormProps) {
                 })),
             })));
         }
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch('http://localhost:3001/api/categories');
+                const data = await res.json();
+                setAllCategories(data);
+            } catch (err) {
+                console.error('Failed to fetch categories:', err);
+            }
+        };
+
+        fetchCategories();
+        if (mode === 'edit' && courseData?.CourseCategory) {
+            setCategoryIds(courseData.CourseCategory.map((cc: any) => cc.categoryId));
+        }
     }, [mode, courseData]);
 
     const [errors, setErrors] = useState<{
@@ -74,6 +90,7 @@ export default function CourseForm(props: CourseFormProps) {
         targetAudience: string //
         price: string
         thumbnail: string
+        categories: string; //
         sections: { title: string; lectures: string[] }[]
     }>({
         title: '',
@@ -83,6 +100,7 @@ export default function CourseForm(props: CourseFormProps) {
         targetAudience: '', //
         price: '',
         thumbnail: '',
+        categories: '', //
         sections: [],
     })
 
@@ -262,6 +280,7 @@ export default function CourseForm(props: CourseFormProps) {
                 : 'Price must be an integer and at least 1,000 VND.',
             thumbnail: mode === 'create' && !thumbnailFile ? 'Thumbnail is required.' : '',
             sections: sectionErrors,
+            categories: categoryIds.length === 0 ? 'At least one category is required.' : '',
         }
 
         setErrors(newErrors)
@@ -332,6 +351,7 @@ export default function CourseForm(props: CourseFormProps) {
         formData.append('price', price)
         formData.append('userId', userId?.toString() || '')
         formData.append('isPublic', isPublic.toString())
+        formData.append('categoryIds', JSON.stringify(categoryIds)); //
 
         console.log(JSON.stringify(sections, null, 2));
 
@@ -529,6 +549,38 @@ export default function CourseForm(props: CourseFormProps) {
                                     </p>
                                 )}
                             </div>
+
+                            <div className="col-span-full">
+                                <label htmlFor="categories" className="block text-sm font-medium text-gray-900">
+                                    Categories
+                                </label>
+                                <div className="mt-2 space-y-2">
+                                    {allCategories.map((cat) => (
+                                        <div key={cat.categoryId} className="flex items-center">
+                                            <input
+                                                id={`cat-${cat.categoryId}`}
+                                                type="checkbox"
+                                                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                                checked={categoryIds.includes(cat.categoryId)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setCategoryIds([...categoryIds, cat.categoryId]);
+                                                    } else {
+                                                        setCategoryIds(categoryIds.filter(id => id !== cat.categoryId));
+                                                    }
+                                                }}
+                                            />
+                                            <label htmlFor={`cat-${cat.categoryId}`} className="ml-2 block text-sm text-gray-700">
+                                                {cat.categoryName}
+                                            </label>
+                                        </div>
+                                    ))}
+                                    {errors.categories && (
+                                        <p className="text-sm text-red-600 mt-1">{errors.categories}</p>
+                                    )}
+                                </div>
+                            </div>
+
 
                             <div className="col-span-full">
                                 <label htmlFor="isPublic" className="block text-sm font-medium text-gray-900">
