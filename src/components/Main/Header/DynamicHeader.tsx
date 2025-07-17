@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import Header from "./Header";
 import ConstructorHeader from "./Constructor.Header";
 import { useUser } from "../../../../context/UserContext";
 import { useMemo } from "react";
@@ -10,16 +9,11 @@ export default function DynamicHeader() {
   const { user } = useUser();
   const pathname = usePathname();
 
-  if (!user) return null;
-
-  if (pathname.startsWith("/course")) return <></>;
-  if (pathname.startsWith("/auth")) return <></>;
-  if (pathname.startsWith("/verify")) return <></>;
-
-  if (user.role === 'INSTRUCTOR' || user.role === "ADMIN") return <ConstructorHeader />;
+  // if (user.role === "INSTRUCTOR" || user.role === "ADMIN")
+  //   return <ConstructorHeader />;
 
   const hiddenRoutes = useMemo(
-    () => ["/course/:slug", "/dashboard", "/admin"],
+    () => ["/course/:slug", "/dashboard", "/admin", "/auth", "/verify"],
     []
   );
 

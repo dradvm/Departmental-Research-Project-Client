@@ -25,10 +25,9 @@ export default function RootLayout({
       </head>
       <body>
         <NextAuthWrapper>
-
           <SessionProvider>
             <UserProvider>
-              {<DynamicHeader />}
+              <DynamicHeader />
               {children}
               <DynamicFooter />
             </UserProvider>
