@@ -2,100 +2,127 @@ import * as React from 'react';
 import clsx from 'clsx';
 import { styled, css } from '@mui/system';
 import { Modal as BaseModal } from '@mui/base/Modal';
+import FormPromotionIns from './FormAddCoupon/FormPromotionIns';
+import { CouponBody } from 'types/coupon';
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type Props = {
-    open: boolean;
-    onClose: () => void;
-    courseId?: number;
+  open: boolean;
+  onClose: () => void;
+  courseId?: number;
 };
 
 export default function ModalUnstyled({ open, onClose, courseId }: Props) {
-    const [couponCode, setCouponCode] = React.useState("");
 
-    const handleSubmit = () => {
-        alert(`Saving coupon: ${couponCode} for course: ${courseId}`);
-        onClose(); // đóng modal sau khi lưu
-    };
+  const defaultPromotion = {
+    isGlobal: false,
+    type: "discount",
+    value: 10,
+    code: "",
+    maxValueDiscount: 100000,
+    minRequire: 0,
+    appliedAmount: 0,
+    quantity: 1,
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0],
+  } as const;
 
-    return (
-        <Modal
-            aria-labelledby="unstyled-modal-title"
-            aria-describedby="unstyled-modal-description"
-            open={open}
-            onClose={onClose}
-            slots={{ backdrop: StyledBackdrop }}
-        >
-            <ModalContent sx={{ width: 400 }}>
-                <h2 id="unstyled-modal-title" className="modal-title">
-                    Add Coupon for Course
-                </h2>
 
-                <p id="unstyled-modal-description" className="modal-description">
-                    Please enter the coupon code you'd like to assign:
-                </p>
+  const [promotionInfo, setPromotionInfo] = React.useState<CouponBody>(defaultPromotion);
 
-                <input
-                    type="text"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="Enter coupon code"
-                    className="border px-3 py-2 rounded-md text-sm"
-                />
 
-                <div className="flex justify-end gap-2 mt-4">
-                    <button
-                        onClick={onClose}
-                        className="text-sm px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        className="text-sm px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700"
-                    >
-                        Save
-                    </button>
-                </div>
-            </ModalContent>
-        </Modal>
-    );
+  return (
+    <>
+      <Modal
+        aria-labelledby="unstyled-modal-title"
+        aria-describedby="unstyled-modal-description"
+        open={open}
+        onClose={onClose}
+        slots={{ backdrop: StyledBackdrop }}
+      >
+        <ModalContent sx={{ width: 400 }}>
+          <h2 id="unstyled-modal-title" className="modal-title">
+            Tạo mã giảm giá cho khóa học
+          </h2>
+
+          <FormPromotionIns
+            promotion={promotionInfo}
+            setPromotionInfor={setPromotionInfo}
+            handleSuccessfulCreation={() => {
+              toast.success("Tạo mã giảm giá thành công!");
+              setTimeout(() => {
+                onClose();
+              }, 1000); // đợi 1 giây để toast hiển thị trước
+            }}
+            handleFailedCreation={() => {
+              toast.error("Tạo mã thất bại!");
+            }}
+            handleInformIsExistingCode={() => {
+              toast.error("Mã giảm giá đã tồn tại!");
+            }}
+            isGlobal={false}
+            mode="course"
+            courseId={courseId}
+            onCancel={() => {
+              onClose(); // ✅ gọi hàm đóng modal
+            }}
+          />
+
+        </ModalContent>
+      </Modal>
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={true}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+    </>
+  );
 }
 
 
 const Backdrop = React.forwardRef<
-    HTMLDivElement,
-    { open?: boolean; className: string }
+  HTMLDivElement,
+  { open?: boolean; className: string }
 >((props, ref) => {
-    const { open, className, ...other } = props;
-    return (
-        <div
-            className={clsx({ 'base-Backdrop-open': open }, className)}
-            ref={ref}
-            {...other}
-        />
-    );
+  const { open, className, ...other } = props;
+  return (
+    <div
+      className={clsx({ 'base-Backdrop-open': open }, className)}
+      ref={ref}
+      {...other}
+    />
+  );
 });
 
 const blue = {
-    200: '#99CCFF',
-    300: '#66B2FF',
-    400: '#3399FF',
-    500: '#007FFF',
-    600: '#0072E5',
-    700: '#0066CC',
+  200: '#99CCFF',
+  300: '#66B2FF',
+  400: '#3399FF',
+  500: '#007FFF',
+  600: '#0072E5',
+  700: '#0066CC',
 };
 
 const grey = {
-    50: '#F3F6F9',
-    100: '#E5EAF2',
-    200: '#DAE2ED',
-    300: '#C7D0DD',
-    400: '#B0B8C4',
-    500: '#9DA8B7',
-    600: '#6B7A90',
-    700: '#434D5B',
-    800: '#303740',
-    900: '#1C2025',
+  50: '#F3F6F9',
+  100: '#E5EAF2',
+  200: '#DAE2ED',
+  300: '#C7D0DD',
+  400: '#B0B8C4',
+  500: '#9DA8B7',
+  600: '#6B7A90',
+  700: '#434D5B',
+  800: '#303740',
+  900: '#1C2025',
 };
 
 const Modal = styled(BaseModal)`
@@ -116,7 +143,7 @@ const StyledBackdrop = styled(Backdrop)`
 `;
 
 const ModalContent = styled('div')(
-    ({ theme }) => css`
+  ({ theme }) => css`
     font-family: 'IBM Plex Sans', sans-serif;
     font-weight: 500;
     text-align: start;
@@ -150,7 +177,7 @@ const ModalContent = styled('div')(
 );
 
 const TriggerButton = styled('button')(
-    ({ theme }) => css`
+  ({ theme }) => css`
     font-family: 'IBM Plex Sans', sans-serif;
     font-weight: 600;
     font-size: 0.875rem;

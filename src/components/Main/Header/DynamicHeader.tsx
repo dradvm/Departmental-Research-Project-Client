@@ -13,6 +13,9 @@ export default function DynamicHeader() {
   if (!user) return null;
 
   if (pathname.startsWith("/course")) return <></>;
+  if (pathname.startsWith("/auth")) return <></>;
+  if (pathname.startsWith("/verify")) return <></>;
+
   if (user.role === 'INSTRUCTOR' || user.role === "ADMIN") return <ConstructorHeader />;
 
   const hiddenRoutes = useMemo(

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     PhotoIcon,
     PencilIcon,
@@ -10,18 +10,66 @@ import { DocumentTextIcon } from '@heroicons/react/20/solid'
 import { useUser } from '../../../context/UserContext'
 import ResponsiveEditor from 'components/Editor/ResponsiveEditor'
 
-export default function CourseForm() {
-    const { user } = useUser()
+type CourseFormProps = {
+    mode: 'create' | 'edit';
+    courseData?: any; // dữ liệu khóa học từ backend khi chỉnh sửa
+};
 
+export default function CourseForm(props: CourseFormProps) {
+    const { user } = useUser();
+
+    const { mode, courseData } = props;
+
+    const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [requirement, setRequirement] = useState("");
     const [subTitle, setSubTitle] = useState("");
+    const [thumbnailName, setThumbnailName] = useState('');
+    const [price, setPrice] = useState('');
+    const [isPublic, setIsPublic] = useState(true);
+    const [targetAudience, setTargetAudience] = useState("");
+
+    useEffect(() => {
+        if (mode === 'edit' && courseData && sections.length === 1 && sections[0].lectures.length === 1 && sections[0].lectures[0].contents.length === 0) {
+            setDescription(courseData.description || '');
+            setRequirement(courseData.requirement || '');
+            setTargetAudience(courseData.targetAudience || '');
+            setTitle(courseData.title || '');
+            setSubTitle(courseData.subTitle || '');
+            setPrice(courseData.price || '');
+            setIsPublic(courseData.isPublic || false);
+            setThumbnailName(courseData.thumbnail || '');
+
+            setSections(courseData.Section.map((section: any, sIdx: number) => ({
+                title: section.nameSection,
+                newTitle: section.nameSection,
+                isEditingTitle: false,
+                showAddLecture: false,
+                newLectureTitle: '',
+                lectures: section.Lecture.map((lecture: any, lIdx: number) => ({
+                    title: lecture.nameLecture,
+                    newTitle: lecture.nameLecture,
+                    isEditing: false,
+                    contents: lecture.video
+                        ? [{
+                            type: 'video',
+                            name: lecture.video.split('/').pop() || 'Video',
+                            file: null, // bạn có thể để null vì không có file gốc
+                            url: lecture.video,
+                            duration: lecture.time, //
+                        }]
+                        : [],
+                })),
+            })));
+        }
+    }, [mode, courseData]);
 
     const [errors, setErrors] = useState<{
         title: string
         subTitle: string //
         description: string
         requirement: string //
+        targetAudience: string //
         price: string
         thumbnail: string
         sections: { title: string; lectures: string[] }[]
@@ -30,6 +78,7 @@ export default function CourseForm() {
         subTitle: '', //
         description: '',
         requirement: '', //
+        targetAudience: '', //
         price: '',
         thumbnail: '',
         sections: [],
@@ -44,7 +93,7 @@ export default function CourseForm() {
                     title: 'Introduction',
                     isEditing: false,
                     newTitle: 'Introduction',
-                    contents: [] as { type: 'video'; name: string; file: File }[],
+                    contents: [] as { type: 'video'; name: string; file: File | null; url?: string; duration?: number; }[],
                 },
             ],
             showAddLecture: false,
@@ -54,8 +103,6 @@ export default function CourseForm() {
         },
     ])
 
-    const [thumbnailName, setThumbnailName] = useState('')
-    const [isPublic, setIsPublic] = useState(true)
 
     const handleAddSection = () => {
         setSections([
@@ -125,26 +172,60 @@ export default function CourseForm() {
         setSections(updated)
     }
 
+    // const handleSelectVideoFile = (
+    //     file: File,
+    //     sectionIdx: number,
+    //     lectureIdx: number
+    // ) => {
+    //     const updated = [...sections]
+    //     updated[sectionIdx].lectures[lectureIdx].contents.push({
+    //         type: 'video',
+    //         name: file.name,
+    //         file: file,
+    //         url: undefined,
+    //     })
+    //     setSections(updated)
+    // }
+
     const handleSelectVideoFile = (
         file: File,
         sectionIdx: number,
         lectureIdx: number
     ) => {
-        const updated = [...sections]
-        updated[sectionIdx].lectures[lectureIdx].contents.push({
-            type: 'video',
-            name: file.name,
-            file: file,
-        })
-        setSections(updated)
-    }
+        const videoElement = document.createElement('video');
+        videoElement.preload = 'metadata';
+
+        videoElement.onloadedmetadata = () => {
+            const duration = videoElement.duration; // thời lượng tính bằng giây
+            console.log(`⏱ Duration of video: ${duration} seconds`);
+
+            const updated = [...sections];
+            updated[sectionIdx].lectures[lectureIdx].contents.push({
+                type: 'video',
+                name: file.name,
+                file,
+                url: undefined,
+                duration, //
+            });
+            setSections(updated);
+        };
+
+        videoElement.onerror = () => {
+            console.error('❌ Error loading video metadata');
+        };
+
+        videoElement.src = URL.createObjectURL(file);
+    };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        console.log('🔴 handleSubmit called');
+
+
         const formData = new FormData()
-        const title = (document.getElementById('title') as HTMLTextAreaElement)?.value || ''
-        const price = (document.getElementById('price') as HTMLInputElement)?.value || ''
+        console.log([...formData.entries()])
         const thumbnailInput = document.getElementById('file-upload') as HTMLInputElement
         const thumbnailFile = thumbnailInput?.files?.[0]
         const userId = user?.userId
@@ -168,14 +249,16 @@ export default function CourseForm() {
             return { title: sectionTitleError, lectures: lectureErrors }
         })
 
-
         const newErrors = {
             title: title.trim() ? '' : 'Title is required.',
             subTitle: subTitle.trim() ? '' : 'Subtitle is required.', //
             description: description.replace(/<\/?[^>]+(>|$)/g, "").trim() ? '' : 'Description is required.',
             requirement: requirement.replace(/<\/?[^>]+(>|$)/g, "").trim() ? '' : 'Requirement is required.',
-            price: price.trim() ? '' : 'Price is required.',
-            thumbnail: thumbnailFile ? '' : 'Thumbnail is required.',
+            targetAudience: targetAudience.replace(/<\/?[^>]+(>|$)/g, "").trim() ? '' : 'Target audience is required.', //
+            price: /^\d+$/.test(price.trim()) && parseInt(price.trim(), 10) >= 1000
+                ? ''
+                : 'Price must be an integer and at least 1,000 VND.',
+            thumbnail: mode === 'create' && !thumbnailFile ? 'Thumbnail is required.' : '',
             sections: sectionErrors,
         }
 
@@ -188,45 +271,96 @@ export default function CourseForm() {
         if (hasErrors) return
 
         const videoFiles: File[] = []
-        const formattedSections = sections.map((section, sectionIdx) => ({
-            nameSection: section.title,
-            order: sectionIdx + 1,
-            lectures: section.lectures.map((lecture, lectureIdx) => {
-                const content = lecture.contents.find((c) => c.type === 'video')
-                const file = content?.file
-                if (file) videoFiles.push(file)
-                return {
-                    nameLecture: lecture.title,
-                    order: lectureIdx + 1,
-                }
-            }),
-        }))
+
+        const formattedSections = sections.map((section, sectionIdx) => {
+            let sectionId: number | undefined = undefined;
+
+            if (mode === 'edit' && courseData?.Section?.[sectionIdx]) {
+                sectionId = courseData.Section[sectionIdx].sectionId;
+            }
+
+            return {
+                sectionId,
+                nameSection: section.title,
+                order: sectionIdx + 1,
+                lectures: section.lectures.map((lecture, lectureIdx) => {
+                    let lectureId: number | undefined = undefined;
+
+                    if (mode === 'edit' && courseData?.Section?.[sectionIdx]?.Lecture?.[lectureIdx]) {
+                        lectureId = courseData.Section[sectionIdx].Lecture[lectureIdx].lectureId;
+                    }
+
+                    const content = lecture.contents?.[0]; // 1 video
+                    let video = '';
+                    let time = 0; //
+                    const isNewFile = content?.file instanceof File;
+
+                    if (isNewFile && content.file) {
+                        videoFiles.push(content.file);
+                        time = content.duration || 0; //
+                    } else if ('url' in content) {
+                        video = (content as any).url;
+                        time = content.duration || 0; //
+                    }
+
+                    return {
+                        lectureId,
+                        nameLecture: lecture.title,
+                        order: lectureIdx + 1,
+                        video,
+                        time, //
+                    };
+                }),
+            };
+        });
+
 
         if (thumbnailFile !== undefined) {
             formData.append('thumbnail', thumbnailFile)
         }
 
+        if (mode === 'edit' && courseData?.courseId) {
+            formData.append('courseId', courseData.courseId.toString());
+        }
         formData.append('title', title)
         formData.append('subTitle', subTitle);
         formData.append('description', description)
         formData.append('requirement', requirement)
+        formData.append('targetAudience', targetAudience) //
         formData.append('price', price)
         formData.append('userId', userId?.toString() || '')
         formData.append('isPublic', isPublic.toString())
+
+        console.log(JSON.stringify(sections, null, 2));
+
         formData.append('sections', JSON.stringify(formattedSections))
         videoFiles.forEach((file) => {
             formData.append('videos', file)
         })
 
         try {
-            const res = await fetch('http://localhost:3001/api/courses/create-full', {
-                method: 'POST',
+            console.log('🟣 Videos to upload:', videoFiles.map(f => f.name));
+
+
+            const endpoint = mode === 'edit'
+                ? `http://localhost:3001/api/courses/update-full/${courseData?.courseId}`
+                : `http://localhost:3001/api/courses/create-full`
+
+            const res = await fetch(endpoint, {
+                method: mode === 'edit' ? 'PATCH' : 'POST',
+                headers: {
+                    Authorization: `Bearer ${user?.access_token}`,
+                },
                 body: formData,
-            })
+            });
 
             const result = await res.json()
             if (!res.ok) throw new Error(result.message)
-            alert('Course created!')
+            else {
+                mode === 'edit'
+                    ? alert('Course updated successfully!')
+                    : alert('Course created!')
+            }
         } catch (err: any) {
             alert(err.message || 'Something went wrong')
         }
@@ -250,6 +384,8 @@ export default function CourseForm() {
                             <textarea
                                 id="title"
                                 name="title"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
                                 rows={2}
                                 className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-indigo-600"
                                 placeholder="Write the course title..."
@@ -330,20 +466,48 @@ export default function CourseForm() {
                         </div>
 
                         <div className="col-span-full">
+                            <label htmlFor="targetAudience" className="block text-sm font-medium text-gray-900">
+                                Target Audience
+                            </label>
+                            <ResponsiveEditor
+                                isDisplay={false}
+                                value={targetAudience}
+                                setValue={setTargetAudience}
+                                handleCancel={() => { }}
+                                handleSave={() => { }}
+                                isDisabled={false}
+                                warningMessageMaxLength="Target audience is too long."
+                                warningMessageMinLength="Target audience is required."
+                                saveButtonMessage=""
+                                maxLength={1000}
+                                hideActions={true}
+                                hideWarnings={true}
+                            />
+                            {errors.targetAudience && (
+                                <p className="text-sm text-red-600 mt-1">{errors.targetAudience}</p>
+                            )}
+                        </div>
+
+
+                        <div className="col-span-full">
                             <label htmlFor="price" className="block text-sm font-medium text-gray-900">
-                                Price ($)
+                                Price (vnđ)
                             </label>
                             <input
                                 id="price"
                                 name="price"
                                 type="number"
-                                step="0.01"
-                                min="0"
+                                value={price}
+                                onChange={(e) => setPrice(e.target.value)}
+                                step="1"
+                                min="1000" // ✅ Ngăn nhập dưới 1000 ngay từ UI
                                 className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-indigo-600"
-                                placeholder="Enter course price"
+                                placeholder="Minimum 1,000 VND"
                             />
                             {errors.price && (
-                                <p className="text-sm text-red-600 mt-1">{errors.price}</p>
+                                <p className="text-sm text-red-600 mt-1">
+                                    {errors.price || 'Please enter a valid price (≥ 1,000 VND)'}
+                                </p>
                             )}
                         </div>
 
@@ -568,10 +732,13 @@ export default function CourseForm() {
                                         {lecture.contents.length > 0 && (
                                             <ul className="pl-6 space-y-1 text-sm text-gray-700">
                                                 {lecture.contents.map((c, i) => (
-                                                    <li key={i}>🎬 {c.name}</li>
+                                                    <li key={i}>
+                                                        🎬 {c.name} {c.url && <span className="text-gray-400">(uploaded)</span>}
+                                                    </li>
                                                 ))}
                                             </ul>
                                         )}
+
                                         {errors.sections?.[idx]?.lectures?.[ldx] && (
                                             <p className="text-sm text-red-600 mt-1">
                                                 {errors.sections[idx].lectures[ldx]}

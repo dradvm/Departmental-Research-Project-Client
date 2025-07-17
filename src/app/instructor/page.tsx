@@ -18,7 +18,9 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
 import InstructorDashboard from "components/Instructor/instructor-dashboard";
-
+import InstructorReview from "components/Instructor/instructor-review";
+import InstructorQA from "components/Instructor/instructor-qa";
+import BarsDataset from "components/Instructor/Overview/instructor-overview";
 const drawerWidth = 240;
 const HEADER_HEIGHT = 64; // Chiều cao header tổng (AppBar bên ngoài)
 
@@ -28,11 +30,13 @@ export default function DashboardLayout() {
   const renderContent = () => {
     switch (selected) {
       case "Dashboard":
-        return <InstructorDashboard></InstructorDashboard>;
+        return <InstructorDashboard />;
       case "Users":
-        return <Typography variant="h4">Manage your users here</Typography>;
+        return <InstructorReview />;
       case "Settings":
-        return <Typography variant="h4">Adjust your settings here</Typography>;
+        return <InstructorQA />;
+      case "Overview":
+        return <BarsDataset />;
       default:
         return <Typography variant="h4">Page not found</Typography>;
     }
@@ -77,7 +81,7 @@ export default function DashboardLayout() {
               <ListItemIcon>
                 <PeopleIcon />
               </ListItemIcon>
-              <ListItemText primary="Users" />
+              <ListItemText primary="Review" />
             </ListItemButton>
           </ListItem>
 
@@ -89,7 +93,19 @@ export default function DashboardLayout() {
               <ListItemIcon>
                 <SettingsIcon />
               </ListItemIcon>
-              <ListItemText primary="Settings" />
+              <ListItemText primary="Q&A" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton
+              selected={selected === "Overview"}
+              onClick={() => setSelected("Overview")}
+            >
+              <ListItemIcon>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Overview" />
             </ListItemButton>
           </ListItem>
         </List>

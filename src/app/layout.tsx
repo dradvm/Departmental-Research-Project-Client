@@ -30,11 +30,9 @@ export default function RootLayout({
             <UserProvider>
               {<DynamicHeader />}
               {children}
+              <DynamicFooter />
             </UserProvider>
           </SessionProvider>
-          <DynamicHeader />
-          {children}
-          <DynamicFooter />
         </NextAuthWrapper>
       </body>
     </html>
