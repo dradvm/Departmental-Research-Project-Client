@@ -1,8 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import Header from "./Header";
 import { useMemo } from "react";
+import Header from "./Header";
 
 export default function DynamicHeader() {
   const pathname = usePathname();
@@ -34,10 +34,9 @@ export default function DynamicHeader() {
   }
 
   const isHeaderHidden = useMemo(() => {
-    console.log(matchHiddenRoutes(pathname, hiddenRoutes));
     return matchHiddenRoutes(pathname, hiddenRoutes);
   }, [hiddenRoutes, pathname]);
 
-  if (isHeaderHidden) return <></>;
+  if (isHeaderHidden) return <div></div>;
   return <Header />;
 }

@@ -64,7 +64,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         const studyProgressData = lecturesData.flatMap(
           (studyProgress) => studyProgress.StudyProgress
         );
-        console.log(studyProgressData);
         const totalWatched = studyProgressData.reduce(
           (total, studyProgress) =>
             total + (studyProgress && studyProgress.isDone ? 1 : 0),
