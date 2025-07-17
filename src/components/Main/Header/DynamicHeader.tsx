@@ -5,6 +5,7 @@ import Header from "./Header";
 import ConstructorHeader from "./Constructor.Header";
 import { useUser } from "../../../../context/UserContext";
 import { useMemo } from "react";
+import Header from "./Header";
 
 export default function DynamicHeader() {
   const { user } = useUser();
@@ -45,10 +46,9 @@ export default function DynamicHeader() {
   }
 
   const isHeaderHidden = useMemo(() => {
-    console.log(matchHiddenRoutes(pathname, hiddenRoutes));
     return matchHiddenRoutes(pathname, hiddenRoutes);
   }, [hiddenRoutes, pathname]);
 
-  if (isHeaderHidden) return <></>;
+  if (isHeaderHidden) return <div></div>;
   return <Header />;
 }

@@ -141,7 +141,7 @@ export default function CoursePage() {
                     return (
                       <FontAwesomeIcon
                         key={index}
-                        icon={getStartIcon(4.3, index)}
+                        icon={getStartIcon(rating ?? 0, index)}
                         className={`text-yellow-600`}
                         fontSize={8}
                       />
