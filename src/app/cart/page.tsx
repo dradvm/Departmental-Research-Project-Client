@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import paymentService from "services/payment.service";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Button } from "components/Button/Button";
+import { Stack } from "@mui/material";
 
 export default function Cart() {
   const router = useRouter();
@@ -101,6 +103,11 @@ export default function Cart() {
     }
   }
 
+  async function handleWishlist(handleWishlistItem: () => void) {
+    handleWishlistItem();
+    await fetchData();
+  }
+
   return (
     <div>
       {cart && cart.items.length > 0 ? (
@@ -108,24 +115,28 @@ export default function Cart() {
           <div className="w-full lg:w-[70%]">
             <h1 className="text-[24px] font-bold">Giỏ hàng của tôi</h1>
             <div>
-              <div className="flex justify-between">
-                <h5 className="font-bold">
-                  Tổng số khóa học: {cart.items.length}
+              <div className="flex justify-between items-center">
+                <h5 className="font-medium">
+                  {cart.items.length} khoá học trong giỏ hàng
                 </h5>
-                <button
-                  className="w-fit p-[4px] border rounded-[8px] bg-red-700 text-white"
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={handleDeleteAllItem}
                 >
                   Xóa tất cả khóa học khỏi giỏ hàng
-                </button>
+                </Button>
               </div>
-              {cart.items.map((item, index) => (
-                <ItemCart
-                  key={index}
-                  item={item}
-                  onDelete={handleDeleteOneItem}
-                ></ItemCart>
-              ))}
+              <Stack className="gap-y-5 mt-3">
+                {cart.items.map((item, index) => (
+                  <ItemCart
+                    key={index}
+                    item={item}
+                    onDelete={handleDeleteOneItem}
+                    onWishlist={handleWishlist}
+                  ></ItemCart>
+                ))}
+              </Stack>
             </div>
           </div>
           <ProformaInvoice
