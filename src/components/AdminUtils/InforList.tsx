@@ -19,6 +19,7 @@ interface InforListProps {
   setSelectedItem: (account: UserType) => void;
   handleOpen: () => void;
   deleteAccount: (userId: number) => void;
+  enableAccount: (userId: number) => void;
 }
 
 export default function InforList({
@@ -26,6 +27,7 @@ export default function InforList({
   setSelectedItem,
   handleOpen,
   deleteAccount,
+  enableAccount,
 }: InforListProps) {
   return (
     <>
@@ -83,11 +85,22 @@ export default function InforList({
 
                   {/* Trạng thái tài khoản dưới dạng Chip */}
                   <TableCell align="center">
-                    <Chip
-                      label={infor.isActive ? "Đã kích hoạt" : "Chưa kích hoạt"}
-                      color={infor.isActive ? "success" : "error"}
-                      variant="outlined"
-                    />
+                    {!infor.isDeleted && (
+                      <Chip
+                        label={
+                          infor.isActive ? "Đã kích hoạt" : "Chưa kích hoạt"
+                        }
+                        color={infor.isActive ? "success" : "error"}
+                        variant="outlined"
+                      />
+                    )}
+                    {infor.isDeleted && (
+                      <Chip
+                        label={"Bị vô hiệu hóa"}
+                        color={"error"}
+                        variant="outlined"
+                      />
+                    )}
                   </TableCell>
 
                   {/* Hành động gộp chung cột */}
@@ -101,15 +114,26 @@ export default function InforList({
                           handleOpen();
                         }}
                       >
-                        Cập nhật
+                        Xem chi tiết
                       </Button>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => deleteAccount(infor.userId)}
-                      >
-                        Xóa
-                      </Button>
+                      {infor.isDeleted && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => enableAccount(infor.userId)}
+                        >
+                          Hủy vô hiệu hóa
+                        </Button>
+                      )}
+                      {!infor.isDeleted && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => deleteAccount(infor.userId)}
+                        >
+                          Vô hiệu hóa
+                        </Button>
+                      )}
                     </Stack>
                   </TableCell>
                 </TableRow>

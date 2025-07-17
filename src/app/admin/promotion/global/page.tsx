@@ -8,11 +8,17 @@ import NoDataFound from "components/AdminUtils/NoDataFound";
 import { Pagination } from "components/AdminUtils/Pagination";
 import { ChangeEvent, useEffect, useState } from "react";
 import couponService from "services/coupon.service";
-import { CouponFilterInput, CouponReq, GlobalCouponType } from "types/coupon";
+import {
+  CouponFilterInput,
+  CouponReq,
+  GlobalCouponDB,
+  GlobalCouponType,
+} from "types/coupon";
 
 export default function GlobalPromotion() {
   const [page, setPage] = useState<number>(1);
   const [globalCoupons, setglobalCoupons] = useState<GlobalCouponType[]>();
+  const [dataLen, setDataLen] = useState<number>(0);
   // open and close modal
   const [open, setOpen] = useState<boolean>(false);
   function handleOpen() {
@@ -52,10 +58,11 @@ export default function GlobalPromotion() {
           limit,
           ...filter,
         };
-        const data: GlobalCouponType[] = (
+        const data: GlobalCouponDB = (
           await couponService.getAllGlobalCoupon(req)
         ).data;
-        setglobalCoupons(data);
+        setDataLen(data.length);
+        setglobalCoupons(data.globalCoupons);
       } catch (e) {
         console.log("Lỗi lấy danh sách mã khuyến mãi hệ thống: ", e);
       }
@@ -88,7 +95,7 @@ export default function GlobalPromotion() {
         <Pagination
           page={page}
           setPage={setPage}
-          dataLength={globalCoupons ? globalCoupons.length : 0}
+          dataLength={dataLen}
           limit={limit}
         ></Pagination>
       </div>

@@ -1,5 +1,4 @@
 import { Pagination as MuiPagination } from "@mui/material";
-import { useMemo } from "react";
 
 interface PaginationProps {
   page: number;
@@ -14,9 +13,7 @@ export function Pagination({
   dataLength,
   limit,
 }: PaginationProps) {
-  const totalPages = useMemo(() => {
-    return dataLength < limit && page > 1 ? page : page + 1;
-  }, [page, limit, dataLength]);
+  const totalPages = Math.ceil(dataLength / limit);
   const handleChange = (_: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
   };

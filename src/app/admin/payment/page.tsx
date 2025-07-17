@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, useEffect, useState } from "react";
-import { PaymentFilter, PaymentType } from "types/payment";
+import { PaymentDB, PaymentFilter, PaymentType } from "types/payment";
 import paymentService from "services/payment.service";
 import { Modal } from "@mui/material";
 import { getIsoStringDateFromDate } from "utils/date-format";
@@ -15,6 +15,7 @@ export default function Payment() {
   const [selectedPayment, setSelectedPayment] = useState<PaymentType>();
   const [infors, setInfors] = useState<PaymentType[]>();
   const [page, setPage] = useState<number>(1);
+  const [dataLen, setDataLen] = useState<number>(0);
   const [filter, setFilter] = useState<PaymentFilter>({
     startDate: undefined,
     endDate: undefined,
@@ -47,7 +48,7 @@ export default function Payment() {
     const fetchPayment = async () => {
       try {
         const skip = (page - 1) * limit;
-        const paymentsDB: PaymentType[] = (
+        const paymentsDB: PaymentDB = (
           await paymentService.getAllPayment({
             limit,
             skip,
@@ -62,7 +63,8 @@ export default function Payment() {
             userName: filter.searchText ? filter.searchText : undefined,
           })
         ).data;
-        setInfors(paymentsDB);
+        setDataLen(paymentsDB.length);
+        setInfors(paymentsDB.payments);
       } catch (e) {
         console.log("Lỗi khi lấy dữ liệu payment: ", e);
         setInfors([]);
@@ -94,7 +96,7 @@ export default function Payment() {
           <Pagination
             page={page}
             setPage={setPage}
-            dataLength={infors ? infors.length : 0}
+            dataLength={dataLen}
             limit={limit}
           ></Pagination>
         </div>

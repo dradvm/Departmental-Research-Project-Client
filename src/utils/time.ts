@@ -132,3 +132,9 @@ export function formatWeekdaysToVietnamese(input: string) {
     )
     .join(", ");
 }
+export function getHourFormSecond(s: number) {
+  if (isNaN(s))
+    return 0;
+  return (Math.round((s / 3600) * 10)) / 10;
+
+}

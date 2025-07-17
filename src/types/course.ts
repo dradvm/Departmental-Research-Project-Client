@@ -39,3 +39,65 @@ export interface Course {
   CourseCategory?: CourseCategory[];
   Wishlist?: Wishlist[];
 }
+
+// 4 following interfaces are used for admin
+interface LectureAdminUI {
+  lectureId: string;
+  lectureName: string;
+  time: string;
+}
+
+interface SectionAdminUI {
+  sectionId: string;
+  sectionName: string;
+  lectures: LectureAdminUI[];
+}
+
+export interface CourseAdminUI {
+  courseId: string;
+  title: string;
+  subTitle: string;
+  description: string;
+  price: string;
+  isPublic: boolean;
+  isAccepted: boolean;
+  thumbnail: string;
+  requirement: string;
+  targetAudience: string;
+  totalTime: string;
+  lectureCount: string;
+  teacherId: string;
+  teacherName: string;
+  teacherEmail: string;
+  teacherBiography: string;
+  sections: SectionAdminUI[];
+}
+
+export interface CourseResAdminUI {
+  courses: CourseAdminUI[];
+  length: number;
+}
+
+// user for PostFilter component
+export interface CourseAdminFilter {
+  minPrice?: string,
+  maxPrice?: string,
+  minLectureCount?: string,
+  maxLectureCount?: string,
+  minTime?: string,
+  maxTime?: string,
+  searchText?: string
+}
+
+// use for courseService: get all course
+export interface CourseAdminQueryType {
+  limit: number;
+  skip: number;
+  minPrice?: number,
+  maxPrice?: number,
+  minLectureCount?: number,
+  maxLectureCount?: number,
+  minTime?: number,
+  maxTime?: number,
+  searchText?: string
+}
