@@ -11,6 +11,7 @@ import { useUser } from '../../../context/UserContext'
 import ResponsiveEditor from 'components/Editor/ResponsiveEditor'
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import courseService from 'services/course.service'
 
 type CourseFormProps = {
     mode: 'create' | 'edit';
@@ -30,6 +31,8 @@ export default function CourseForm(props: CourseFormProps) {
     const [price, setPrice] = useState('');
     const [isPublic, setIsPublic] = useState(true);
     const [targetAudience, setTargetAudience] = useState("");
+    const [categoryIds, setCategoryIds] = useState<number[]>([]);
+    const [allCategories, setAllCategories] = useState<{ categoryId: number, categoryName: string }[]>([]);
 
     useEffect(() => {
         if (mode === 'edit' && courseData && sections.length === 1 && sections[0].lectures.length === 1 && sections[0].lectures[0].contents.length === 0) {
@@ -64,6 +67,20 @@ export default function CourseForm(props: CourseFormProps) {
                 })),
             })));
         }
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch('http://localhost:3001/api/categories');
+                const data = await res.json();
+                setAllCategories(data);
+            } catch (err) {
+                console.error('Failed to fetch categories:', err);
+            }
+        };
+
+        fetchCategories();
+        if (mode === 'edit' && courseData?.CourseCategory) {
+            setCategoryIds(courseData.CourseCategory.map((cc: any) => cc.categoryId));
+        }
     }, [mode, courseData]);
 
     const [errors, setErrors] = useState<{
@@ -74,6 +91,7 @@ export default function CourseForm(props: CourseFormProps) {
         targetAudience: string //
         price: string
         thumbnail: string
+        categories: string; //
         sections: { title: string; lectures: string[] }[]
     }>({
         title: '',
@@ -83,6 +101,7 @@ export default function CourseForm(props: CourseFormProps) {
         targetAudience: '', //
         price: '',
         thumbnail: '',
+        categories: '', //
         sections: [],
     })
 
@@ -174,21 +193,6 @@ export default function CourseForm(props: CourseFormProps) {
         setSections(updated)
     }
 
-    // const handleSelectVideoFile = (
-    //     file: File,
-    //     sectionIdx: number,
-    //     lectureIdx: number
-    // ) => {
-    //     const updated = [...sections]
-    //     updated[sectionIdx].lectures[lectureIdx].contents.push({
-    //         type: 'video',
-    //         name: file.name,
-    //         file: file,
-    //         url: undefined,
-    //     })
-    //     setSections(updated)
-    // }
-
     const handleSelectVideoFile = (
         file: File,
         sectionIdx: number,
@@ -199,7 +203,6 @@ export default function CourseForm(props: CourseFormProps) {
 
         videoElement.onloadedmetadata = () => {
             const duration = videoElement.duration; // thời lượng tính bằng giây
-            console.log(`⏱ Duration of video: ${duration} seconds`);
 
             const updated = [...sections];
             updated[sectionIdx].lectures[lectureIdx].contents.push({
@@ -223,11 +226,7 @@ export default function CourseForm(props: CourseFormProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        console.log('🔴 handleSubmit called');
-
-
         const formData = new FormData()
-        console.log([...formData.entries()])
         const thumbnailInput = document.getElementById('file-upload') as HTMLInputElement
         const thumbnailFile = thumbnailInput?.files?.[0]
         const userId = user?.userId
@@ -262,6 +261,7 @@ export default function CourseForm(props: CourseFormProps) {
                 : 'Price must be an integer and at least 1,000 VND.',
             thumbnail: mode === 'create' && !thumbnailFile ? 'Thumbnail is required.' : '',
             sections: sectionErrors,
+            categories: categoryIds.length === 0 ? 'At least one category is required.' : '',
         }
 
         setErrors(newErrors)
@@ -332,32 +332,18 @@ export default function CourseForm(props: CourseFormProps) {
         formData.append('price', price)
         formData.append('userId', userId?.toString() || '')
         formData.append('isPublic', isPublic.toString())
-
-        console.log(JSON.stringify(sections, null, 2));
-
+        formData.append('categoryIds', JSON.stringify(categoryIds)); //
         formData.append('sections', JSON.stringify(formattedSections))
         videoFiles.forEach((file) => {
             formData.append('videos', file)
         })
 
         try {
-            console.log('🟣 Videos to upload:', videoFiles.map(f => f.name));
+            const res = mode === 'edit'
+                ? await courseService.updateFullCourse(courseData?.courseId, formData)
+                : await courseService.createFullCourse(formData);
 
-
-            const endpoint = mode === 'edit'
-                ? `http://localhost:3001/api/courses/update-full/${courseData?.courseId}`
-                : `http://localhost:3001/api/courses/create-full`
-
-            const res = await fetch(endpoint, {
-                method: mode === 'edit' ? 'PATCH' : 'POST',
-                headers: {
-                    Authorization: `Bearer ${user?.access_token}`,
-                },
-                body: formData,
-            });
-
-            const result = await res.json()
-            if (!res.ok) throw new Error(result.message)
+            if (!res.data) throw new Error('Something went wrong');
             else {
                 mode === 'edit'
                     ? toast.success('Course updated successfully!')
@@ -529,6 +515,38 @@ export default function CourseForm(props: CourseFormProps) {
                                     </p>
                                 )}
                             </div>
+
+                            <div className="col-span-full">
+                                <label htmlFor="categories" className="block text-sm font-medium text-gray-900">
+                                    Categories
+                                </label>
+                                <div className="mt-2 space-y-2">
+                                    {allCategories.map((cat) => (
+                                        <div key={cat.categoryId} className="flex items-center">
+                                            <input
+                                                id={`cat-${cat.categoryId}`}
+                                                type="checkbox"
+                                                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                                checked={categoryIds.includes(cat.categoryId)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setCategoryIds([...categoryIds, cat.categoryId]);
+                                                    } else {
+                                                        setCategoryIds(categoryIds.filter(id => id !== cat.categoryId));
+                                                    }
+                                                }}
+                                            />
+                                            <label htmlFor={`cat-${cat.categoryId}`} className="ml-2 block text-sm text-gray-700">
+                                                {cat.categoryName}
+                                            </label>
+                                        </div>
+                                    ))}
+                                    {errors.categories && (
+                                        <p className="text-sm text-red-600 mt-1">{errors.categories}</p>
+                                    )}
+                                </div>
+                            </div>
+
 
                             <div className="col-span-full">
                                 <label htmlFor="isPublic" className="block text-sm font-medium text-gray-900">

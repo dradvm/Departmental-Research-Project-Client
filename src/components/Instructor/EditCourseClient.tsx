@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import InstructorCreateCourse from "components/Instructor/instructor-update-course";
 import { useUser } from '../../../context/UserContext';
+import courseService from 'services/course.service';
 
 export default function EditCoursePage() {
     const { id } = useParams();
@@ -16,17 +17,9 @@ export default function EditCoursePage() {
 
         const fetchCourse = async () => {
             try {
-                const res = await fetch(`http://localhost:3001/api/courses/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${user.access_token}`,
-                    },
-                });
-
-                if (!res.ok) {
-                    throw new Error("Failed to fetch course");
-                }
-
-                const data = await res.json();
+                if (!id) return;
+                const res = await courseService.getCourseById(id.toString());
+                const data = await res.data;
                 setCourse(data);
             } catch (error) {
                 console.error("Error fetching course:", error);
@@ -34,7 +27,7 @@ export default function EditCoursePage() {
         };
 
         fetchCourse();
-    }, [id, user?.access_token]); // 👈 trigger khi token có
+    }, [id, user?.access_token]);
 
     if (!user?.access_token) {
         return <p className="p-6">Waiting for authentication...</p>;

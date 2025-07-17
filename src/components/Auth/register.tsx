@@ -6,6 +6,7 @@ import { sendRequest } from 'utils/api';
 import { useRouter } from 'next/navigation';
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { authService } from 'services/auth.service';
 
 const RegisterPage = () => {
     const router = useRouter()
@@ -42,11 +43,7 @@ const RegisterPage = () => {
             return;
         }
 
-        const res = await sendRequest<IBackendRes<any>>({
-            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`,
-            method: 'POST',
-            body: { email, password, name, gender },
-        });
+        const res = await authService.register({ email, password, name, gender });
 
         if (res?.data) {
             router.push(`/verify/${res?.data?.id}`)

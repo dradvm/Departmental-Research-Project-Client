@@ -18,4 +18,9 @@ export const userService = {
     return axiosInstance.put(`/users/${userId}`);
   },
   changeRoleUser: () => axiosInstance.patch(`/users/role/instructor`),
+    updateProfile: (formData: FormData) => {
+        return axiosInstance.post("/users/update-profile", formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+    },
 };

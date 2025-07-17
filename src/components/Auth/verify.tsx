@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { sendRequest } from 'utils/api';
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { authService } from 'services/auth.service';
 
 const Verify = (props: any) => {
     const { id } = props;
@@ -30,15 +31,7 @@ const Verify = (props: any) => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const { userId, code } = formData;
-
-        console.log(">>> check formData: ", formData);
-
-        const res = await sendRequest<IBackendRes<any>>({
-            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/check-code`,
-            method: 'POST',
-            body: { userId, code },
-        });
-        console.log(">>> check response: ", res)
+        const res = await authService.verifyActivationCode(code, userId);
         if (res?.data) {
             toast.success('Verification successful!');
             router.push('/auth/login');

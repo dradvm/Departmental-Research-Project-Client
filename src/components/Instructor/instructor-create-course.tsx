@@ -172,20 +172,6 @@ export default function CourseForm(props: CourseFormProps) {
         setSections(updated)
     }
 
-    // const handleSelectVideoFile = (
-    //     file: File,
-    //     sectionIdx: number,
-    //     lectureIdx: number
-    // ) => {
-    //     const updated = [...sections]
-    //     updated[sectionIdx].lectures[lectureIdx].contents.push({
-    //         type: 'video',
-    //         name: file.name,
-    //         file: file,
-    //         url: undefined,
-    //     })
-    //     setSections(updated)
-    // }
 
     const handleSelectVideoFile = (
         file: File,
@@ -340,7 +326,6 @@ export default function CourseForm(props: CourseFormProps) {
 
         try {
             console.log('🟣 Videos to upload:', videoFiles.map(f => f.name));
-
 
             const endpoint = mode === 'edit'
                 ? `http://localhost:3001/api/courses/update-full/${courseData?.courseId}`

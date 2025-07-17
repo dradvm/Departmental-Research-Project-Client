@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { useEffect, useState } from 'react';
 import { useUser } from '../../../../context/UserContext';
+import courseService from 'services/course.service';
 
 const currencyFormatter = (value: number) =>
     value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
@@ -24,19 +25,12 @@ export default function RevenueBarChart() {
     useEffect(() => {
         const fetchRevenue = async () => {
             try {
-                const res = await fetch(`http://localhost:3001/api/courses/revenue/${user.userId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${user.access_token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!res.ok) {
+                const res = await courseService.getRevenueByInstructor(user.userId);
+                if (!res?.data) {
                     throw new Error('Lỗi khi gọi API doanh thu');
                 }
 
-                const data = await res.json();
+                const data = res?.data;
 
                 // Chuyển revenue từ string => number (nếu cần)
                 const formatted = data.map((item: any) => ({
