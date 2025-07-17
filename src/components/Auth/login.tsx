@@ -8,9 +8,11 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import ModalReactive from "./modal.reactive";
 import ModalResetPassword from "./modal.change.password";
+import { useSession } from "next-auth/react";
 
 const LoginPage = () => {
   const router = useRouter();
+  const { update } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalResetOpen, setIsModalResetOpen] = useState(false);
 
@@ -36,7 +38,7 @@ const LoginPage = () => {
       }
       toast.error(`${res?.error}`);
     } else {
-      //redirect to home
+      update();
       router.push("/instructor");
     }
 
