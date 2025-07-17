@@ -105,3 +105,30 @@ export function formatMessageTime(isoString: Date | string) {
     return `${time} ${day} Tháng ${month}, ${year}`;
   }
 }
+
+export function formatDateVN(date: Date) {
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+
+  return `${day} Tháng ${month}, ${year}`;
+}
+
+export function formatWeekdaysToVietnamese(input: string) {
+  const map: Record<"MO" | "TU" | "WE" | "TH" | "FR" | "SA" | "SU", string> = {
+    MO: "T2",
+    TU: "T3",
+    WE: "T4",
+    TH: "T5",
+    FR: "T6",
+    SA: "T7",
+    SU: "CN",
+  };
+
+  return input
+    .split(",")
+    .map(
+      (day: string) => map[day.trim().toUpperCase() as keyof typeof map] || day
+    )
+    .join(", ");
+}

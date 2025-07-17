@@ -12,6 +12,7 @@ import CourseReviews from "./CourseReviews";
 import CourseQA from "./CourseQA";
 import CourseNotes from "./CourseNotes";
 import { Course } from "types/course";
+import CourseCalendar from "./CourseCalendar";
 
 export default function CourseDetails({ course }: { course: Course | null }) {
   const [value, setValue] = React.useState("1");
@@ -73,7 +74,9 @@ export default function CourseDetails({ course }: { course: Course | null }) {
         <TabPanel value="6">
           <CourseReviews courseId={course?.courseId?.toString() ?? ""} />
         </TabPanel>
-        <TabPanel value="7">Item Three</TabPanel>
+        <TabPanel value="7">
+          <CourseCalendar course={course ?? null} />
+        </TabPanel>
       </TabContext>
     </Box>
   );
