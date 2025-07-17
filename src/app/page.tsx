@@ -12,12 +12,13 @@ import { Course } from "types/course";
 import { useEffect, useState } from "react";
 import enrollmentService from "services/enrollment.service";
 import CourseEnrolledWithLastLectureSwiper from "components/Swiper/CourseEnrolledWithLastLectureSwiper";
+import { useUser } from "../../context/UserContext";
 
 library.add(fas, far, fab);
 
 export default function Home() {
   const [courseEnrolledStudy, setCourseEnrolledStudy] = useState<Course[]>();
-
+  const { user } = useUser();
   useEffect(() => {
     enrollmentService
       .getCourseEnrolledWithLastStudy()
@@ -33,25 +34,26 @@ export default function Home() {
     <Stack className="gap-y-20 px-32 py-8">
       <section className="">
         <Stack className="gap-y-10">
-          <div className="flex items-center space-x-5">
-            <MyAvatar
-              user={{
-                isActive: false,
-                isDeleted: true,
-                img: null,
-                name: "Tao là duy",
-              }}
-              height={64}
-              width={64}
-              fontSize="2rem"
-            />
-            <Stack className="gap-y-1">
-              <div className="text-2xl font-bold">
-                Chào mừng Nguyễn trở lại!
-              </div>
-              <div>Lập trình viên fullstack</div>
-            </Stack>
-          </div>
+          {user && (
+            <div className="flex items-center space-x-5">
+              <MyAvatar
+                user={{
+                  isActive: true,
+                  isDeleted: false,
+                  img: user.image,
+                  name: user.name,
+                }}
+                height={64}
+                width={64}
+                fontSize="2rem"
+              />
+              <Stack className="gap-y-1">
+                <div className="text-2xl font-bold">
+                  Chào mừng {user.name} trở lại!
+                </div>
+              </Stack>
+            </div>
+          )}
           <div className="relative w-full h-96">
             <div className="absolute z-10 px-4 py-6 bg-white rounded-sm shadow translate-x-16 translate-y-16 w-96">
               <Stack className="gap-y-1">
