@@ -50,6 +50,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         else if (+res.statusCode === 401) {
           throw new InvalidEmailPasswordError()
         }
+        else if (+res.statusCode === 404) {
+          throw new InvalidEmailPasswordError()
+        }
         else if (+res.statusCode === 400) {
           throw new InactiveAccoounError()
         }

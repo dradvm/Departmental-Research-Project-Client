@@ -12,6 +12,7 @@ export async function authenticate(email: string, password: string) {
     console.log(">>> check r: ", r);
     return r;
   } catch (error) {
+
     if ((error as any).name === "InvalidEmailPasswordError") {
       return {
         error: (error as any).type,
