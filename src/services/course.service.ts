@@ -43,7 +43,28 @@ const courseService = {
   // accept a course
   acceptCourse: (courseId: number) => {
     return axiosInstance.put(`/courses/accept/${courseId}`);
-  }
+  },
+
+  getRevenueByInstructor: (instructorId: number) => {
+    return axiosInstance.get(`/courses/revenue/${instructorId}`);
+  },
+
+  createFullCourse: (formData: FormData) => {
+    return axiosInstance.post('/courses/create-full', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  updateFullCourse: (id: number | string, formData: FormData) => {
+    return axiosInstance.patch(`/courses/update-full/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  getMyCourses: () => {
+    return axiosInstance.get('/courses/me');
+  },
+
 };
 
 export default courseService;

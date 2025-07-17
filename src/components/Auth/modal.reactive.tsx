@@ -5,6 +5,7 @@ import { sendRequest } from 'utils/api'
 import { useHasMounted } from 'utils/customHook'
 import { ToastContainer, toast, Bounce } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { authService } from 'services/auth.service'
 
 export default function ModalReactive(props: any) {
     const { isModalOpen, setIsModalOpen, userEmail } = props
@@ -22,11 +23,8 @@ export default function ModalReactive(props: any) {
     }
 
     const handleResend = async () => {
-        const res = await sendRequest<IBackendRes<any>>({
-            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/retry-active`,
-            method: 'POST',
-            body: { email: userEmail },
-        })
+        const res = await authService.resendActivationCode(userEmail);
+
         console.log(">>>check res000:", res)
         if (res?.data) {
             setUserId(res?.data?.id)
@@ -37,11 +35,8 @@ export default function ModalReactive(props: any) {
     }
 
     const handleNext = async () => {
-        const res = await sendRequest<IBackendRes<any>>({
-            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/check-code`,
-            method: 'POST',
-            body: { code, userId: userId },
-        })
+        const res = await authService.verifyActivationCode(code, userId);
+
         if (res?.data) {
             setStep(prev => Math.min(prev + 1, 3))
         } else {

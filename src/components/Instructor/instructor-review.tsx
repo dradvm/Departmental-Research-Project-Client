@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useUser } from "../../../context/UserContext";
 import withRole from "../WithRole/withRole";
 import CourseReviews from "components/Course/CourseDetails/CourseReviews";
+import courseService from "services/course.service";
 
 function CourseDashboard() {
     const { user } = useUser();
@@ -16,37 +17,19 @@ function CourseDashboard() {
 
     useEffect(() => {
         const fetchCourses = async () => {
-            if (!user?.access_token) return;
-
             try {
                 setLoading(true);
-
-                const res = await fetch("http://localhost:3001/api/courses/me", {
-                    headers: {
-                        Authorization: `Bearer ${user.access_token}`,
-                    },
-                });
-
-                if (!res.ok) {
-                    throw new Error("Failed to fetch courses");
-                }
-
-                const data = await res.json();
-                setCourses(data);
+                const res = await courseService.getMyCourses();
+                setCourses(res.data);
             } catch (err: any) {
-                setError(err.message || "Something went wrong");
+                setError(err.response?.data?.message || err.message || "Something went wrong");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchCourses();
-    }, [user?.access_token]); // đảm bảo gọi lại khi user thay đổi
-
-    // useEffect(() => {
-    //     console.log("access_token:", user?.access_token);
-    // }, [user?.access_token]);
-
+    }, []);
 
     const filteredCourses = courses.filter((course: any) =>
         course.title?.toLowerCase().includes(searchQuery.toLowerCase())

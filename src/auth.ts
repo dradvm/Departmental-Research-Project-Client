@@ -1,9 +1,7 @@
-import axios from "axios";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-// import axiosInstance from "services/http";
+import { authService } from "services/auth.service";
 import { IUser } from "types/next-auth";
-import { sendRequest } from "utils/api";
 import { InactiveAccoounError, InvalidEmailPasswordError } from "utils/errors";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -16,21 +14,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {},
       },
       authorize: async (credentials) => {
-        // try {
-        //   const res = await axios.post(
-        //     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
-        //     {
-        //       email: credentials.email,
-        //       password: credentials.password,
-        //     }
-        //   );
-        const res = await sendRequest<IBackendRes<any>>({
-          url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
-          method: 'POST',
-          body: {
-            email: credentials.email,
-            password: credentials.password
-          },
+        const { email, password } = credentials as {
+          email: string;
+          password: string;
+        };
+
+        const res = await authService.login({
+          email,
+          password,
         });
 
         if (res.statusCode === 201) {
@@ -59,19 +50,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         else {
           throw new Error("Internal server error")
         }
-        //   return {
-
-        //   }
-        // } catch(err) {
-        //   if (axios.isAxiosError(err) && err.response) {
-        //     if (err.response.status === 401) {
-        //       throw new InvalidEmailPasswordError();
-        //     } else if (err.response.status === 400) {
-        //       throw new InactiveAccoounError();
-        //     }
-        //   }
-        //   throw new Error("Internal server error");
-        // }
       },
     }),
   ],

@@ -11,6 +11,7 @@ import { useUser } from '../../../context/UserContext'
 import ResponsiveEditor from 'components/Editor/ResponsiveEditor'
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import courseService from 'services/course.service'
 
 type CourseFormProps = {
     mode: 'create' | 'edit';
@@ -192,21 +193,6 @@ export default function CourseForm(props: CourseFormProps) {
         setSections(updated)
     }
 
-    // const handleSelectVideoFile = (
-    //     file: File,
-    //     sectionIdx: number,
-    //     lectureIdx: number
-    // ) => {
-    //     const updated = [...sections]
-    //     updated[sectionIdx].lectures[lectureIdx].contents.push({
-    //         type: 'video',
-    //         name: file.name,
-    //         file: file,
-    //         url: undefined,
-    //     })
-    //     setSections(updated)
-    // }
-
     const handleSelectVideoFile = (
         file: File,
         sectionIdx: number,
@@ -217,7 +203,6 @@ export default function CourseForm(props: CourseFormProps) {
 
         videoElement.onloadedmetadata = () => {
             const duration = videoElement.duration; // thời lượng tính bằng giây
-            console.log(`⏱ Duration of video: ${duration} seconds`);
 
             const updated = [...sections];
             updated[sectionIdx].lectures[lectureIdx].contents.push({
@@ -241,11 +226,7 @@ export default function CourseForm(props: CourseFormProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        console.log('🔴 handleSubmit called');
-
-
         const formData = new FormData()
-        console.log([...formData.entries()])
         const thumbnailInput = document.getElementById('file-upload') as HTMLInputElement
         const thumbnailFile = thumbnailInput?.files?.[0]
         const userId = user?.userId
@@ -352,32 +333,17 @@ export default function CourseForm(props: CourseFormProps) {
         formData.append('userId', userId?.toString() || '')
         formData.append('isPublic', isPublic.toString())
         formData.append('categoryIds', JSON.stringify(categoryIds)); //
-
-        console.log(JSON.stringify(sections, null, 2));
-
         formData.append('sections', JSON.stringify(formattedSections))
         videoFiles.forEach((file) => {
             formData.append('videos', file)
         })
 
         try {
-            console.log('🟣 Videos to upload:', videoFiles.map(f => f.name));
+            const res = mode === 'edit'
+                ? await courseService.updateFullCourse(courseData?.courseId, formData)
+                : await courseService.createFullCourse(formData);
 
-
-            const endpoint = mode === 'edit'
-                ? `http://localhost:3001/api/courses/update-full/${courseData?.courseId}`
-                : `http://localhost:3001/api/courses/create-full`
-
-            const res = await fetch(endpoint, {
-                method: mode === 'edit' ? 'PATCH' : 'POST',
-                headers: {
-                    Authorization: `Bearer ${user?.access_token}`,
-                },
-                body: formData,
-            });
-
-            const result = await res.json()
-            if (!res.ok) throw new Error(result.message)
+            if (!res.data) throw new Error('Something went wrong');
             else {
                 mode === 'edit'
                     ? toast.success('Course updated successfully!')

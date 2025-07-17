@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { authService } from 'services/auth.service'
 import { sendRequest } from 'utils/api'
 import { useHasMounted } from 'utils/customHook'
 
@@ -50,11 +51,7 @@ export default function ModalResetPassword({ isModalOpen, setIsModalOpen }: any)
 
         setErrors({})
 
-        const res = await sendRequest<IBackendRes<any>>({
-            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/retry-password`,
-            method: 'POST',
-            body: { email },
-        })
+        const res = await authService.requestPasswordReset(email);
 
         if (res?.data) {
             setEmail(res.data.email)
@@ -81,11 +78,13 @@ export default function ModalResetPassword({ isModalOpen, setIsModalOpen }: any)
 
         setErrors({})
 
-        const res = await sendRequest<IBackendRes<any>>({
-            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/change-password`,
-            method: 'POST',
-            body: { code, password: newPassword, confirmPassword, email },
-        })
+        const res = await authService.resetPassword({
+            email,
+            code,
+            password: newPassword,
+            confirmPassword,
+        });
+
 
         if (res?.data) {
             setStep(3)
@@ -206,10 +205,10 @@ export default function ModalResetPassword({ isModalOpen, setIsModalOpen }: any)
                                         <li
                                             key={idx}
                                             className={`flex items-center ${isCompleted
-                                                    ? 'text-green-600'
-                                                    : isActive
-                                                        ? 'text-indigo-600'
-                                                        : 'text-gray-400'
+                                                ? 'text-green-600'
+                                                : isActive
+                                                    ? 'text-indigo-600'
+                                                    : 'text-gray-400'
                                                 } after:mx-4 after:hidden sm:after:inline-block after:w-full after:h-1 after:border-b after:border-gray-200`}
                                         >
                                             <span className="flex items-center">

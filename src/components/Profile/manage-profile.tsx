@@ -6,6 +6,7 @@ import { useRef, useState, useEffect } from 'react'
 import axios from 'axios'
 import { ToastContainer, toast, Bounce } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { userService } from 'services/user.service'
 
 export default function ProfileForm() {
     const { data: session, update } = useSession()
@@ -53,16 +54,7 @@ export default function ProfileForm() {
         formData.append('biography', biography)
 
         try {
-            const response = await axios.post(
-                'http://localhost:3001/api/users/update-profile',
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        'Content-Type': 'multipart/form-data',
-                    },
-                }
-            )
+            const response = await userService.updateProfile(formData);
 
             const updatedImage = response.data?.data?.image || session.user?.image
 
@@ -75,7 +67,6 @@ export default function ProfileForm() {
             toast.success('Profile updated!')
             setFile(null)
         } catch (err) {
-            console.error('Update error:', err)
             toast.error('Update failed.')
         }
     }
@@ -120,8 +111,8 @@ export default function ProfileForm() {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 className={`mt-2 block w-full rounded-lg border px-4 py-2 text-gray-900 shadow-sm sm:text-sm ${nameError
-                                        ? 'border-red-500 focus:ring-red-500'
-                                        : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
+                                    ? 'border-red-500 focus:ring-red-500'
+                                    : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
                                     }`}
                             />
                             {nameError && (

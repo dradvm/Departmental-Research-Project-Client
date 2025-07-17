@@ -16,5 +16,10 @@ export const userService = {
     // enable user account: isDeleted: false
     enableAccount: (userId: number) => {
         return axiosInstance.put(`/users/${userId}`);
-    }
+    },
+    updateProfile: (formData: FormData) => {
+        return axiosInstance.post("/users/update-profile", formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+    },
 }
