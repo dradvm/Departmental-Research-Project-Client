@@ -17,12 +17,10 @@ export const userService = {
     enableAccount: (userId: number) => {
         return axiosInstance.put(`/users/${userId}`);
     },
+    changeRoleUser: () => axiosInstance.patch(`/users/role/instructor`),
     updateProfile: (formData: FormData) => {
         return axiosInstance.post("/users/update-profile", formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         });
     },
-    updateRoleToInstructor: (userId: number) => {
-        return axiosInstance.patch(`/users/${userId}/role/instructor`);
-    },
-}
+};
