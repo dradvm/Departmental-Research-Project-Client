@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 import { useUser } from "../../../../context/UserContext";
+import { userService } from "services/user.service";
 
 export default function Header() {
   const { data: session, status } = useSession();
@@ -43,19 +44,8 @@ export default function Header() {
 
   const handleRoleChange = async () => {
     try {
-      const res = await fetch(`http://localhost:3001/api/users/${user.userId}/role/instructor`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.access_token}`,
-        },
-      });
-
-      if (!res.ok) throw new Error("Failed to update role");
-
-      const data = await res.json();
-      alert(`Cập nhật role thành công, Vui long đăng nhập lại để thấy thay đổi!`);
-      // Optional: thông báo UI, redirect, hoặc reload
+      await userService.updateRoleToInstructor(user.userId);
+      alert("Cập nhật role thành công, Vui lòng đăng nhập lại để thấy thay đổi!");
     } catch (err) {
       console.error("Lỗi khi cập nhật role:", err);
     }

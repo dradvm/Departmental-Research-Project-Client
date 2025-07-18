@@ -22,4 +22,7 @@ export const userService = {
             headers: { 'Content-Type': 'multipart/form-data' },
         });
     },
+    updateRoleToInstructor: (userId: number) => {
+        return axiosInstance.patch(`/users/${userId}/role/instructor`);
+    },
 }
