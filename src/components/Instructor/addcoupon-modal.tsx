@@ -58,6 +58,9 @@ export default function ModalUnstyled({ open, onClose, courseId }: Props) {
             handleFailedCreation={() => {
               toast.error("Tạo mã thất bại!");
             }}
+            handleIsApplyingCode={() => {
+              toast.error("Khóa học đã có mã khuyến mãi đang áp dụng hoặc đang chờ duyệt!");
+            }}
             handleInformIsExistingCode={() => {
               toast.error("Mã giảm giá đã tồn tại!");
             }}
