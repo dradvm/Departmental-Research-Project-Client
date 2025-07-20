@@ -139,7 +139,7 @@ export default function ThreeStepModal({
   }, []);
   return (
     <>
-      <Dialog open={true}>
+      <Dialog open={true} onClose={handleClose}>
         <Box
           sx={{
             width: 600,

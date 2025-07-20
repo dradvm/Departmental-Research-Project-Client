@@ -117,7 +117,7 @@ const StudyRemindItem = ({
   );
 };
 
-export default function CourseCalendar({ course }: { course: Course | null }) {
+export default function CourseCalendar({ course }: { course?: Course | null }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [studyRemindList, setStudyRemindList] = useState<StudyRemind[]>([]);
   const popupRef = useRef<Window | null>(null);
@@ -198,10 +198,6 @@ export default function CourseCalendar({ course }: { course: Course | null }) {
   useEffect(() => {
     loadStudyRemindList();
   }, [loadStudyRemindList]);
-
-  useEffect(() => {
-    console.log(studyRemindList);
-  }, [studyRemindList]);
 
   return (
     <Stack className="px-32 py-6 gap-y-3">

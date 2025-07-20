@@ -37,16 +37,6 @@ export default function MyCoursesLayout({
             Mong muốn
           </Link>
           <Link
-            href={"./certification"}
-            className={`h-9 font-medium cursor-pointer ${
-              path.endsWith("/certification")
-                ? "border-b-4 border-white text-white"
-                : "hover:text-white text-slate-300"
-            }`}
-          >
-            Chứng chỉ
-          </Link>
-          <Link
             href={"./learning-tools"}
             className={`h-9 font-medium cursor-pointer ${
               path.endsWith("/learning-tools")

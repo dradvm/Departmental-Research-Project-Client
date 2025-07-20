@@ -3,6 +3,7 @@ import { Review } from "./review";
 import { Section } from "./section";
 import { Category } from "./category";
 import { Wishlist } from "./wishlist";
+import { UserType } from "./user";
 
 export interface CourseCategory {
   courseId: number;
@@ -21,10 +22,7 @@ export interface Course {
   thumbnail: string;
   requirement: string;
   targetAudience: string;
-  User?: {
-    userId: number;
-    name: string;
-  };
+  User?: UserType;
 
   Section?: Section[];
 
@@ -80,24 +78,24 @@ export interface CourseResAdminUI {
 
 // user for PostFilter component
 export interface CourseAdminFilter {
-  minPrice?: string,
-  maxPrice?: string,
-  minLectureCount?: string,
-  maxLectureCount?: string,
-  minTime?: string,
-  maxTime?: string,
-  searchText?: string
+  minPrice?: string;
+  maxPrice?: string;
+  minLectureCount?: string;
+  maxLectureCount?: string;
+  minTime?: string;
+  maxTime?: string;
+  searchText?: string;
 }
 
 // use for courseService: get all course
 export interface CourseAdminQueryType {
   limit: number;
   skip: number;
-  minPrice?: number,
-  maxPrice?: number,
-  minLectureCount?: number,
-  maxLectureCount?: number,
-  minTime?: number,
-  maxTime?: number,
-  searchText?: string
+  minPrice?: number;
+  maxPrice?: number;
+  minLectureCount?: number;
+  maxLectureCount?: number;
+  minTime?: number;
+  maxTime?: number;
+  searchText?: string;
 }

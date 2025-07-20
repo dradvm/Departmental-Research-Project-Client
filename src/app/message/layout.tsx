@@ -11,8 +11,8 @@ import { useParams } from "next/navigation";
 import { Socket } from "socket.io-client";
 import { getSocket } from "utils/socket";
 import { createContext } from "react";
-import { useSession } from "next-auth/react";
 import MyAvatar from "components/Avatar/Avatar";
+import { useUser } from "../../../context/UserContext";
 
 type MessageContextType = {
   socket: Socket | null;
@@ -37,15 +37,19 @@ const ThreadItem = ({
   thread: Thread;
   userId: number | undefined;
 }) => {
+  console.log(thread);
   const message: Message = useMemo(() => {
-    if (
-      new Date(thread.Message_Message_userReceiverIdToUser[0].timeSend) >
-      new Date(thread.Message_Message_userSenderIdToUser[0].timeSend)
-    ) {
-      return thread.Message_Message_userReceiverIdToUser[0];
-    } else {
-      return thread.Message_Message_userSenderIdToUser[0];
+    const sender: Message = thread.Message_Message_userSenderIdToUser[0];
+    const receiver: Message | null =
+      thread.Message_Message_userReceiverIdToUser.length > 0
+        ? thread.Message_Message_userReceiverIdToUser[0]
+        : null;
+    if (receiver) {
+      return new Date(receiver.timeSend) > new Date(sender.timeSend)
+        ? receiver
+        : sender;
     }
+    return sender;
   }, [thread]);
   return (
     <Link
@@ -61,7 +65,7 @@ const ThreadItem = ({
         <div className="font-semibold text-base">{thread.name}</div>
         <div className="flex justify-between">
           <div
-            className={`text-xs truncate max-w-96 ${
+            className={`text-xs truncate max-w-60 ${
               userId === message.userReceiverId &&
               message.seenAt === null &&
               message.userSenderId !== selectedUserId
@@ -93,12 +97,62 @@ export default function MessageLayout({ children }: { children: ReactNode }) {
   const [threads, setThreads] = useState<Thread[]>([]);
   const socket = useMemo<Socket>(() => getSocket(), []);
 
-  const { data: session } = useSession();
+  const { user } = useUser();
+
+  const messageHasNotSeen = useMemo(() => {
+    if (user) {
+      return threads.reduce((total, thread) => {
+        const sender: Message = thread.Message_Message_userSenderIdToUser[0];
+        const receiver: Message | null =
+          thread.Message_Message_userReceiverIdToUser.length > 0
+            ? thread.Message_Message_userReceiverIdToUser[0]
+            : null;
+        let message: Message = sender;
+        if (receiver) {
+          message =
+            new Date(receiver.timeSend) > new Date(sender.timeSend)
+              ? receiver
+              : sender;
+        }
+
+        return (
+          total +
+          (user.userId === message.userReceiverId &&
+          message.seenAt === null &&
+          message.userSenderId !== selectedUserId
+            ? 1
+            : 0)
+        );
+      }, 0);
+    }
+    return 0;
+  }, [threads, user, selectedUserId]);
 
   const loadThreads = () => {
     messageService
       .getThreads()
-      .then((res) => setThreads(res.data))
+      .then((res) => {
+        const sortedThreads = res.data.sort((a: Thread, b: Thread) => {
+          const lastTimeMessageA = Math.max(
+            new Date(
+              a.Message_Message_userReceiverIdToUser[0]?.timeSend || 0
+            ).getTime(),
+            new Date(
+              a.Message_Message_userSenderIdToUser[0]?.timeSend || 0
+            ).getTime()
+          );
+          const lastTimeMessageB = Math.max(
+            new Date(
+              b.Message_Message_userReceiverIdToUser[0]?.timeSend || 0
+            ).getTime(),
+            new Date(
+              b.Message_Message_userSenderIdToUser[0]?.timeSend || 0
+            ).getTime()
+          );
+          return lastTimeMessageB - lastTimeMessageA;
+        });
+        setThreads(sortedThreads);
+      })
       .catch((err) => console.log(err));
   };
 
@@ -108,13 +162,12 @@ export default function MessageLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     socket.emit("register", {
-      userId: session?.user.userId,
+      userId: user?.userId,
     });
     socket.on("receiveThread", () => {
-      console.log("Nhận tin nhắn mới");
       loadThreads();
     });
-  }, [socket, session]);
+  }, [socket, user?.userId]);
 
   return (
     <MessageContext value={{ socket: socket }}>
@@ -126,7 +179,7 @@ export default function MessageLayout({ children }: { children: ReactNode }) {
               Tin nhắn
             </div>
             <div className="font-thin text-lg flex items-center gap-2">
-              Bạn có 0 tin nhắn chưa đọc
+              Bạn có {messageHasNotSeen} tin nhắn chưa đọc
             </div>
           </Stack>
           <Divider />
@@ -137,7 +190,7 @@ export default function MessageLayout({ children }: { children: ReactNode }) {
                 thread={thread}
                 handleClick={() => setSelectedUserId(thread.userId)}
                 selectedUserId={selectedUserId}
-                userId={session?.user.userId}
+                userId={user?.userId}
               />
             ))}
           </div>

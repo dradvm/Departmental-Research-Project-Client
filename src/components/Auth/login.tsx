@@ -1,6 +1,7 @@
 "use client";
-
 import { useState } from "react";
+import type React from "react";
+
 import Link from "next/link";
 import { authenticate } from "utils/action";
 import { ToastContainer, toast, Bounce } from "react-toastify";
@@ -9,29 +10,23 @@ import { useRouter } from "next/navigation";
 import ModalReactive from "./modal.reactive";
 import ModalResetPassword from "./modal.change.password";
 import { useSession } from "next-auth/react";
+import { Eye, EyeOff, ArrowLeft, Mail, Lock } from "lucide-react";
 
 const LoginPage = () => {
   const router = useRouter();
   const { update } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalResetOpen, setIsModalResetOpen] = useState(false);
-
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // const data = await signIn("credentials", { email, password, redirect: false })
-    // console.log(">>> check data: ", data);
     const res = await authenticate(email, password);
     console.log(res);
     if (res?.error) {
-      //error
       if (res?.code === 2) {
-        //tài khoản chưa được kích hoạt
-        //router.push('/verify')
         setIsModalOpen(true);
         setEmail(email);
         return;
@@ -39,10 +34,8 @@ const LoginPage = () => {
       toast.error(`${res?.error}`);
     } else {
       update();
-      router.push("/instructor");
+      router.push("/");
     }
-
-    // Gửi dữ liệu tới API hoặc xử lý logic đăng nhập ở đây
   };
 
   return (
@@ -59,113 +52,144 @@ const LoginPage = () => {
         pauseOnHover
         theme="light"
         transition={Bounce}
-      />{" "}
-      <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+      />
+
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          {/* Back to Home Link */}
           <Link
             href="/"
-            className="text-indigo-600 hover:text-indigo-500 text-sm font-medium flex items-center mb-4"
+            className="inline-flex items-center gap-2 text-slate-600 hover:text-indigo-600 text-sm font-medium mb-8 transition-colors duration-200 group"
           >
-            ← Back to Home
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
+            Về trang chủ
           </Link>
 
-          <img
-            className="mx-auto h-10 w-auto"
-            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
-          />
-
-          <h2 className="mt-10 text-center text-2xl leading-9 font-bold tracking-tight text-gray-900">
-            Sign in to your account
-          </h2>
-        </div>
-
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Email input */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm leading-6 font-medium text-gray-900"
-              >
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600 sm:text-sm"
-                />
+          {/* Main Card */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+            {/* Logo and Header */}
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                  <div className="w-4 h-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded"></div>
+                </div>
               </div>
+              <h1 className="text-2xl font-bold text-slate-800 mb-2">
+                Chào mừng trở lại
+              </h1>
+              <p className="text-slate-600 text-sm">
+                Đăng nhập vào tài khoản của bạn
+              </p>
             </div>
 
-            {/* Password input with toggle */}
-            <div>
-              <div className="flex items-center justify-between">
+            {/* Login Form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email Field */}
+              <div className="space-y-2">
                 <label
-                  htmlFor="password"
-                  className="block text-sm leading-6 font-medium text-gray-900"
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-slate-700"
                 >
-                  Password
+                  Địa chỉ email
                 </label>
-                <div className="text-sm">
-                  <a
-                    href="#"
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="Nhập email của bạn"
+                    className="w-full pl-11 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  />
+                </div>
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-semibold text-slate-700"
+                  >
+                    Mật khẩu
+                  </label>
+                  <button
+                    type="button"
                     onClick={(e) => {
                       e.preventDefault();
                       setIsModalResetOpen(true);
                     }}
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
+                    className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
                   >
-                    Forgot password?
-                  </a>
+                    Quên mật khẩu?
+                  </button>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="Nhập mật khẩu của bạn"
+                    className="w-full pl-11 pr-12 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors duration-200"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
                 </div>
               </div>
-              <div className="mt-2 relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600 sm:text-sm pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-2 flex items-center text-sm text-gray-500 hover:text-indigo-600"
-                  tabIndex={-1}
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-            </div>
 
-            {/* Submit button */}
-            <div>
+              {/* Submit Button */}
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
-                Sign in
+                Đăng nhập
               </button>
-            </div>
-          </form>
+            </form>
 
-          <p className="mt-10 text-center text-sm text-gray-500">
-            Don't have an account?{" "}
-            <Link
-              href="/auth/register"
-              className="font-semibold text-indigo-600 hover:text-indigo-500"
-            >
-              Sign up now
-            </Link>
-          </p>
+            {/* Sign Up Link */}
+            <div className="mt-8 text-center">
+              <p className="text-slate-600 text-sm">
+                Chưa có tài khoản?{" "}
+                <Link
+                  href="/auth/register"
+                  className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
+                >
+                  Đăng ký ngay
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center mt-8">
+            <p className="text-slate-500 text-xs">
+              Bằng cách đăng nhập, bạn đồng ý với{" "}
+              <a href="#" className="text-indigo-600 hover:text-indigo-500">
+                Điều khoản dịch vụ
+              </a>{" "}
+              và{" "}
+              <a href="#" className="text-indigo-600 hover:text-indigo-500">
+                Chính sách bảo mật
+              </a>
+            </p>
+          </div>
         </div>
       </div>
+
       <ModalReactive
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}

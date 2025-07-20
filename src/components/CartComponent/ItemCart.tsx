@@ -1,4 +1,4 @@
-import { Button, Divider, Stack } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import courseService from "services/course.service";
@@ -12,16 +12,31 @@ import {
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formatDuration2 } from "utils/time";
+import wishlistService from "services/wishlist.service";
+import Link from "next/link";
 export default function ItemCart({
   item,
   onDelete,
-  onWishlist,
+  loadData,
 }: {
   item: ItemType;
   onDelete: (courseId: number, titleCourse: string) => void;
-  onWishlist: (handleWishlistItem: number) => void;
+  loadData: () => void;
 }) {
   const [course, setCourse] = useState<Course>();
+
+  const handleWishList = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    wishlistService
+      .addWishlist(Number(item.course.courseId))
+      .then(() => {
+        loadData();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   const getStartIcon = (average: number, star: number) => {
     if (average > star) {
@@ -68,7 +83,10 @@ export default function ItemCart({
   return (
     <div className="">
       <Divider />
-      <div className="flex space-x-3 mt-3">
+      <Link
+        href={`/course/${course?.courseId}`}
+        className="flex space-x-3 mt-3"
+      >
         <div className="md:block md:w-[15%] relative">
           <Image
             src={item.course.thumbnail ?? "/thumbnail.webp"}
@@ -117,35 +135,31 @@ export default function ItemCart({
           <div>
             <div
               className="hover:bg-indigo-100 p-1 rounded-sm cursor-pointer"
-              onClick={() =>
-                onDelete(parseInt(item.course.courseId), item.course.title)
-              }
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete(parseInt(item.course.courseId), item.course.title);
+              }}
             >
               Xóa
             </div>
           </div>
           <div>
-            <div className="hover:bg-indigo-100 p-1 rounded-sm cursor-pointer">
+            <div
+              className="hover:bg-indigo-100 p-1 rounded-sm cursor-pointer"
+              onClick={handleWishList}
+            >
               Thêm vào yêu thích
             </div>
           </div>
         </Stack>
         {/* Div 4 */}
-        <div className="w-[30%] md:w-[20%] flex flex-col justify-center">
-          <p className="text-center text-[20px] font-bold">
+        <Stack className="w-[30%] md:w-[20%] flex flex-col justify-center">
+          <p className="text-end text-lg font-bold">
             {formatVND(parseInt(item.course.final_price))}
           </p>
-        </div>
-      </div>
-      {/* Div 3 only for mobile and tablet*/}
-      <div className="w-full flex flex-row gap-[4px] justify-end mb-[8px] lg:hidden">
-        <button className="w-fit p-[4px] border rounded-[8px] bg-red-700 text-white">
-          Xóa
-        </button>
-        <button className="w-fit p-[4px] border rounded-[8px] bg-blue-300 text-white">
-          Thêm vào yêu thích
-        </button>
-      </div>
+        </Stack>
+      </Link>
     </div>
   );
 }

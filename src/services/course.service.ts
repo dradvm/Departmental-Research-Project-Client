@@ -34,10 +34,24 @@ const courseService = {
         instructorId,
       },
     }),
-
+  getReviewByCourseAndUser: (courseId: string) =>
+    axiosInstance.get(`/courses/${courseId}/review`),
+  createReview: (courseId: number, rating: number, review: string) =>
+    axiosInstance.post(`/courses/reviews`, {
+      courseId,
+      review,
+      rating,
+    }),
+  updateReview: (reviewId: number, rating: number, review: string) =>
+    axiosInstance.patch(`/courses/reviews/${reviewId}`, {
+      review,
+      rating,
+    }),
+  deleteReview: (reviewId: number) =>
+    axiosInstance.delete(`/courses/reviews/${reviewId}`),
   // for admin functions
   getAllCourse: (params: CourseAdminQueryType) => {
-    return axiosInstance.get('/courses', { params });
+    return axiosInstance.get("/courses", { params });
   },
 
   // accept a course
@@ -50,21 +64,26 @@ const courseService = {
   },
 
   createFullCourse: (formData: FormData) => {
-    return axiosInstance.post('/courses/create-full', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    return axiosInstance.post("/courses/create-full", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
   },
 
   updateFullCourse: (id: number | string, formData: FormData) => {
     return axiosInstance.patch(`/courses/update-full/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { "Content-Type": "multipart/form-data" },
     });
   },
 
   getMyCourses: () => {
-    return axiosInstance.get('/courses/me');
+    return axiosInstance.get("/courses/me");
   },
+  getCoursesByCategory: (categoryId: number) =>
+    axiosInstance.get(`/courses/category/${categoryId}`),
+  getCategories: () => axiosInstance.get("/courses/categories"),
 
+  getCoursePrice: (courseId: number) =>
+    axiosInstance.get(`/courses/${courseId}/price`),
 };
 
 export default courseService;

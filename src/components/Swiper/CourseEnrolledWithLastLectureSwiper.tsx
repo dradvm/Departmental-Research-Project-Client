@@ -16,12 +16,10 @@ export default function CourseEnrolledWithLastLectureSwiper() {
   const [enrolledStudy, setCourseEnrolledStudy] = useState<Enrollment[]>([]);
   const swiperRef = useRef<SwiperCore>(null);
   const [isBeginning, setIsBeginning] = useState(true);
-  const [isEnd, setIsEnd] = useState(false);
+  const [isEnd, setIsEnd] = useState(true);
 
   const onSwiperInit = (swiper: SwiperCore) => {
     swiperRef.current = swiper;
-    setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
   };
 
   const onSlideChange = (swiper: SwiperCore) => {
@@ -59,11 +57,16 @@ export default function CourseEnrolledWithLastLectureSwiper() {
     enrollmentService
       .getCourseEnrolledWithLastStudy()
       .then((res) => {
-        console.log(res.data);
+        setIsEnd(res.data.length < 3);
         setCourseEnrolledStudy(res.data);
       })
       .catch((err) => console.log(err));
   }, []);
+
+  useEffect(() => {
+    console.log(isBeginning);
+    console.log(isEnd);
+  }, [isBeginning, isEnd]);
   return (
     <Box position="relative">
       <Swiper
@@ -161,7 +164,7 @@ export default function CourseEnrolledWithLastLectureSwiper() {
             top: "50%",
             left: 0,
             transform: "translateY(-50%)",
-            zIndex: 30,
+            zIndex: 100,
             bgcolor: "white",
             boxShadow: 1,
             padding: "12px",
@@ -174,7 +177,6 @@ export default function CourseEnrolledWithLastLectureSwiper() {
           <ChevronLeft />
         </IconButton>
       )}
-
       {/* Nút phải */}
       {!isEnd && (
         <IconButton
@@ -184,7 +186,7 @@ export default function CourseEnrolledWithLastLectureSwiper() {
             top: "50%",
             right: 0,
             transform: "translateY(-50%)",
-            zIndex: 30,
+            zIndex: 100,
             bgcolor: "white",
             boxShadow: 1,
             padding: "12px",

@@ -4,14 +4,18 @@ import { Button } from "components/Button/Button";
 import CircularIndeterminate from "components/CircularIndeterminate/CircularIndeterminate";
 import CourseContent from "components/Course/CourseContent/CourseContent";
 import CourseDetails from "components/Course/CourseDetails/CourseDetails";
+import ReviewModal from "components/Modal/ReviewModal";
 
 import { ChevronDown, EllipsisVertical, Share2, Star } from "lucide-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import courseService from "services/course.service";
 import enrollmentService from "services/enrollment.service";
 import studyProgressService from "services/study-progress.service";
 import { Course } from "types/course";
 import { Lecture } from "types/lecture";
+import { Review } from "types/review";
 
 type LearnContextType = {
   enabledBlock: boolean;
@@ -53,7 +57,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [progress, setProgress] = useState<number>(0);
   const [totalWatched, setTotalWatched] = useState<number>(0);
   const [currentTimeNote, setCurrentTimeNote] = useState<number>(0);
+  const [isOpenReviewModal, setIsOpenReviewModal] = useState<boolean>(false);
+  const [review, setReview] = useState<Review | null>(null);
+
+  const handleOpenReviewModal = () => {
+    setIsOpenReviewModal(true);
+  };
+  const handleCloseReviewModal = () => {
+    setIsOpenReviewModal(false);
+  };
+
   useEffect(() => {
+    courseService
+      .getReviewByCourseAndUser(courseId)
+      .then((res) => setReview(res.data))
+      .catch((err) => console.error(err));
     studyProgressService
       .getCourseStudyProgress(Number(courseId))
       .then((res) => {
@@ -117,14 +135,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     >
       <header className="h-14 bg-gray-950 w-full flex items-center justify-between px-4 text-white border-b border-slate-700">
         <div className="flex items-center">
-          <div>UDEMY</div>
+          <Link href={"/"}>EduMarket</Link>
           <div className="h-5 bg-gray-500 mx-5" style={{ width: "1px" }}></div>
-          <div className="font-medium">Khoá học vỡ lòng với n8n</div>
+          <Link href={`/course/${courseId}`} className="font-medium">
+            {course?.title}
+          </Link>
         </div>
         <div className="flex items-center space-x-3">
-          <Button>
-            <Star size={14} className="me-1" /> Để lại đánh giá
-          </Button>
+          {!review && (
+            <Button onClick={handleOpenReviewModal}>
+              <Star size={14} className="me-1" /> Để lại đánh giá
+            </Button>
+          )}
+          {isOpenReviewModal && (
+            <ReviewModal
+              review={review}
+              courseId={parseInt(courseId)}
+              handleCloseModal={handleCloseReviewModal}
+            />
+          )}
           <div className="relative flex items-center">
             <Button variant="hover">
               <CircularIndeterminate progress={progress} />
