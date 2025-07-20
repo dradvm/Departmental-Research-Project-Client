@@ -6,7 +6,6 @@ export interface CouponBody {
   startDate: string;
   endDate: string;
   quantity: number;
-  appliedAmount: number;
   minRequire: number;
   maxValueDiscount: number;
   code: string;
