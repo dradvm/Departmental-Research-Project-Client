@@ -42,7 +42,11 @@ const schema: yup.ObjectSchema<CouponBody> = yup.object({
     .string()
     .min(3, "Mã khuyến mãi ít nhất 3 ký tự")
     .max(10, "Mã khuyến mãi tối đa 10 ký tự")
-    .required("Vui lòng nhập Mã khuyến mãi"),
+    .required("Vui lòng nhập Mã khuyến mãi")
+    .matches(
+      /^[a-zA-Z0-9]+$/,
+      "Mã khuyến mãi chỉ được phép chứa chữ cái tiếng Anh hoặc số"
+    ),
   maxValueDiscount: yup
     .number()
     .required("Vui lòng nhập số tiền Giảm tối đa")
@@ -52,24 +56,10 @@ const schema: yup.ObjectSchema<CouponBody> = yup.object({
     .typeError("Đơn hàng tối thiểu phải là số")
     .min(0)
     .required("Vui lòng nhập giá trị đơn tối thiểu"),
-  appliedAmount: yup
-    .number()
-    .typeError("Số lượng áp dụng phải là số")
-    .min(0)
-    .required("Vui lòng nhập số lượng đã áp dụng")
-    .test(
-      "check-appliedAmount",
-      "Số lượng đã áp dụng phải ít hơn số lượng tối đa",
-      function (appliedAmountInput) {
-        const { quantity } = this.parent;
-        if (!quantity) return true;
-        return appliedAmountInput <= quantity;
-      }
-    ),
   quantity: yup
     .number()
     .typeError("Số lượng tối đa phải là số")
-    .min(0)
+    .min(1, "Số lượng tối đa phải lớn hơn 0")
     .required("Vui lòng nhập số lượng tối đa")
     .test(
       "check-quantity",
@@ -171,7 +161,7 @@ export default function PromotionForm({
           </h2>
 
           <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-6">
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-3">
               <label
                 htmlFor="type"
                 className="block text-sm/6 font-medium text-gray-900"
@@ -193,7 +183,7 @@ export default function PromotionForm({
               </div>
             </div>
 
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-3">
               <label
                 htmlFor="value"
                 className="block text-sm/6 font-medium text-gray-900"
@@ -213,7 +203,7 @@ export default function PromotionForm({
               </div>
             </div>
 
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-3">
               <label
                 htmlFor="code"
                 className="block text-sm/6 font-medium text-gray-900"
@@ -229,6 +219,30 @@ export default function PromotionForm({
                 />
                 {errors.code && (
                   <p className="text-red-500 text-sm">{errors.code.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="sm:col-span-3">
+              <label
+                htmlFor="quantity"
+                className="block text-sm/6 font-medium text-gray-900"
+              >
+                Số lượng tối đa
+              </label>
+              <div className="mt-2">
+                <input
+                  id="quantity"
+                  type="number"
+                  min={0}
+                  max={1000000}
+                  {...register("quantity")}
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                />
+                {errors.quantity && (
+                  <p className="text-red-500 text-sm">
+                    {errors.quantity.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -276,54 +290,6 @@ export default function PromotionForm({
                 {errors.minRequire && (
                   <p className="text-red-500 text-sm">
                     {errors.minRequire.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="appliedAmount"
-                className="block text-sm/6 font-medium text-gray-900"
-              >
-                Số lượng đã áp dụng
-              </label>
-              <div className="mt-2">
-                <input
-                  id="appliedAmount"
-                  type="number"
-                  min={0}
-                  max={1000000}
-                  {...register("appliedAmount")}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-                {errors.appliedAmount && (
-                  <p className="text-red-500 text-sm">
-                    {errors.appliedAmount.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="quantity"
-                className="block text-sm/6 font-medium text-gray-900"
-              >
-                Số lượng tối đa
-              </label>
-              <div className="mt-2">
-                <input
-                  id="quantity"
-                  type="number"
-                  min={0}
-                  max={1000000}
-                  {...register("quantity")}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-                {errors.quantity && (
-                  <p className="text-red-500 text-sm">
-                    {errors.quantity.message}
                   </p>
                 )}
               </div>

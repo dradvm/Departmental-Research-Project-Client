@@ -1,11 +1,14 @@
-import { CouponCourseBodyPutType } from "types/couponcourse"
+import { CouponCourseBody, CouponCourseBodyPutType } from "types/couponcourse"
 import axiosInstance from "./http"
 
 export const couponCourseService = {
     // create a coupon for a course
     // teacher send request and admin will accept
-    createACouponCourse: (body: CouponCourseBodyPutType) => {
-        return axiosInstance.post('couponcourse', body)
+    createACouponCourse: (body: CouponCourseBody) => {
+        return axiosInstance.post('/couponcourse', body)
+    },
+    checkIsApplyingCoupon: (courseId: number) => {
+        return axiosInstance.get(`/couponcourse/check/isApplying/${courseId}`);
     },
     // get all coupon course service for teacher
     getAllCouponCourse: () => {

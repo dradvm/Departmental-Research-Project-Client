@@ -12,7 +12,6 @@ export default function AddGlobalPromotion() {
     value: 0,
     startDate: "",
     endDate: "",
-    appliedAmount: 0,
     quantity: 0,
     maxValueDiscount: 0,
     minRequire: 0,
