@@ -13,16 +13,19 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Button } from "components/Button/Button";
 import { Stack } from "@mui/material";
+import Loading from "components/Main/Loading/Loading";
 
 export default function Cart() {
   const router = useRouter();
   const [cart, setCart] = useState<CartType>();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isFirstLoading, setIsFirstLoading] = useState(true);
 
   // get data: only run the firs time
   async function getDataFirstTime() {
     const cart: CartType = (await cartService.getCart()).data;
     setCart(cart);
+    setIsFirstLoading(false);
   }
   // usually run
   async function fetchData() {
@@ -103,65 +106,66 @@ export default function Cart() {
     }
   }
 
-  async function handleWishlist(handleWishlistItem: () => void) {
-    handleWishlistItem();
-    await fetchData();
-  }
-
   return (
-    <div>
-      {cart && cart.items.length > 0 ? (
-        <div className="mt-[40px] flex flex-col lg:flex-row lg:gap-[5%]">
-          <div className="w-full lg:w-[70%]">
-            <h1 className="text-[24px] font-bold">Giỏ hàng của tôi</h1>
-            <div>
-              <div className="flex justify-between items-center">
-                <h5 className="font-medium">
-                  {cart.items.length} khoá học trong giỏ hàng
-                </h5>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={handleDeleteAllItem}
-                >
-                  Xóa tất cả khóa học khỏi giỏ hàng
-                </Button>
-              </div>
-              <Stack className="gap-y-5 mt-3">
-                {cart.items.map((item, index) => (
-                  <ItemCart
-                    key={index}
-                    item={item}
-                    onDelete={handleDeleteOneItem}
-                    onWishlist={handleWishlist}
-                  ></ItemCart>
-                ))}
-              </Stack>
-            </div>
-          </div>
-          <ProformaInvoice
-            dataInput={{
-              totalPrice: cart.totalPrice,
-              finalPrice: cart.finalPrice,
-              inputRef: inputRef,
-              applyCoupon: handleApplyCoupon,
-              createPaymentIntent: createPaymentIntent,
-            }}
-          ></ProformaInvoice>
-        </div>
+    <div className="min-h-96 flex justify-center items-center w-full">
+      {isFirstLoading ? (
+        <Loading />
       ) : (
-        <div className="mt-[40px] text-center">
-          <h1 className="text-[32px] text-purple-800 font-bold">
-            Giỏ hàng không có khóa học nào.
-          </h1>
-          <button className="mt-8 p-2 bg-purple-500 rounded-[12px] hover:mt-6 hover:bg-purple-400">
-            <Link href="#" className="text-[28px] text-white">
-              Khám phá trang khóa học ngay!
-            </Link>
-          </button>
+        <div className="w-full">
+          {cart && cart.items.length > 0 ? (
+            <div className="flex flex-col lg:flex-row lg:gap-[5%]">
+              <div className="w-full lg:w-[70%]">
+                <h1 className="text-[24px] font-bold">Giỏ hàng của tôi</h1>
+                <div>
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium">
+                      {cart.items.length} khoá học trong giỏ hàng
+                    </h5>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={handleDeleteAllItem}
+                    >
+                      Xóa tất cả khóa học khỏi giỏ hàng
+                    </Button>
+                  </div>
+                  <Stack className="gap-y-5 mt-3">
+                    {cart.items.map((item, index) => (
+                      <ItemCart
+                        key={index}
+                        item={item}
+                        onDelete={handleDeleteOneItem}
+                        loadData={getDataFirstTime}
+                      ></ItemCart>
+                    ))}
+                  </Stack>
+                </div>
+              </div>
+              <ProformaInvoice
+                dataInput={{
+                  totalPrice: cart.totalPrice,
+                  finalPrice: cart.finalPrice,
+                  inputRef: inputRef,
+                  applyCoupon: handleApplyCoupon,
+                  createPaymentIntent: createPaymentIntent,
+                }}
+              ></ProformaInvoice>
+            </div>
+          ) : (
+            <Stack className="items-center gap-y-3">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-indigo-600">
+                Giỏ hàng của bạn hiện đang trống.
+              </h1>
+              <Link href="/">
+                <Button variant="filled" size="lg">
+                  Khám phá khóa học ngay
+                </Button>
+              </Link>
+            </Stack>
+          )}
+          <ToastContainer position="top-right" autoClose={3000} />
         </div>
       )}
-      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

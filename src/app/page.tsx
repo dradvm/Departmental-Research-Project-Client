@@ -13,11 +13,15 @@ import { useEffect, useState } from "react";
 import enrollmentService from "services/enrollment.service";
 import CourseEnrolledWithLastLectureSwiper from "components/Swiper/CourseEnrolledWithLastLectureSwiper";
 import { useUser } from "../../context/UserContext";
+import { Category } from "types/category";
+import courseService from "services/course.service";
+import CourseSwiper from "components/Swiper/CourseSwiper";
 
 library.add(fas, far, fab);
 
 export default function Home() {
   const [courseEnrolledStudy, setCourseEnrolledStudy] = useState<Course[]>();
+  const [categories, setCategories] = useState<Category[]>([]);
   const { user } = useUser();
   useEffect(() => {
     enrollmentService
@@ -26,6 +30,13 @@ export default function Home() {
         {
           setCourseEnrolledStudy(res.data);
         }
+      })
+      .catch((err) => console.log(err));
+    courseService
+      .getCategories()
+      .then((res) => {
+        console.log(res.data);
+        setCategories(res.data);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -51,6 +62,7 @@ export default function Home() {
                 <div className="text-2xl font-bold">
                   Chào mừng {user.name} trở lại!
                 </div>
+                <div>{user.biography}</div>
               </Stack>
             </div>
           )}
@@ -85,6 +97,15 @@ export default function Home() {
             <CourseEnrolledWithLastLectureSwiper />
           </Stack>
         </section>
+      )}
+      {categories !== undefined && categories.length > 0 ? (
+        <>
+          {categories.map((category) => (
+            <CourseSwiper category={category} key={category.categoryId} />
+          ))}
+        </>
+      ) : (
+        <></>
       )}
     </Stack>
   );

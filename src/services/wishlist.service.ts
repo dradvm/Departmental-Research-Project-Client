@@ -13,5 +13,7 @@ const wishlistService = {
     }),
   removeWishlist: (courseId: number) =>
     axiosInstance.delete(`/wishlist/${courseId}`),
+  isExitInWishlist: (courseId: number) =>
+    axiosInstance.get(`/wishlist/isExistInWishlist/${courseId}`),
 };
 export default wishlistService;

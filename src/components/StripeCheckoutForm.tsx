@@ -46,7 +46,7 @@ export default function StripeCheckoutForm({
       payment_method: {
         card: cardElement,
         billing_details: {
-          name: name,
+          name,
         },
       },
     });
@@ -54,7 +54,6 @@ export default function StripeCheckoutForm({
     if (result.error) {
       setMessage(result.error.message || "Đã có lỗi xảy ra. Hãy thử lại");
     } else if (result.paymentIntent?.status === "succeeded") {
-      // succeeded => create payment
       try {
         await paymentService.createPayment(cart);
         localStorage.removeItem("cartInfor");
@@ -73,40 +72,45 @@ export default function StripeCheckoutForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white shadow-lg rounded-2xl p-8 space-y-6 border max-w-md mx-auto"
+      className="max-w-md bg-white border rounded-xl shadow p-6 space-y-5"
     >
-      {/* Name */}
+      {/* Họ và tên */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium mb-1">
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-black mb-1"
+        >
           Họ và tên
         </label>
         <input
           id="name"
           type="text"
           required
-          className="w-full border border-gray-300 rounded-md p-2"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-600"
           placeholder="Họ và tên của bạn"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </div>
 
-      {/* Number Account */}
+      {/* Số thẻ */}
       <div>
-        <label className="block text-sm font-medium mb-1">Số thẻ</label>
-        <div className="border border-gray-300 rounded-md p-3">
+        <label className="block text-sm font-medium text-black mb-1">
+          Số thẻ
+        </label>
+        <div className="p-2 border border-gray-300 rounded-md">
           <CardNumberElement
             options={{
               style: {
                 base: {
                   fontSize: "16px",
-                  color: "#32325d",
+                  color: "#000000",
                   "::placeholder": {
-                    color: "#aab7c4",
+                    color: "#9ca3af", // tailwind's gray-400
                   },
                 },
                 invalid: {
-                  color: "#fa755a",
+                  color: "#dc2626", // tailwind's red-600
                 },
               },
             }}
@@ -114,32 +118,36 @@ export default function StripeCheckoutForm({
         </div>
       </div>
 
-      {/* Exprie Date & CVC */}
+      {/* Ngày hết hạn & CVC */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Ngày hết hạn</label>
-          <div className="border border-gray-300 rounded-md p-3">
+          <label className="block text-sm font-medium text-black mb-1">
+            Ngày hết hạn
+          </label>
+          <div className="p-2 border border-gray-300 rounded-md">
             <CardExpiryElement />
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">CVC</label>
-          <div className="border border-gray-300 rounded-md p-3">
+          <label className="block text-sm font-medium text-black mb-1">
+            CVC
+          </label>
+          <div className="p-2 border border-gray-300 rounded-md">
             <CardCvcElement />
           </div>
         </div>
       </div>
 
-      {/* Checkout Button */}
+      {/* Nút Thanh toán */}
       <button
         type="submit"
         disabled={!stripe || processing}
-        className="w-full bg-purple-600 text-white p-3 rounded-md font-semibold hover:bg-purple-700 transition"
+        className="w-full py-3 rounded-md bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition"
       >
         {processing ? "Đang xử lý..." : "Thanh toán"}
       </button>
 
-      {/* Inform */}
+      {/* Thông báo */}
       {message && (
         <p
           className={`text-center text-sm ${

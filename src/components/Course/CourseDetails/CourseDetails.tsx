@@ -62,7 +62,7 @@ export default function CourseDetails({ course }: { course: Course | null }) {
         </Box>
         <TabPanel value="1"></TabPanel>
         <TabPanel value="2">
-          <CourseOverview course={course} />
+          <CourseOverview courseId={course?.courseId ?? 0} />
         </TabPanel>
         <TabPanel value="3">
           <CourseQA />
