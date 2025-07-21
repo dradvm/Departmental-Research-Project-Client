@@ -15,5 +15,6 @@ const wishlistService = {
     axiosInstance.delete(`/wishlist/${courseId}`),
   isExitInWishlist: (courseId: number) =>
     axiosInstance.get(`/wishlist/isExistInWishlist/${courseId}`),
+  count: () => axiosInstance.get("/wishlist/count"),
 };
 export default wishlistService;

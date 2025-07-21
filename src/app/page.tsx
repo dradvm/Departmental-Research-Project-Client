@@ -23,6 +23,7 @@ export default function Home() {
   const [courseEnrolledStudy, setCourseEnrolledStudy] = useState<Course[]>();
   const [categories, setCategories] = useState<Category[]>([]);
   const { user } = useUser();
+  const [isSkeleton, setIsSkeleton] = useState<boolean>(true);
   useEffect(() => {
     enrollmentService
       .getCourseEnrolledWithLastStudy()
@@ -35,8 +36,8 @@ export default function Home() {
     courseService
       .getCategories()
       .then((res) => {
-        console.log(res.data);
         setCategories(res.data);
+        setIsSkeleton(false);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -82,30 +83,80 @@ export default function Home() {
           </div>
         </Stack>
       </section>
-      {courseEnrolledStudy !== undefined && courseEnrolledStudy.length > 0 && (
-        <section>
+
+      {isSkeleton ? (
+        <Stack className="animate-pulse gap-y-10">
+          {/* Tiêu đề + Link */}
           <Stack className="gap-y-5">
             <div className="flex items-center justify-between">
-              <div className="font-bold text-2xl">Hãy bắt đầu học nào</div>
-              <Link
-                className="font-medium text-indigo-600 underline"
-                href={"/home/my-courses/learning"}
-              >
-                Học tập
-              </Link>
+              <div className="h-6 w-56 bg-gray-300 rounded"></div>
+              <div className="h-5 w-20 bg-gray-200 rounded"></div>
             </div>
-            <CourseEnrolledWithLastLectureSwiper />
+
+            {/* Swiper đầu tiên (Học tiếp) */}
+            <div className="grid grid-cols-3 gap-4">
+              {Array(3)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i} className="bg-gray-200 rounded-lg h-40"></div>
+                ))}
+            </div>
           </Stack>
-        </section>
-      )}
-      {categories !== undefined && categories.length > 0 ? (
-        <>
-          {categories.map((category) => (
-            <CourseSwiper category={category} key={category.categoryId} />
-          ))}
-        </>
+
+          {/* Các danh mục khác (giả lập thêm 2 slider nữa) */}
+          {Array(2)
+            .fill(0)
+            .map((_, idx) => (
+              <div key={idx} className="space-y-4">
+                {/* Tiêu đề danh mục */}
+                <div className="flex justify-between items-center">
+                  <div className="h-6 w-48 bg-gray-300 rounded"></div>
+                  <div className="h-5 w-20 bg-gray-200 rounded"></div>
+                </div>
+                <div className="grid grid-cols-5 gap-4">
+                  {Array(5)
+                    .fill(0)
+                    .map((_, i) => (
+                      <div
+                        key={i}
+                        className="bg-gray-200 rounded-lg h-40"
+                      ></div>
+                    ))}
+                </div>
+              </div>
+            ))}
+        </Stack>
       ) : (
-        <></>
+        <>
+          {courseEnrolledStudy !== undefined &&
+            courseEnrolledStudy.length > 0 && (
+              <section>
+                <Stack className="gap-y-5">
+                  <div className="flex items-center justify-between">
+                    <div className="font-bold text-2xl">
+                      Hãy bắt đầu học nào
+                    </div>
+                    <Link
+                      className="font-medium text-indigo-600 underline"
+                      href={"/home/my-courses/learning"}
+                    >
+                      Học tập
+                    </Link>
+                  </div>
+                  <CourseEnrolledWithLastLectureSwiper />
+                </Stack>
+              </section>
+            )}
+          {categories !== undefined && categories.length > 0 ? (
+            <>
+              {categories.map((category) => (
+                <CourseSwiper category={category} key={category.categoryId} />
+              ))}
+            </>
+          ) : (
+            <></>
+          )}
+        </>
       )}
     </Stack>
   );

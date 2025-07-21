@@ -17,6 +17,7 @@ export interface Course {
   subTitle: string;
   description: string;
   price: number;
+  finalPrice?: number;
   isPublic: boolean;
   isAccepted: boolean;
   thumbnail: string;

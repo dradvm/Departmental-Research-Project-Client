@@ -15,5 +15,6 @@ const cartService = {
   },
   isExitInCart: (courseId: number) =>
     axiosInstance.get(`/cart/isExistInCart/${courseId}`),
+  count: () => axiosInstance.get("/cart/count"),
 };
 export default cartService;

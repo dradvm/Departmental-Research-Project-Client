@@ -11,33 +11,40 @@ import { formatDuration2 } from "utils/time";
 import { useMemo, useState } from "react";
 import wishlistService from "services/wishlist.service";
 import Link from "next/link";
+import { useUser } from "../../../../context/UserContext";
+import { useRouter } from "next/navigation";
 
 export default function CourseCard({ course }: { course: Course }) {
   const [isFavorite, setFavorite] = useState(course.Wishlist?.length ?? 0 > 0);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { user } = useUser();
+  const router = useRouter();
   const toggleFavorite = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
     event.preventDefault();
-    setIsLoading(true);
-    if (!isLoading) {
-      if (isFavorite) {
-        wishlistService
-          .removeWishlist(course.courseId)
-          .then(() => {
-            setIsLoading(false);
-          })
-          .catch((err) => console.log(err));
-      } else {
-        wishlistService
-          .addWishlist(course.courseId)
-          .then(() => {
-            setIsLoading(false);
-          })
-          .catch((err) => console.log(err));
+    if (user) {
+      setIsLoading(true);
+      if (!isLoading) {
+        if (isFavorite) {
+          wishlistService
+            .removeWishlist(course.courseId)
+            .then(() => {
+              setIsLoading(false);
+            })
+            .catch((err) => console.log(err));
+        } else {
+          wishlistService
+            .addWishlist(course.courseId)
+            .then(() => {
+              setIsLoading(false);
+            })
+            .catch((err) => console.log(err));
+        }
       }
+      setFavorite((prev) => !prev);
+    } else {
+      router.push("/auth/login");
     }
-    setFavorite((prev) => !prev);
   };
   const rating = useMemo(() => {
     const reviews = course.Review ?? [];
@@ -84,13 +91,21 @@ export default function CourseCard({ course }: { course: Course }) {
                 <span className="text-sm">{course._count?.Enrollment}</span>
               </div>
 
-              <div className="text-right text-sm">
-                <div className="font-bold text-gray-800">
-                  {formatVND(course.price)}
-                </div>
-                <div className="line-through text-gray-400 text-xs">
-                  {formatVND(course.price)}
-                </div>
+              <div className="flex items-center">
+                {course.finalPrice === course.price ? (
+                  <div className="font-bold text-gray-800 text-right text-sm">
+                    {formatVND(course.finalPrice ?? 0)}
+                  </div>
+                ) : (
+                  <Stack className="text-right text-sm">
+                    <div className="font-bold text-gray-800">
+                      {formatVND(course.finalPrice ?? 0)}
+                    </div>
+                    <div className="line-through text-gray-400 text-xs">
+                      {formatVND(course.price ?? 0)}
+                    </div>
+                  </Stack>
+                )}
               </div>
               <div
                 onClick={toggleFavorite}

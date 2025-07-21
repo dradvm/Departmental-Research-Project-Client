@@ -57,7 +57,7 @@ export default function CourseEnrolledWithLastLectureSwiper() {
     enrollmentService
       .getCourseEnrolledWithLastStudy()
       .then((res) => {
-        setIsEnd(res.data.length < 3);
+        setIsEnd(res.data.length <= 3);
         setCourseEnrolledStudy(res.data);
       })
       .catch((err) => console.log(err));
