@@ -15,7 +15,7 @@ export default function PostDetailModal({
   acceptCourse,
 }: PostDetailModalProps) {
   return (
-    <div className="absolute top-1/2 left-1/2 w-[90vw] max-w-[900px] transform -translate-x-1/2 -translate-y-1/2 p-6 sm:p-8 bg-white rounded-xl shadow-xl">
+    <div className="absolute top-1/2 left-1/2 w-[90vw] max-w-[900px] transform -translate-x-1/2 -translate-y-1/2 p-6 sm:p-8 bg-white rounded-xl shadow-xl max-h-[700px] overflow-y-auto">
       {/* Close Button */}
       <button
         className="absolute top-3 right-3 p-1 text-gray-600 hover:bg-red-500 hover:text-white rounded-full transition"
@@ -47,22 +47,28 @@ export default function PostDetailModal({
 
         {/* Course Description */}
         <div className="space-y-2 text-gray-700">
-          <p>
+          <div>
             <span className="font-semibold">Mô tả khóa học:</span>{" "}
-            {postDetail.description}
-          </p>
-          <p>
+            <div
+              dangerouslySetInnerHTML={{ __html: postDetail.description }}
+            ></div>
+          </div>
+          <div>
             <span className="font-semibold">Học phí:</span>{" "}
             {formatVND(parseInt(postDetail.price))}
-          </p>
-          <p>
+          </div>
+          <div>
             <span className="font-semibold">Mục tiêu khóa học:</span>{" "}
-            {postDetail.targetAudience}
-          </p>
-          <p>
+            <div
+              dangerouslySetInnerHTML={{ __html: postDetail.targetAudience }}
+            ></div>
+          </div>
+          <div>
             <span className="font-semibold">Yêu cầu khóa học:</span>{" "}
-            {postDetail.requirement}
-          </p>
+            <div
+              dangerouslySetInnerHTML={{ __html: postDetail.requirement }}
+            ></div>
+          </div>
         </div>
       </div>
 
