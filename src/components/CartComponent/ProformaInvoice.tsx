@@ -1,3 +1,4 @@
+import { Button } from "components/Button/Button";
 import { RefObject } from "react";
 import { formatVND } from "utils/money";
 
@@ -15,44 +16,40 @@ export default function ProformaInvoice({
   dataInput: InputProformalInvoice;
 }) {
   return (
-    <div className="w-full md:w-[60%] mx-auto lg:w-[25%] lg:mx-0 flex flex-col">
-      <p className="text-[24px] font-bold">Bảng tạm tính</p>
-      <div className="mt-[12px]">
-        <p className="text-[18px] font-bold">Tạm tính:</p>
-        <p className="text-[18px] font-bold text-blue-500">
+    <div className="w-96 flex flex-col border rounded-xl p-4 space-y-4">
+      <p className="text-xl font-bold text-black">Bảng tạm tính</p>
+
+      <div>
+        <p className="text-base font-semibold text-black">Tạm tính:</p>
+        <p className="text-lg font-bold text-indigo-600">
           {formatVND(parseInt(dataInput.totalPrice))}
         </p>
       </div>
-      <div className="flex">
+
+      <div className="flex space-x-2 items-center">
         <input
           ref={dataInput.inputRef}
           id="promotion-code"
-          className="flex-1 p-[4px] border-[2px] rounded-[8px]"
           type="text"
           placeholder="Nhập mã của bạn"
+          className="text-sm grow  px-4 py-2 placeholder:text-slate-700 placeholder border border-gray-300 rounded hover:bg-gray-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
         />
-        <button
-          className="ml-[4px] p-[4px] rounded-[8px] bg-purple-600 text-white"
-          onClick={dataInput.applyCoupon}
-        >
+
+        <Button variant="filled" size="sm" onClick={dataInput.applyCoupon}>
           Áp dụng
-        </button>
+        </Button>
       </div>
-      <div className="mt-[12px]">
-        <p className="text-[18px] font-bold underline decoration-double">
-          Cần thanh toán:
-        </p>
-        <p className="text-[28px] font-bold text-blue-500">
+
+      <div>
+        <p className="text-base font-semibold text-black">Cần thanh toán:</p>
+        <p className="text-2xl font-bold text-indigo-600">
           {formatVND(parseInt(dataInput.finalPrice))}
         </p>
       </div>
 
-      <button
-        className="m-[4px] p-[12px] rounded-[8px] bg-purple-600 text-center text-white"
-        onClick={dataInput.createPaymentIntent}
-      >
+      <Button variant="filled" onClick={dataInput.createPaymentIntent}>
         Thanh toán
-      </button>
+      </Button>
     </div>
   );
 }

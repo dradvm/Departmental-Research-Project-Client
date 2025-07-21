@@ -13,7 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 import { motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Enrollment } from "types/enrollment";
 import { Course } from "types/course";
 import { Lecture } from "types/lecture";
@@ -23,9 +23,30 @@ import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
 import { Category } from "types/category";
 import { StudyProgress } from "types/study-progress";
 import Loading from "components/Main/Loading/Loading";
+import courseService from "services/course.service";
+import { Review } from "types/review";
+import ReviewModal from "components/Modal/ReviewModal";
 
 function CourseItem({ course }: { course: Course }) {
   const [lecture, setLecture] = useState<Lecture>();
+  const [review, setReview] = useState<Review | null>(null);
+  const [isOpenReviewModal, setIsOpenReviewModal] = useState<boolean>(false);
+
+  const loadReviews = useCallback(() => {
+    courseService
+      .getReviewByCourseAndUser(course.courseId.toString())
+      .then((res) => setReview(res.data))
+      .catch((err) => console.error(err));
+  }, [course.courseId]);
+
+  const handleOpenReviewModal = (e: MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsOpenReviewModal(true);
+  };
+  const handleCloseReviewModal = () => {
+    setIsOpenReviewModal(false);
+  };
   const progress = useMemo(() => {
     const studyProgress: StudyProgress[] =
       course.Section?.flatMap((section) =>
@@ -35,15 +56,6 @@ function CourseItem({ course }: { course: Course }) {
       (studyProgress.reduce((total, sp) => total + (sp.isDone ? 1 : 0), 0) /
         studyProgress.length) *
         100
-    );
-  }, [course]);
-  const rating = useMemo(() => {
-    const reviews = course.Review ?? [];
-    return Number(
-      (
-        reviews.reduce((total, review) => total + review.rating, 0) /
-        (reviews.length || 1)
-      ).toFixed(1)
     );
   }, [course]);
   const getStartIcon = (average: number, star: number) => {
@@ -61,90 +73,107 @@ function CourseItem({ course }: { course: Course }) {
     }
   };
   useEffect(() => {
+    loadReviews();
     studyProgressSerivce
       .getLastStudyLecture(course.courseId)
       .then((res) => {
         setLecture(res.data);
       })
       .catch((err) => console.log(err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [course.courseId]);
 
   return (
     lecture && (
-      <Link
-        href={`/course/${course.courseId}/learn/lecture/${lecture.lectureId}`}
-        className="group"
-      >
-        <Stack className="gap-y-2">
-          <div
-            className="w-full h-44 relative"
-            style={{ border: "1px solid #999" }}
-          >
-            <Image
-              src={course.thumbnail}
-              fill
-              alt="props"
-              className="object-cover"
-            />
-            <div className="absolute w-full h-full top-0 left-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-100">
-              <div className="w-full h-full bg-black opacity-50"></div>
-              <motion.div
-                initial={{ opacity: 0, y: 0, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 0, scale: 1 }}
-                className="text-white absolute w-full h-full flex items-center justify-center top-0 left-0"
-              >
-                <div className="absolute rounded-full p-6 bg-white"></div>
-                <FontAwesomeIcon
-                  icon={faPlay}
-                  className="absolute text-black text-xl"
-                />
-              </motion.div>
-            </div>
-          </div>
-          <Stack className="gap-y-1">
-            <div className="font-medium text-base/5 line-clamp-2 h-10">
-              {course.title}
-            </div>
-            <div className="text-slate-500 text-xs truncate">
-              {course.User?.name}
-            </div>
-          </Stack>
-          <Stack className="mt-2 text-indigo-600">
-            <LinearProgress
-              variant="determinate"
-              value={progress}
-              className="w-full col-span-3"
-              sx={{
-                height: 2,
-              }}
-              color="inherit"
-            />
-            <div className="flex justify-between mt-1">
-              <div className="text-xs text-slate-700 h-4">
-                Hoàn thành {progress}%
+      <>
+        <Link
+          href={`/course/${course.courseId}/learn/lecture/${lecture.lectureId}`}
+          className="group"
+        >
+          <Stack className="gap-y-2">
+            <div
+              className="w-full h-44 relative"
+              style={{ border: "1px solid #999" }}
+            >
+              <Image
+                src={course.thumbnail}
+                fill
+                alt="props"
+                className="object-cover"
+              />
+              <div className="absolute w-full h-full top-0 left-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-100">
+                <div className="w-full h-full bg-black opacity-50"></div>
+                <motion.div
+                  initial={{ opacity: 0, y: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 0, scale: 1 }}
+                  className="text-white absolute w-full h-full flex items-center justify-center top-0 left-0"
+                >
+                  <div className="absolute rounded-full p-6 bg-white"></div>
+                  <FontAwesomeIcon
+                    icon={faPlay}
+                    className="absolute text-black text-xl"
+                  />
+                </motion.div>
               </div>
-              <Stack className="items-end">
-                <div className="flex items-center space-x-1 h-4">
-                  {Array(5)
-                    .fill(0)
-                    .map((star, index) => {
-                      return (
-                        <FontAwesomeIcon
-                          key={index}
-                          icon={getStartIcon(rating, index)}
-                          className={`text-yellow-600`}
-                          fontSize={8}
-                        />
-                      );
-                    })}
-                </div>
-                <div className="text-xs text-slate-700 ">Đưa ra đánh giá</div>
-              </Stack>
             </div>
+            <Stack className="gap-y-1">
+              <div className="font-medium text-base/5 line-clamp-2 h-10">
+                {course.title}
+              </div>
+              <div className="text-slate-500 text-xs truncate">
+                {course.User?.name}
+              </div>
+            </Stack>
+            <Stack className="mt-2 text-indigo-600">
+              <LinearProgress
+                variant="determinate"
+                value={progress}
+                className="w-full col-span-3"
+                sx={{
+                  height: 2,
+                }}
+                color="inherit"
+              />
+              <div className="flex justify-between mt-1">
+                <div className="text-xs text-slate-700 h-4">
+                  Hoàn thành {progress}%
+                </div>
+                <Stack className="items-end">
+                  <div className="flex items-center space-x-1 h-4">
+                    {Array(5)
+                      .fill(0)
+                      .map((star, index) => {
+                        return (
+                          <FontAwesomeIcon
+                            key={index}
+                            icon={getStartIcon(review?.rating ?? 0, index)}
+                            className={`text-yellow-600`}
+                            fontSize={8}
+                          />
+                        );
+                      })}
+                  </div>
+                  <div
+                    className="text-xs text-slate-700 "
+                    onClick={handleOpenReviewModal}
+                  >
+                    {review ? "Cập nhật đánh giá" : "Đánh giá khoá học"}
+                  </div>
+                </Stack>
+              </div>
+            </Stack>
           </Stack>
-        </Stack>
-      </Link>
+        </Link>
+        {isOpenReviewModal && (
+          <ReviewModal
+            onSave={loadReviews}
+            review={review}
+            courseId={course.courseId}
+            handleCloseModal={handleCloseReviewModal}
+          />
+        )}
+      </>
     )
   );
 }

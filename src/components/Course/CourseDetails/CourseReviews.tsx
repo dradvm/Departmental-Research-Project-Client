@@ -15,6 +15,7 @@ import { getTimeAgo } from "utils/time";
 import Loading from "../../Main/Loading/Loading";
 import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
 import MyAvatar from "components/Avatar/Avatar";
+import ReviewModal from "components/Modal/ReviewModal";
 function BarReviews({
   stars,
   barReviewSelect,
@@ -165,6 +166,16 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
   const [totalReview, setTotalReview] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingReviews, setIsLoadingReviews] = useState<boolean>(true);
+
+  const [isOpenReviewModal, setIsOpenReviewModal] = useState<boolean>(false);
+
+  const handleOpenReviewModal = () => {
+    setIsOpenReviewModal(true);
+  };
+  const handleCloseReviewModal = () => {
+    setIsOpenReviewModal(false);
+  };
+
   const handleClearSearch = () => {
     setSearch("");
     setSearchValue("");
@@ -211,7 +222,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
       return regularStar;
     }
   };
-  useEffect(() => {
+  const fetchReviewOverview = useCallback(() => {
     courseService
       .getCourseReviewOverview(courseId)
       .then((res) => {
@@ -222,6 +233,10 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
   }, [courseId]);
 
   useEffect(() => {
+    fetchReviewOverview();
+  }, [fetchReviewOverview]);
+
+  const loadReviews = useCallback(() => {
     courseService
       .getCourseReviews(
         courseId,
@@ -245,23 +260,34 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
       )
       .then((res) => setTotalReview(res.data))
       .catch((err) => console.log(err));
-  }, [barReviewSelect, courseId, searchValue, cursor]);
+  }, [courseId, barReviewSelect, searchValue, cursor]);
+
+  useEffect(() => {
+    loadReviews();
+  }, [loadReviews]);
 
   useEffect(() => {
     setNumberReviews(reviews.length);
   }, [reviews]);
-  useEffect(() => {
-    console.log(courseId);
-  }, [courseId]);
   return (
     <>
       {isLoading ? (
         <Loading />
       ) : reviewOverview?.average === null ? (
         <div className="flex w-full justify-center mt-3">
-          <Button variant="primary">
+          <Button variant="primary" onClick={handleOpenReviewModal}>
             Khoá học chưa có đánh giá. Đánh giá ngay!
           </Button>
+          {isOpenReviewModal && (
+            <ReviewModal
+              onSave={() => {
+                fetchReviewOverview();
+                loadReviews();
+              }}
+              courseId={parseInt(courseId)}
+              handleCloseModal={handleCloseReviewModal}
+            />
+          )}
         </div>
       ) : (
         <Stack className="px-28 py-10 gap-y-10">

@@ -10,8 +10,8 @@ import messageService from "services/message.service";
 import { Message, Thread } from "types/message";
 import { formatMessageTime, isWithinTwoMinutes } from "utils/time";
 import { useMessageContext } from "../layout";
-import { useSession } from "next-auth/react";
 import MyAvatar from "components/Avatar/Avatar";
+import { useUser } from "../../../../context/UserContext";
 
 const MessageItem = ({
   message,
@@ -120,18 +120,18 @@ export default function ThreadPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { socket } = useMessageContext();
   const [socketId, setSocketId] = useState<string | undefined>(undefined);
-  const { data: session } = useSession();
+  const { user } = useUser();
 
   const handleSendMessage = useCallback(() => {
     if (typeof threadId === "string") {
       socket?.emit("sendMessage", {
-        userSenderId: session?.user.userId,
+        userSenderId: user?.userId,
         userReceiverId: parseInt(threadId),
         message: input,
       });
       setInput("");
     }
-  }, [session?.user.userId, socket, threadId, input]);
+  }, [user?.userId, socket, threadId, input]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -158,17 +158,17 @@ export default function ThreadPage() {
 
   useEffect(() => {
     if (typeof threadId === "string") {
-      if (session?.user.userId) {
+      if (user?.userId) {
         if (!socketId) {
           socket?.emit("joinThread", {
-            userId: session?.user.userId,
+            userId: user?.userId,
             threadId: parseInt(threadId),
           });
           setSocketId(socket?.id);
         }
       }
     }
-  }, [threadId, socket, session, socketId]);
+  }, [threadId, socket, user, socketId]);
 
   useEffect(() => {
     socket?.on("receiveMessage", (message: Message) => {

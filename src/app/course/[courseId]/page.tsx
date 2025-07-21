@@ -13,12 +13,14 @@ import { formatDuration } from "utils/time";
 import CoursePageListCourse from "components/Course/CoursePage/CoursePageListCourse";
 import courseService from "services/course.service";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Course } from "types/course";
 import Image from "next/image";
 import { Button } from "components/Button/Button";
 import CourseCard from "components/Course/CoursePage/CourseCard";
 import wishlistService from "services/wishlist.service";
+import cartService from "services/cart.service";
+import { formatVND } from "utils/money";
 
 export default function CoursePage() {
   const { courseId } = useParams<{
@@ -29,17 +31,49 @@ export default function CoursePage() {
   const [otherCourse, setOtherCourse] = useState<Course[]>([]);
   const [isFavorite, setFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isExistInCart, setIsExistInCart] = useState(false);
+  const [price, setPrice] = useState<number | null>(null);
+  const [finalPrice, setFinalPrice] = useState<number | null>(null);
 
-  const toggleFavorite = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
+  const loadIsExistInCart = useCallback(() => {
+    cartService
+      .isExitInCart(Number(courseId))
+      .then((res) => {
+        if (res.data) {
+          setIsExistInCart(true);
+        } else {
+          setIsExistInCart(false);
+        }
+      })
+      .catch((err) => console.log(err));
+  }, [courseId]);
+
+  const loadIsExistInWishlist = useCallback(() => {
+    wishlistService
+      .isExitInWishlist(Number(courseId))
+      .then((res) => {
+        if (res.data) {
+          setFavorite(true);
+        } else {
+          setFavorite(false);
+        }
+      })
+      .catch((err) => console.log(err));
+  }, [courseId]);
+
+  const toggleFavorite = () => {
     setIsLoading(true);
-    if (!isLoading && course) {
+    setIsDisabled(true);
+    if (!isLoading && course && !isDisabled) {
       if (isFavorite) {
         wishlistService
           .removeWishlist(course.courseId)
           .then(() => {
             setIsLoading(false);
+            setIsDisabled(false);
+            loadIsExistInWishlist();
+            loadIsExistInCart();
           })
           .catch((err) => console.log(err));
       } else {
@@ -47,11 +81,13 @@ export default function CoursePage() {
           .addWishlist(course.courseId)
           .then(() => {
             setIsLoading(false);
+            setIsDisabled(false);
+            loadIsExistInWishlist();
+            loadIsExistInCart();
           })
           .catch((err) => console.log(err));
       }
     }
-    setFavorite((prev) => !prev);
   };
   const rating = useMemo(() => {
     if (course) {
@@ -79,6 +115,20 @@ export default function CoursePage() {
     setIsOpenListCourse((prev) => !prev);
   };
 
+  const handleAddToCart = useCallback(() => {
+    if (course) {
+      setIsDisabled(true);
+      cartService
+        .addCourseIntoCart({ courseId: course.courseId })
+        .then(() => {
+          setIsDisabled(false);
+          loadIsExistInCart();
+          loadIsExistInWishlist();
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [course, loadIsExistInCart, loadIsExistInWishlist]);
+
   const getStartIcon = (average: number, star: number) => {
     if (average > star) {
       const reminder = average - star;
@@ -104,12 +154,26 @@ export default function CoursePage() {
   }, [courseId]);
 
   useEffect(() => {
+    loadIsExistInCart();
+  }, [loadIsExistInCart]);
+
+  useEffect(() => {
+    loadIsExistInWishlist();
+  }, [loadIsExistInWishlist]);
+
+  useEffect(() => {
     if (course) {
       courseService
         .getOtherCourses(course?.courseId, course?.userId)
         .then((res) => setOtherCourse(res.data))
         .catch((err) => console.log(err));
-      setFavorite((course.Wishlist?.length ?? 0) > 0);
+      courseService
+        .getCoursePrice(course?.courseId)
+        .then((res) => {
+          setPrice(res.data.price);
+          setFinalPrice(res.data.finalPrice);
+        })
+        .catch((err) => console.log(err));
     }
   }, [course]);
 
@@ -237,16 +301,43 @@ export default function CoursePage() {
             style={{ objectFit: "cover", width: "100%", height: "100%" }}
           />
 
-          <div className="px-4 py-8">
-            <div className="text-2xl font-medium">{course?.price}</div>
+          <Stack className="px-4 py-8 gap-y-3">
+            {price !== null && finalPrice !== null ? (
+              <div className="flex space-x-3 items-center">
+                <div className="text-lg font-medium line-through text-gray-400">
+                  {formatVND(price ?? 0)}
+                </div>
+
+                <div className="text-lg font-bold">
+                  {formatVND(finalPrice ?? 0)}
+                </div>
+              </div>
+            ) : (
+              <div className="h-3 bg-gray-200 rounded-full dark:bg-gray-700 w-48"></div>
+            )}
+
             <Stack className="gap-y-2">
               <div className="flex space-x-2 w-full">
-                <div className="cursor-pointer px-4 py-2 bg-indigo-600 hover:bg-indigo-500 font-medium text-white rounded-sm grow text-center">
-                  Thêm vào giỏ hàng
-                </div>
-                <div
+                {isExistInCart ? (
+                  <Link href={"/cart"} className="flex grow">
+                    <Button variant="filled" className="grow">
+                      Chuyển đến giỏ hàng
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    variant="filled"
+                    onClick={handleAddToCart}
+                    disabled={isDisabled}
+                    className="grow"
+                  >
+                    Thêm vào giỏ hàng
+                  </Button>
+                )}
+                <button
+                  disabled={isDisabled}
                   onClick={toggleFavorite}
-                  className={`border border-indigo-600 px-3 py-2 rounded-sm flex items-center text-indigo-600 ${!isLoading && " hover:bg-indigo-50 cursor-pointer"}`}
+                  className={`border border-indigo-600 px-3 py-2 rounded-sm flex items-center text-indigo-600 ${!isLoading && " hover:bg-indigo-50 cursor-pointer"} ${isDisabled && "cursor-not-allowed"}`}
                 >
                   {isLoading ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-indigo-600 border-t-transparent"></div>
@@ -259,13 +350,10 @@ export default function CoursePage() {
                       )}
                     </>
                   )}
-                </div>
+                </button>
               </div>
-              <Button size="lg" variant="primary">
-                Mua ngay
-              </Button>
             </Stack>
-          </div>
+          </Stack>
         </Stack>
       </div>
     </Stack>

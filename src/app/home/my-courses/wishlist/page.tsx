@@ -76,6 +76,7 @@ function CourseItem({ course }: { course: Course }) {
       return regularStar;
     }
   };
+
   return (
     <Link href={"/"} className="group">
       <Stack className="gap-y-2">
