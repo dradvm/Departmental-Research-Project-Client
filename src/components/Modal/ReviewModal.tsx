@@ -7,6 +7,7 @@ import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 import { Button } from "components/Button/Button";
 import { Review } from "types/review";
 import courseService from "services/course.service";
+import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 export default function ReviewModal({
   courseId,
   handleCloseModal,
@@ -24,6 +25,7 @@ export default function ReviewModal({
   const [reviewContent, setReviewContent] = useState(
     review && review.review ? review.review : ""
   );
+  const { setEnabledBlock } = useLearnContext();
   const handleClose = () => {
     handleCloseModal();
   };
@@ -121,6 +123,8 @@ export default function ReviewModal({
             {rating > 0 && (
               <>
                 <textarea
+                  onFocus={() => setEnabledBlock(false)}
+                  onBlur={() => setEnabledBlock(true)}
                   rows={4}
                   placeholder="Hãy cho chúng tôi biết trải nghiệm cá nhân của riêng bạn khi tham gia khóa học này. Khóa học có phù hợp với bạn không?"
                   className="text-sm w-full px-4 py-2 placeholder:text-slate-700 border border-gray-300 rounded hover:bg-gray-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none overflow-y-auto"

@@ -1,6 +1,7 @@
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider, Stack } from "@mui/material";
+import MyAvatar from "components/Avatar/Avatar";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import courseService from "services/course.service";
@@ -71,7 +72,10 @@ export default function CourseOverview({ courseId }: { courseId: number }) {
           <Divider />
           <div className="grid grid-cols-3 gap-4">
             <div>Mô tả</div>
-            <div className="col-span-2">{course?.description}</div>
+            <div
+              className="col-span-2 ql-editor"
+              dangerouslySetInnerHTML={{ __html: course?.description }}
+            ></div>
           </div>
           <Divider />
           <div className="grid grid-cols-3 gap-4">
@@ -79,14 +83,14 @@ export default function CourseOverview({ courseId }: { courseId: number }) {
             <Stack className="col-span-2 gap-7">
               <Stack className="gap-3">
                 <div className="flex items-center space-x-5">
-                  <div className="rounded-full w-12 h-12 overflow-hidden relative">
-                    <Image
-                      src={course.User?.img ?? "/thumbnail.webp"}
-                      alt="image"
-                      fill
-                      style={{ objectFit: "cover" }}
-                    />
-                  </div>
+                  <MyAvatar
+                    user={{
+                      img: course.User?.img,
+                      isActive: !!course.User?.isActive,
+                      isDeleted: !!course.User?.isDeleted,
+                      name: course.User?.name ?? "",
+                    }}
+                  />
                   <Stack>
                     <div className="font-semibold">{course.User?.name}</div>
                     <div className="text-sm text-slate-700 font-medium">

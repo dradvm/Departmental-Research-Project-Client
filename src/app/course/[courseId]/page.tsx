@@ -22,6 +22,8 @@ import wishlistService from "services/wishlist.service";
 import cartService from "services/cart.service";
 import { formatVND } from "utils/money";
 import { useUser } from "../../../../context/UserContext";
+import { Enrollment } from "types/enrollment";
+import enrollmentService from "services/enrollment.service";
 
 export default function CoursePage() {
   const { courseId } = useParams<{
@@ -37,6 +39,7 @@ export default function CoursePage() {
   const { user } = useUser();
   const router = useRouter();
   const [isSkeleton, setIsSkeleton] = useState<boolean>(true);
+  const [isEnrolled, setIsEnrolled] = useState<Enrollment | null>(null);
   const loadIsExistInCart = useCallback(() => {
     if (user) {
       cartService
@@ -183,6 +186,10 @@ export default function CoursePage() {
             setOtherCourse(res.data);
             setIsSkeleton(false);
           })
+          .catch((err) => console.log(err));
+        enrollmentService
+          .isEnrolled(course.courseId)
+          .then((res) => setIsEnrolled(res.data))
           .catch((err) => console.log(err));
       } else {
         courseService
@@ -451,12 +458,14 @@ export default function CoursePage() {
             <Stack className="gap-y-3">
               <div className="text-2xl font-medium">Yêu cầu</div>
               <div
+                className="ql-editor"
                 dangerouslySetInnerHTML={{ __html: course?.description ?? "" }}
               ></div>
             </Stack>
             <Stack className="gap-y-3">
               <div className="text-2xl font-medium">Mô tả</div>
               <div
+                className="ql-editor"
                 dangerouslySetInnerHTML={{ __html: course?.description ?? "" }}
               ></div>
             </Stack>
@@ -465,6 +474,7 @@ export default function CoursePage() {
                 Đối tượng của khoá học này
               </div>
               <div
+                className="ql-editor"
                 dangerouslySetInnerHTML={{
                   __html: course?.targetAudience ?? "",
                 }}
@@ -532,41 +542,52 @@ export default function CoursePage() {
                 </div>
               )}
               <Stack className="gap-y-2">
-                <div className="flex space-x-2 w-full">
-                  {isExistInCart ? (
-                    <Link href={"/cart"} className="flex grow">
-                      <Button variant="filled" className="grow">
-                        Chuyển đến giỏ hàng
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Button
-                      variant="filled"
-                      onClick={handleAddToCart}
-                      disabled={isDisabled}
-                      className="grow"
-                    >
-                      Thêm vào giỏ hàng
-                    </Button>
-                  )}
-                  <button
-                    disabled={isDisabled}
-                    onClick={toggleFavorite}
-                    className={`border border-indigo-600 px-3 py-2 rounded-sm flex items-center text-indigo-600 ${!isLoading && " hover:bg-indigo-50 cursor-pointer"} ${isDisabled && "cursor-not-allowed"}`}
+                {isEnrolled ? (
+                  <Link
+                    className="flex grow"
+                    href={`/course/${course?.courseId}/learn/lecture/${isEnrolled.Course.LastLectureStudy?.[0].Lecture.lectureId}`}
                   >
-                    {isLoading ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-indigo-600 border-t-transparent"></div>
+                    <Button variant="filled" className="grow">
+                      Chuyển đến khoá học
+                    </Button>
+                  </Link>
+                ) : (
+                  <div className="flex space-x-2 w-full">
+                    {isExistInCart ? (
+                      <Link href={"/cart"} className="flex grow">
+                        <Button variant="filled" className="grow">
+                          Chuyển đến giỏ hàng
+                        </Button>
+                      </Link>
                     ) : (
-                      <>
-                        {isFavorite ? (
-                          <FontAwesomeIcon icon={faHeart} fontSize={18} />
-                        ) : (
-                          <Heart size={18} />
-                        )}
-                      </>
+                      <Button
+                        variant="filled"
+                        onClick={handleAddToCart}
+                        disabled={isDisabled}
+                        className="grow"
+                      >
+                        Thêm vào giỏ hàng
+                      </Button>
                     )}
-                  </button>
-                </div>
+                    <button
+                      disabled={isDisabled}
+                      onClick={toggleFavorite}
+                      className={`border border-indigo-600 px-3 py-2 rounded-sm flex items-center text-indigo-600 ${!isLoading && " hover:bg-indigo-50 cursor-pointer"} ${isDisabled && "cursor-not-allowed"}`}
+                    >
+                      {isLoading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-indigo-600 border-t-transparent"></div>
+                      ) : (
+                        <>
+                          {isFavorite ? (
+                            <FontAwesomeIcon icon={faHeart} fontSize={18} />
+                          ) : (
+                            <Heart size={18} />
+                          )}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
               </Stack>
             </Stack>
           </Stack>

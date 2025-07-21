@@ -78,7 +78,7 @@ function CourseItem({ course }: { course: Course }) {
   };
 
   return (
-    <Link href={"/"} className="group">
+    <Link href={`/course/${course.courseId}`} className="group">
       <Stack className="gap-y-2">
         <div
           className="w-full h-44 relative"
