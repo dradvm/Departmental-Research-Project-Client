@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getSession } from "next-auth/react";
-
 const createAxios = (
   route = "",
   contentType = "application/json",
@@ -11,7 +10,7 @@ const createAxios = (
 
   //--------------
   const instance = axios.create({
-    baseURL: `http://localhost:3001/api${route}`,
+    baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api${route}`,
     timeout: timeout,
     headers: {
       "Content-Type": contentType,
