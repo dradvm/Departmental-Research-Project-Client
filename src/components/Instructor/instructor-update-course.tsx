@@ -199,6 +199,7 @@ export default function CourseForm(props: CourseFormProps) {
         lectureIdx: number
     ) => {
         const videoElement = document.createElement('video');
+
         videoElement.preload = 'metadata';
 
         videoElement.onloadedmetadata = () => {
@@ -743,26 +744,31 @@ export default function CourseForm(props: CourseFormProps) {
                                                     </div>
 
                                                     {/* + Content (select video) */}
-                                                    <div className="relative">
-                                                        <input
-                                                            type="file"
-                                                            accept="video/*"
-                                                            className="absolute inset-0 opacity-0 cursor-pointer"
-                                                            onChange={(e) => {
-                                                                const file = e.target.files?.[0]
-                                                                if (file) {
-                                                                    handleSelectVideoFile(file, idx, ldx)
-                                                                    e.target.value = ''
-                                                                }
-                                                            }}
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            className="border border-purple-600 text-purple-600 text-sm px-3 py-1 rounded hover:bg-purple-50 font-medium"
-                                                        >
-                                                            + Content
-                                                        </button>
-                                                    </div>
+                                                    {lecture.contents.length === 0 ? (
+                                                        <div className="relative">
+                                                            <input
+                                                                type="file"
+                                                                accept="video/*"
+                                                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                                                onChange={(e) => {
+                                                                    const file = e.target.files?.[0]
+                                                                    if (file) {
+                                                                        handleSelectVideoFile(file, idx, ldx)
+                                                                        e.target.value = ''
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                className="border border-purple-600 text-purple-600 text-sm px-3 py-1 rounded hover:bg-purple-50 font-medium"
+                                                            >
+                                                                + Content
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-xs text-gray-500">🎬 Video already added</p>
+                                                    )}
+
                                                 </div>
                                             )}
                                             {/* File list */}
