@@ -11,8 +11,8 @@ import courseService from "services/course.service";
 import { Category } from "types/category";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useUser } from "../../../../context/UserContext";
+import { useSearchParams } from "next/navigation";
+import { useUser } from "../../../context/UserContext";
 import Loading from "components/Main/Loading/Loading";
 export default function CourseSearchPage() {
   const searchParams = useSearchParams();

@@ -1,4 +1,4 @@
-import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
+import { useLearnContext } from "context/LearnContext";
 import { useEffect, useState } from "react";
 
 export default function Input({

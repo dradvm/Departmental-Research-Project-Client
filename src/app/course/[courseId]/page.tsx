@@ -21,7 +21,7 @@ import CourseCard from "components/Course/CoursePage/CourseCard";
 import wishlistService from "services/wishlist.service";
 import cartService from "services/cart.service";
 import { formatVND } from "utils/money";
-import { useUser } from "../../../../context/UserContext";
+import { useUser } from "../../../context/UserContext";
 import { Enrollment } from "types/enrollment";
 import enrollmentService from "services/enrollment.service";
 

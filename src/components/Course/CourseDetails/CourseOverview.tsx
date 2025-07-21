@@ -2,7 +2,6 @@ import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider, Stack } from "@mui/material";
 import MyAvatar from "components/Avatar/Avatar";
-import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import courseService from "services/course.service";
 import { Course } from "types/course";

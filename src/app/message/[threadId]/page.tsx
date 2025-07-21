@@ -9,9 +9,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import messageService from "services/message.service";
 import { Message, Thread } from "types/message";
 import { formatMessageTime, isWithinTwoMinutes } from "utils/time";
-import { useMessageContext } from "../layout";
 import MyAvatar from "components/Avatar/Avatar";
-import { useUser } from "../../../../context/UserContext";
+import { useUser } from "../../../context/UserContext";
+import { useMessageContext } from "context/MessageContext";
 
 const MessageItem = ({
   message,

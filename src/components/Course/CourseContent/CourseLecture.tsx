@@ -5,7 +5,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
+import { useLearnContext } from "context/LearnContext";
 import { debounce } from "lodash";
 import { TvMinimalPlay } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";

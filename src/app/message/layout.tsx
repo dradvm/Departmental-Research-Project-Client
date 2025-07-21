@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, ReactNode, useContext, useMemo } from "react";
+import { useState, useEffect, ReactNode, useMemo } from "react";
 import Divider from "@mui/material/Divider";
 import clsx from "clsx";
 import { Stack } from "@mui/material";
@@ -10,21 +10,9 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Socket } from "socket.io-client";
 import { getSocket } from "utils/socket";
-import { createContext } from "react";
 import MyAvatar from "components/Avatar/Avatar";
-import { useUser } from "../../../context/UserContext";
-
-type MessageContextType = {
-  socket: Socket | null;
-};
-
-const MessageContext = createContext<MessageContextType>({
-  socket: null,
-});
-
-export function useMessageContext() {
-  return useContext(MessageContext);
-}
+import { useUser } from "../../context/UserContext";
+import { MessageContext } from "context/MessageContext";
 
 const ThreadItem = ({
   handleClick,

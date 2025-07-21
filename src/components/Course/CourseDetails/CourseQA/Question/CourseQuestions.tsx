@@ -1,5 +1,5 @@
 import { Stack } from "@mui/material";
-import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
+import { useLearnContext } from "context/LearnContext";
 import { Button } from "components/Button/Button";
 import Loading from "components/Main/Loading/Loading";
 import FlexibleSelect, {

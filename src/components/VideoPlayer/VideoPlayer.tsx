@@ -1,3 +1,4 @@
+"use client";
 import dynamic from "next/dynamic";
 import { Box, LinearProgress, Slider, Tooltip } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,9 +21,9 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { formatTime } from "utils/time";
 import throttle from "lodash/throttle";
 import screenfull from "screenfull";
-import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import studyProgressService from "services/study-progress.service";
+import { useLearnContext } from "context/LearnContext";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 type ReactPlayerRef = {
   seekTo: (amount: number, type?: "seconds" | "fraction") => void;
@@ -68,7 +69,6 @@ export default function VideoPlayer({
   const router = useRouter();
   const { lectureId } = useParams<{ lectureId: string }>();
   const hasSeekedRef = useRef(false);
-  const {} = useLearnContext();
   const searchParams = useSearchParams();
 
   const getCurrrentLectureIndex = useCallback(() => {

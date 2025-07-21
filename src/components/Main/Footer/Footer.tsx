@@ -31,8 +31,6 @@ const footerLinks = [
   },
 ];
 
-const socialLinks = [];
-
 export default function Footer() {
   return (
     <footer
@@ -57,19 +55,6 @@ export default function Footer() {
             height={34}
             style={{ marginBottom: 16 }}
           />
-          <div style={{ display: "flex", gap: 12 }}>
-            {socialLinks.map((s, i) => (
-              <a
-                key={i}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: "#fff", fontSize: 20 }}
-              >
-                {s.icon}
-              </a>
-            ))}
-          </div>
         </div>
         <div
           style={{

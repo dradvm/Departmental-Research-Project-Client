@@ -1,4 +1,4 @@
-import { LectureWithSection } from "./lecture";
+import { Lecture } from "./lecture";
 
 export type Note = {
   noteId: number;
@@ -6,5 +6,5 @@ export type Note = {
   note: string;
   userId: number;
   lectureId: number;
-  Lecture: LectureWithSection;
+  Lecture: Lecture;
 };

@@ -1,14 +1,11 @@
+"use client";
+
+import { useParams } from "next/navigation";
 import Verify from "components/Auth/verify";
 
-const VerifyPage = ({ params }: { params: { id: string } }) => {
-    const { id } = params;
-    return (
-        <div>
-            <Verify
-                id={id}
-            />
-        </div>
-    )
-}
+export default function VerifyPage() {
+  const params = useParams();
+  const id = typeof params.id === "string" ? params.id : ""; // fallback nếu undefined
 
-export default VerifyPage;
+  return <Verify id={id} />;
+}

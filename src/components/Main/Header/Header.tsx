@@ -8,20 +8,15 @@ import {
   MenuItem,
   Typography,
   ListItemText,
-  Box,
 } from "@mui/material";
 import { Button } from "components/Button/Button";
 import { Bell, Heart, ShoppingCart } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { useUser } from "../../../../context/UserContext";
+import { useUser } from "../../../context/UserContext";
 import { userService } from "services/user.service";
-import enrollmentService from "services/enrollment.service";
-import { Enrollment } from "types/enrollment";
 import MyAvatar from "components/Avatar/Avatar";
-import { LanguageIcon } from "@heroicons/react/24/solid";
 import messageService from "services/message.service";
 import cartService from "services/cart.service";
 import wishlistService from "services/wishlist.service";
@@ -32,7 +27,7 @@ export default function Header() {
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [messageHasNotSeenCount, setMessageHasNotSeenCount] = useState(0);
-  const [notificationCount, setNotificationCount] = useState(0);
+  // const [notificationCount, setNotificationCount] = useState(0);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");

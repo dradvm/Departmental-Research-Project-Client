@@ -1,5 +1,4 @@
 import { Stack } from "@mui/material";
-import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import { Button } from "components/Button/Button";
 import { useState } from "react";
 import qaService from "services/qa.service";
@@ -7,6 +6,7 @@ import Question from "types/question";
 import QuestionForm from "./CourseQA/Question/QuestionForm";
 import CourseAnswers from "./CourseQA/Answer/CourseAnswers";
 import CourseQuestions from "./CourseQA/Question/CourseQuestions";
+import { useLearnContext } from "context/LearnContext";
 
 function AskQuestion({
   setIsAsk,
