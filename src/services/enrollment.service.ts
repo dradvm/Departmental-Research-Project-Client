@@ -24,5 +24,7 @@ const enrollmentService = {
   getCourseEnrolledInstructors: () =>
     axiosInstance.get("/enrollment/instructors"),
   getCourseEnrolledWithLastStudy: () => axiosInstance.get("/enrollment/home"),
+  isEnrolled: (courseId: number) =>
+    axiosInstance.get(`/enrollment/is-enrolled/${courseId}`),
 };
 export default enrollmentService;

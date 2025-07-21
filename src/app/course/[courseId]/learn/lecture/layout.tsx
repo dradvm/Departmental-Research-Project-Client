@@ -15,7 +15,6 @@ import enrollmentService from "services/enrollment.service";
 import studyProgressService from "services/study-progress.service";
 import { Course } from "types/course";
 import { Lecture } from "types/lecture";
-import { Review } from "types/review";
 
 type LearnContextType = {
   enabledBlock: boolean;
@@ -58,19 +57,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [totalWatched, setTotalWatched] = useState<number>(0);
   const [currentTimeNote, setCurrentTimeNote] = useState<number>(0);
   const [isOpenReviewModal, setIsOpenReviewModal] = useState<boolean>(false);
-  const [review, setReview] = useState<Review | null>(null);
+  const [review, setReview] = useState<boolean>(false);
 
   const handleOpenReviewModal = () => {
     setIsOpenReviewModal(true);
   };
   const handleCloseReviewModal = () => {
     setIsOpenReviewModal(false);
+    setReview(true);
   };
 
   useEffect(() => {
     courseService
       .getReviewByCourseAndUser(courseId)
-      .then((res) => setReview(res.data))
+      .then((res) => setReview(!!res.data))
       .catch((err) => console.error(err));
     studyProgressService
       .getCourseStudyProgress(Number(courseId))
@@ -137,7 +137,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="flex items-center">
           <Link href={"/"}>EduMarket</Link>
           <div className="h-5 bg-gray-500 mx-5" style={{ width: "1px" }}></div>
-          <Link href={`/course/${courseId}`} className="font-medium">
+          <Link
+            href={`/course/${courseId}`}
+            className="font-medium hover:text-gray-400"
+          >
             {course?.title}
           </Link>
         </div>
@@ -149,7 +152,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           )}
           {isOpenReviewModal && (
             <ReviewModal
-              review={review}
               courseId={parseInt(courseId)}
               handleCloseModal={handleCloseReviewModal}
             />
@@ -162,9 +164,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </Button>
             <div className="absolute "></div>
           </div>
-          <Button variant="outline">
-            Chia sẻ <Share2 className="ms-2" size={14} strokeWidth={1} />
-          </Button>
           <Button variant="outline">
             <EllipsisVertical size={20} strokeWidth={1} />
           </Button>

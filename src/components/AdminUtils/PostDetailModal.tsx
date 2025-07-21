@@ -50,6 +50,7 @@ export default function PostDetailModal({
           <div>
             <span className="font-semibold">Mô tả khóa học:</span>{" "}
             <div
+              className="ql-editor"
               dangerouslySetInnerHTML={{ __html: postDetail.description }}
             ></div>
           </div>
@@ -60,12 +61,14 @@ export default function PostDetailModal({
           <div>
             <span className="font-semibold">Mục tiêu khóa học:</span>{" "}
             <div
+              className="ql-editor"
               dangerouslySetInnerHTML={{ __html: postDetail.targetAudience }}
             ></div>
           </div>
           <div>
             <span className="font-semibold">Yêu cầu khóa học:</span>{" "}
             <div
+              className="ql-editor"
               dangerouslySetInnerHTML={{ __html: postDetail.requirement }}
             ></div>
           </div>
