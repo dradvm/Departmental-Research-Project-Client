@@ -6,5 +6,6 @@ const messageService = {
     axiosInstance.get(`/messages/threads/${otherUserId}`),
   getMessages: (otherUserId: number) =>
     axiosInstance.get(`/messages/${otherUserId}`),
+  countNotSeeenMessages: () => axiosInstance.get("/messages/count-not-seen"),
 };
 export default messageService;

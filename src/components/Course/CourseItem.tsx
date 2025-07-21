@@ -1,4 +1,4 @@
-import { MouseEvent, useMemo, useState } from "react";
+import { MouseEvent, useEffect, useMemo, useState } from "react";
 import { Course } from "types/course";
 import {
   faStarHalfStroke,
@@ -11,6 +11,7 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formatDuration2 } from "utils/time";
 import { formatVND } from "utils/money";
+import courseService from "services/course.service";
 
 export default function CourseItem({ course }: { course: Course }) {
   const rating = useMemo(() => {
@@ -83,7 +84,20 @@ export default function CourseItem({ course }: { course: Course }) {
             </div>
             <div className="text-sm">({course._count?.Review})</div>
           </div>
-          <div className="font-medium">{formatVND(course.price)}</div>
+          {course.finalPrice === course.price ? (
+            <div className="font-medium">
+              {formatVND(course.finalPrice ?? 0)}
+            </div>
+          ) : (
+            <div className="flex space-x-3 items-bottom items-center">
+              <div className="font-medium">
+                {formatVND(course.finalPrice ?? 0)}
+              </div>
+              <div className="text-sm line-through text-gray-700">
+                {formatVND(course.price ?? 0)}
+              </div>
+            </div>
+          )}
         </Stack>
       </Stack>
     </Link>

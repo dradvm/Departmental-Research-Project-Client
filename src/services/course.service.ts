@@ -28,12 +28,6 @@ const courseService = {
         search: search,
       },
     }),
-  getOtherCourses: (courseId: number, instructorId: number) =>
-    axiosInstance.get(`/courses/${courseId}/others`, {
-      params: {
-        instructorId,
-      },
-    }),
   getReviewByCourseAndUser: (courseId: string) =>
     axiosInstance.get(`/courses/${courseId}/review`),
   createReview: (courseId: number, rating: number, review: string) =>
@@ -78,12 +72,67 @@ const courseService = {
   getMyCourses: () => {
     return axiosInstance.get("/courses/me");
   },
-  getCoursesByCategory: (categoryId: number) =>
-    axiosInstance.get(`/courses/category/${categoryId}`),
+  getCoursesByCategoryPublic: (categoryId: number) =>
+    axiosInstance.get(`/courses/category/${categoryId}/public`),
+  getCoursesByCategoryPrivate: (categoryId: number) =>
+    axiosInstance.get(`/courses/category/${categoryId}/private`),
   getCategories: () => axiosInstance.get("/courses/categories"),
 
   getCoursePrice: (courseId: number) =>
     axiosInstance.get(`/courses/${courseId}/price`),
+  getOtherCourseByUserPublic: (userId: number, courseId: number) =>
+    axiosInstance.get(`/courses/other-courses/${courseId}/public`, {
+      params: {
+        userId,
+      },
+    }),
+
+  getOtherCourseByUserPrivate: (userId: number, courseId: number) =>
+    axiosInstance.get(`/courses/other-courses/${courseId}/private`, {
+      params: {
+        userId,
+      },
+    }),
+  searchCoursePublic: (
+    search?: string,
+    rating?: number,
+    categoryId?: number,
+    priceMin?: number,
+    priceMax?: number,
+    durationMin?: number,
+    durationMax?: number
+  ) =>
+    axiosInstance.get("/courses/search/public", {
+      params: {
+        search,
+        rating,
+        categoryId,
+        priceMin,
+        priceMax,
+        durationMin,
+        durationMax,
+      },
+    }),
+  searchCoursePrivate: (
+    search?: string,
+    rating?: number,
+    categoryId?: number,
+    priceMin?: number,
+    priceMax?: number,
+    durationMin?: number,
+    durationMax?: number
+  ) =>
+    axiosInstance.get("/courses/search/private", {
+      params: {
+        search,
+        rating,
+        categoryId,
+        priceMin,
+        priceMax,
+        durationMin,
+        durationMax,
+      },
+    }),
 };
 
 export default courseService;

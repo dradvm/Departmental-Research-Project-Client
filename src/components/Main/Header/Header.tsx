@@ -22,12 +22,28 @@ import enrollmentService from "services/enrollment.service";
 import { Enrollment } from "types/enrollment";
 import MyAvatar from "components/Avatar/Avatar";
 import { LanguageIcon } from "@heroicons/react/24/solid";
+import messageService from "services/message.service";
+import cartService from "services/cart.service";
+import wishlistService from "services/wishlist.service";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Header() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [messageHasNotSeenCount, setMessageHasNotSeenCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && search.trim()) {
+      router.push(`/course/search?search=${encodeURIComponent(search.trim())}`);
+    }
+  };
   const { user } = useUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [enrolledStudy, setCourseEnrolledStudy] = useState<Enrollment[]>([]);
   const open = Boolean(anchorEl);
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -48,34 +64,36 @@ export default function Header() {
       .changeRoleUser()
       .then(() =>
         alert(
-          `Cập nhật role thành công, Vui long đăng nhập lại để thấy thay đổi!`
+          `Trở thành giảng viên thành công! Bạn có thể bắt đầu tạo khóa học ngay bây giờ. Vui lòng đăng nhập lại để cập nhật quyền hạn.`
         )
       )
       .catch((err) => console.error("Lỗi khi cập nhật role:", err));
   };
 
   useEffect(() => {
-    enrollmentService
-      .getCourseEnrolledWithLastStudy()
-      .then((res) => {
-        setCourseEnrolledStudy(res.data);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (user) {
+      messageService.countNotSeeenMessages().then((res) => {
+        setMessageHasNotSeenCount(res.data);
+      });
+      cartService.count().then((res) => {
+        setCartCount(res.data);
+      });
+      wishlistService.count().then((res) => {
+        setWishlistCount(res.data);
+      });
+    }
+  }, [user]);
   return (
     <>
       <div className="flex items-center px-8 py-4 space-x-3">
         <Link href={"/"}>EduMarket</Link>
-        <div className="relative font-sm  select-none h-10 cursor-pointer group hover:text-indigo-700">
-          <div className="hover:bg-violet-100  w-full h-full flex items-center px-3 rounded before:content-[''] before:absolute before:bg-black before:w-full before:h-4 before:left-0 before:bottom-0 before:translate-y-4 before:bg-transparent">
-            Khám phá
-          </div>
-          <div className="px-5 py-3 absolute left-0 bottom-0 translate-y-[110%] w-40 bg-white border border-gray-200 invisible opacity-0 rounded shadow-lg group-hover:visible group-hover:opacity-100 transition-all duration-100 scale-95 group-hover:scale-100"></div>
-        </div>
         <div className="grow flex">
           <input
             type="text"
-            placeholder="Tìm đánh giá"
+            placeholder="Tìm khoá học"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={handleKeyDown}
             className={`rounded-full px-4 py-2 placeholder:text-slate-700 placeholder border border-gray-300 rounded hover:bg-gray-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 ${user ? "grow" : "w-[800px]"}`}
           />
         </div>
@@ -124,13 +142,17 @@ export default function Header() {
                     href={"/home/my-courses/wishlist"}
                     className="relative font-sm h-10 select-none flex items-center px-3 rounded hover:bg-violet-100 hover:text-indigo-700 cursor-pointer"
                   >
-                    <Heart size={18} />
+                    <Badge badgeContent={wishlistCount} color="error">
+                      <Heart size={18} />
+                    </Badge>
                   </Link>
                   <Link
                     href={"/cart"}
                     className="relative font-sm h-10 select-none flex items-center px-3 rounded hover:bg-violet-100 hover:text-indigo-700 cursor-pointer"
                   >
-                    <ShoppingCart size={18} />
+                    <Badge badgeContent={cartCount} color="error">
+                      <ShoppingCart size={18} />
+                    </Badge>
                   </Link>
                   <div className="relative font-sm h-10 select-none flex items-center px-3 rounded hover:bg-violet-100 hover:text-indigo-700 cursor-pointer">
                     <Badge badgeContent={1} color="error">
@@ -143,16 +165,26 @@ export default function Header() {
                       className="relative font-sm h-10 select-none flex items-center px-3 rounded hover:bg-violet-100 hover:text-indigo-700 cursor-pointer"
                       onClick={handleAvatarClick}
                     >
-                      <Badge overlap="circular" color="error" variant="dot">
-                        <div className="rounded-full w-8 h-8 overflow-hidden">
-                          <Image
-                            src={user.image || "/default-avatar.jpg"}
-                            alt="avatar"
-                            width={64}
-                            height={64}
-                            className="object-cover"
-                          />
-                        </div>
+                      <Badge
+                        overlap="circular"
+                        color="error"
+                        variant="dot"
+                        invisible={
+                          !messageHasNotSeenCount &&
+                          !cartCount &&
+                          !wishlistCount
+                        }
+                      >
+                        <MyAvatar
+                          user={{
+                            isDeleted: false,
+                            isActive: true,
+                            img: user.image,
+                            name: user.name,
+                          }}
+                          width={32}
+                          height={32}
+                        />
                       </Badge>
                     </div>
 
@@ -164,7 +196,11 @@ export default function Header() {
                       transformOrigin={{ vertical: "top", horizontal: "right" }}
                     >
                       {/* Header: Avatar + Name */}
-                      <div className="flex items-center space-x-3 px-4 py-6">
+                      <Link
+                        href={"/profile"}
+                        onClick={handleClose}
+                        className="group flex items-center space-x-3 px-4 py-6"
+                      >
                         <MyAvatar
                           user={{
                             isDeleted: false,
@@ -177,12 +213,14 @@ export default function Header() {
                           fontSize="1.5rem"
                         />
                         <div className="grow">
-                          <Typography fontWeight="bold">{user.name}</Typography>
+                          <div className="font-bold text-lg group-hover:text-indigo-600">
+                            {user.name}
+                          </div>
                           <Typography fontSize={14} color="text.secondary">
                             {user.email}
                           </Typography>
                         </div>
-                      </div>
+                      </Link>
 
                       <Divider />
 
@@ -196,9 +234,11 @@ export default function Header() {
                           className="flex items-center justify-between grow"
                         >
                           <ListItemText>Giỏ hàng của tôi</ListItemText>
-                          <div className="ml-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-purple-500 rounded-full">
-                            2
-                          </div>
+                          {cartCount > 0 && (
+                            <div className="ml-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-purple-500 rounded-full">
+                              {cartCount}
+                            </div>
+                          )}
                         </Link>
                       </MenuItem>
                       <MenuItem onClick={handleClose}>
@@ -207,16 +247,20 @@ export default function Header() {
                           className="flex items-center justify-between grow"
                         >
                           <ListItemText>Mong muốn</ListItemText>
-                          <div className="ml-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-purple-500 rounded-full">
-                            2
-                          </div>
+                          {wishlistCount > 0 && (
+                            <div className="ml-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-purple-500 rounded-full">
+                              {wishlistCount}
+                            </div>
+                          )}
                         </Link>
                       </MenuItem>
-                      <MenuItem onClick={handleClose}>
-                        <Link href={"/instructor"}>
-                          Bảng điều khiển của giảng viên
-                        </Link>
-                      </MenuItem>
+                      {user.role === "INSTRUCTOR" && (
+                        <MenuItem onClick={handleClose}>
+                          <Link href={"/instructor"}>
+                            Bảng điều khiển của giảng viên
+                          </Link>
+                        </MenuItem>
+                      )}
 
                       <Divider />
 
@@ -238,9 +282,11 @@ export default function Header() {
                           className="flex items-center justify-between grow"
                         >
                           <ListItemText>Tin nhắn</ListItemText>
-                          <div className="ml-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-purple-500 rounded-full">
-                            2
-                          </div>
+                          {messageHasNotSeenCount > 0 && (
+                            <div className="ml-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-purple-500 rounded-full">
+                              {messageHasNotSeenCount}
+                            </div>
+                          )}
                         </Link>
                       </MenuItem>
                       <MenuItem onClick={handleClose}>
@@ -254,10 +300,10 @@ export default function Header() {
                 </>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <Link href="/auth/login" passHref legacyBehavior>
+                  <Link href="/auth/login" passHref>
                     <Button variant="primary">Đăng nhập</Button>
                   </Link>
-                  <Link href="/auth/login" passHref legacyBehavior>
+                  <Link href="/auth/login" passHref>
                     <Button variant="filled">Đăng ký</Button>
                   </Link>
                 </div>
