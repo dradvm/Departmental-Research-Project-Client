@@ -39,16 +39,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         //Sai pass: 401
         //Chưa active: 400
         else if (+res.statusCode === 401) {
-          throw new InvalidEmailPasswordError()
-        }
-        else if (+res.statusCode === 404) {
-          throw new InvalidEmailPasswordError()
-        }
-        else if (+res.statusCode === 400) {
-          throw new InactiveAccoounError()
-        }
-        else {
-          throw new Error("Internal server error")
+          throw new InvalidEmailPasswordError();
+        } else if (+res.statusCode === 404) {
+          throw new InvalidEmailPasswordError();
+        } else if (+res.statusCode === 400) {
+          throw new InactiveAccoounError();
+        } else {
+          throw new Error("Internal server error");
         }
       },
     }),
@@ -64,7 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       // Khi gọi update() từ client
-      if (trigger === 'update' && session) {
+      if (trigger === "update" && session) {
         token.user = {
           ...token.user,
           ...session, // các field bạn truyền từ `update()`
@@ -82,4 +79,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return !!auth;
     },
   },
+  trustHost: true,
 });

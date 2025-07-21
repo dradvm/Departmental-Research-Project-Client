@@ -25,7 +25,7 @@ export default function ItemCart({
 }) {
   const [course, setCourse] = useState<Course>();
 
-  const handleWishList = (e: MouseEvent) => {
+  const handleWishList = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     wishlistService

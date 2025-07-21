@@ -1,5 +1,4 @@
 import { Menu, MenuItem, Stack } from "@mui/material";
-import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import { Button } from "components/Button/Button";
 import { EllipsisVertical, User } from "lucide-react";
 import Image from "next/image";
@@ -14,6 +13,7 @@ import AnswerItem from "./AnswerItem";
 import AnswerForm from "./AnswerForm";
 import QuestionForm from "../Question/QuestionForm";
 import { useSession } from "next-auth/react";
+import { useLearnContext } from "context/LearnContext";
 
 export default function CourseAnswers({
   question,

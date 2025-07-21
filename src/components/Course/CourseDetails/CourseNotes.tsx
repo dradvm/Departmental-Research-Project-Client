@@ -6,7 +6,6 @@ import {
   DialogTitle,
   Stack,
 } from "@mui/material";
-import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
 import { Button } from "components/Button/Button";
 import Editor from "components/Editor/Editor";
 import { CirclePlus, Pencil, Trash2 } from "lucide-react";
@@ -19,6 +18,7 @@ import Loading from "../../Main/Loading/Loading";
 import FlexibleSelect from "components/FlexibleSelect/FlexibleSelect";
 import { useRouter } from "next/navigation";
 import studyProgressService from "services/study-progress.service";
+import { useLearnContext } from "context/LearnContext";
 
 const MAX_LENGTH_NOTE = 1000;
 
@@ -47,7 +47,7 @@ const NoteItem = ({
       .trackStudyProgress(note.lectureId.toString(), note.timeNote)
       .then(() => {
         router.push(
-          `/course/${note.Lecture.Section.courseId}/learn/lecture/${note.lectureId}?start=${note.timeNote}`
+          `/course/${note.Lecture.Section?.courseId}/learn/lecture/${note.lectureId}?start=${note.timeNote}`
         );
       })
       .catch((err) => console.log(err));
@@ -122,7 +122,8 @@ const NoteItem = ({
               className="flex flex-wrap items-center cursor-pointer"
             >
               <div className="me-3 font-medium">
-                {note.Lecture.Section.order}. {note.Lecture.Section.nameSection}
+                {note.Lecture.Section?.order}.{" "}
+                {note.Lecture.Section?.nameSection}
               </div>
               <div className="text-sm">
                 {lectures.findIndex(

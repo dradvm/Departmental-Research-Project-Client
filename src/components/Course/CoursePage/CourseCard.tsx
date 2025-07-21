@@ -11,7 +11,7 @@ import { formatDuration2 } from "utils/time";
 import { useMemo, useState } from "react";
 import wishlistService from "services/wishlist.service";
 import Link from "next/link";
-import { useUser } from "../../../../context/UserContext";
+import { useUser } from "../../../context/UserContext";
 import { useRouter } from "next/navigation";
 
 export default function CourseCard({ course }: { course: Course }) {

@@ -12,7 +12,7 @@ import { Course } from "types/course";
 import { useEffect, useState } from "react";
 import enrollmentService from "services/enrollment.service";
 import CourseEnrolledWithLastLectureSwiper from "components/Swiper/CourseEnrolledWithLastLectureSwiper";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../context/UserContext";
 import { Category } from "types/category";
 import courseService from "services/course.service";
 import CourseSwiper from "components/Swiper/CourseSwiper";

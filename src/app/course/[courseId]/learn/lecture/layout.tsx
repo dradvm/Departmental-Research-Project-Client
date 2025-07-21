@@ -6,43 +6,16 @@ import CourseContent from "components/Course/CourseContent/CourseContent";
 import CourseDetails from "components/Course/CourseDetails/CourseDetails";
 import ReviewModal from "components/Modal/ReviewModal";
 
-import { ChevronDown, EllipsisVertical, Share2, Star } from "lucide-react";
+import { ChevronDown, EllipsisVertical, Star } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import courseService from "services/course.service";
 import enrollmentService from "services/enrollment.service";
 import studyProgressService from "services/study-progress.service";
 import { Course } from "types/course";
 import { Lecture } from "types/lecture";
-
-type LearnContextType = {
-  enabledBlock: boolean;
-  setEnabledBlock: React.Dispatch<React.SetStateAction<boolean>>;
-  course: Course | null;
-  lectures: Lecture[];
-  handleSetTotalWatched: (checked: boolean) => void;
-  currentTimeNote: number;
-  setCurrentTimeNote: React.Dispatch<React.SetStateAction<number>>;
-  lectureId: string;
-  courseId: string;
-};
-
-const LearnContext = createContext<LearnContextType>({
-  enabledBlock: true,
-  setEnabledBlock: () => {},
-  course: null,
-  lectures: [],
-  handleSetTotalWatched: () => {},
-  currentTimeNote: 0,
-  setCurrentTimeNote: () => {},
-  lectureId: "",
-  courseId: "",
-});
-
-export function useLearnContext() {
-  return useContext(LearnContext);
-}
+import { LearnContext } from "../../../../../context/LearnContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [enabledBlock, setEnabledBlock] = useState(true);

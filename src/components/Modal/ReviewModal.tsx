@@ -7,7 +7,7 @@ import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 import { Button } from "components/Button/Button";
 import { Review } from "types/review";
 import courseService from "services/course.service";
-import { useLearnContext } from "app/course/[courseId]/learn/lecture/layout";
+import { useLearnContext } from "context/LearnContext";
 export default function ReviewModal({
   courseId,
   handleCloseModal,

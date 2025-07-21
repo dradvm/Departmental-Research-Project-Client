@@ -8,7 +8,7 @@ import { Course } from "types/course";
 import { Category } from "types/category";
 import CourseItem from "components/Course/CourseItem";
 import courseService from "services/course.service";
-import { useUser } from "../../../context/UserContext";
+import { useUser } from "../../context/UserContext";
 import Link from "next/link";
 export default function CourseSwiper({ category }: { category: Category }) {
   const [courses, setCourses] = useState<Course[]>([]);

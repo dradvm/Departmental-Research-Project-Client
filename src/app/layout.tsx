@@ -10,8 +10,9 @@ import NextAuthWrapper from "lib/next.auth.wrapper";
 
 import { usePathname } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
-import { UserProvider } from "../../context/UserContext";
+import { UserProvider } from "../context/UserContext";
 import { DynamicFooter } from "components/Main/Footer/DynamicFooter";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -24,15 +25,17 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body>
-        <NextAuthWrapper>
-          <SessionProvider>
-            <UserProvider>
-              <DynamicHeader />
-              {children}
-              <DynamicFooter />
-            </UserProvider>
-          </SessionProvider>
-        </NextAuthWrapper>
+        <Suspense>
+          <NextAuthWrapper>
+            <SessionProvider>
+              <UserProvider>
+                <DynamicHeader />
+                {children}
+                <DynamicFooter />
+              </UserProvider>
+            </SessionProvider>
+          </NextAuthWrapper>
+        </Suspense>
       </body>
     </html>
   );
