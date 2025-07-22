@@ -1,7 +1,6 @@
 "use client";
 import Sidebar, { NavItemSideBar } from "components/Sidebar/Sidebar";
 import {
-  AlertTriangle,
   CreditCard,
   FileText,
   GraduationCap,
@@ -49,11 +48,6 @@ export default function AdminLayout({
         "/admin/promotion/global",
         "/admin/promotion/normal",
       ],
-    },
-    {
-      text: "Report",
-      icon: <AlertTriangle />,
-      path: "/admin/report",
     },
   ];
 

@@ -10,7 +10,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { Button } from "components/Button/Button";
-import { Bell, Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -27,7 +27,6 @@ export default function Header() {
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [messageHasNotSeenCount, setMessageHasNotSeenCount] = useState(0);
-  // const [notificationCount, setNotificationCount] = useState(0);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
@@ -149,11 +148,6 @@ export default function Header() {
                       <ShoppingCart size={18} />
                     </Badge>
                   </Link>
-                  <div className="relative font-sm h-10 select-none flex items-center px-3 rounded hover:bg-violet-100 hover:text-indigo-700 cursor-pointer">
-                    <Badge badgeContent={1} color="error">
-                      <Bell size={18} />
-                    </Badge>
-                  </div>
 
                   <>
                     <div
@@ -259,18 +253,6 @@ export default function Header() {
 
                       <Divider />
 
-                      {/* Section 2 */}
-                      <MenuItem onClick={handleClose}>
-                        <Link
-                          href={"/cart"}
-                          className="flex items-center justify-between grow"
-                        >
-                          <ListItemText>Thông báo</ListItemText>
-                          <div className="ml-2 inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-purple-500 rounded-full">
-                            2
-                          </div>
-                        </Link>
-                      </MenuItem>
                       <MenuItem onClick={handleClose}>
                         <Link
                           href={"/message"}
