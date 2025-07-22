@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import couponService from "services/coupon.service";
+import withRole from "components/WithRole/withRole";
 
 const schema: yup.ObjectSchema<CouponBody> = yup.object({
   isGlobal: yup.boolean().default(true),
@@ -97,7 +98,7 @@ const schema: yup.ObjectSchema<CouponBody> = yup.object({
     ),
 });
 
-export default function PromotionForm({
+function PromotionForm({
   promotion,
   setPromotionInfor,
   handleSuccessfulCreation,
@@ -361,3 +362,5 @@ export default function PromotionForm({
     </form>
   );
 }
+
+export default withRole(PromotionForm, ["ADMIN"]);

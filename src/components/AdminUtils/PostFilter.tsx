@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import withRole from "components/WithRole/withRole";
 import { Search } from "lucide-react";
 import { CourseAdminFilter } from "types/course";
 
@@ -6,7 +7,7 @@ interface PostFilterProp {
   filter: CourseAdminFilter;
   onChangeFilter: React.ChangeEventHandler<HTMLInputElement>;
 }
-export default function PostFilter({ filter, onChangeFilter }: PostFilterProp) {
+function PostFilter({ filter, onChangeFilter }: PostFilterProp) {
   return (
     <Box
       sx={{
@@ -146,3 +147,5 @@ export default function PostFilter({ filter, onChangeFilter }: PostFilterProp) {
     </Box>
   );
 }
+
+export default withRole(PostFilter, ["ADMIN"]);

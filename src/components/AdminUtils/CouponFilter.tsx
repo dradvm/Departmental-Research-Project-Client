@@ -1,3 +1,4 @@
+import withRole from "components/WithRole/withRole";
 import { Funnel, Search } from "lucide-react";
 import Link from "next/link";
 import { ChangeEvent } from "react";
@@ -9,7 +10,7 @@ interface CouponFilterProps {
   isGlobalCouponPage: boolean;
 }
 
-export default function CouponFilter(props: CouponFilterProps) {
+function CouponFilter(props: CouponFilterProps) {
   return (
     <div className="h-fit my-4">
       <div className="flex gap-8">
@@ -98,3 +99,5 @@ export default function CouponFilter(props: CouponFilterProps) {
     </div>
   );
 }
+
+export default withRole(CouponFilter, ["ADMIN"]);

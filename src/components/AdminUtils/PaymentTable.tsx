@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { Button } from "components/Button/Button";
+import withRole from "components/WithRole/withRole";
 import { PaymentType } from "types/payment";
 import { getDateFormat } from "utils/date-format";
 import { formatVND } from "utils/money";
@@ -20,7 +21,7 @@ interface PaymentTableProps {
   handleOpen: () => void;
 }
 
-export default function PaymentTable(props: PaymentTableProps) {
+function PaymentTable(props: PaymentTableProps) {
   return (
     <TableContainer component={Paper} sx={{ boxShadow: 1 }}>
       <Table>
@@ -78,3 +79,5 @@ export default function PaymentTable(props: PaymentTableProps) {
     </TableContainer>
   );
 }
+
+export default withRole(PaymentTable, ["ADMIN"]);

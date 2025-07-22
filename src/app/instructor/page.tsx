@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Box,
   Drawer,
@@ -9,22 +9,25 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Toolbar,
-  Typography,
   CssBaseline,
+  Typography,
 } from "@mui/material";
 
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import PeopleIcon from "@mui/icons-material/People";
-import SettingsIcon from "@mui/icons-material/Settings";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import RateReviewIcon from "@mui/icons-material/RateReview";
+import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
+import BarChartIcon from "@mui/icons-material/BarChart";
+
 import InstructorDashboard from "components/Instructor/instructor-dashboard";
 import InstructorReview from "components/Instructor/instructor-review";
 import InstructorQA from "components/Instructor/instructor-qa";
 import BarsDataset from "components/Instructor/Overview/instructor-overview";
+import withRole from "components/WithRole/withRole";
+
 const drawerWidth = 240;
 const HEADER_HEIGHT = 64; // Chiều cao header tổng (AppBar bên ngoài)
 
-export default function DashboardLayout() {
+function DashboardLayout() {
   const [selected, setSelected] = React.useState("Dashboard");
 
   const renderContent = () => {
@@ -38,7 +41,7 @@ export default function DashboardLayout() {
       case "Overview":
         return <BarsDataset />;
       default:
-        return <Typography variant="h4">Page not found</Typography>;
+        return <Typography variant="h4">Không tìm thấy trang</Typography>;
     }
   };
 
@@ -55,7 +58,7 @@ export default function DashboardLayout() {
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
             boxSizing: "border-box",
-            top: HEADER_HEIGHT, // 💡 Không đè lên header
+            top: HEADER_HEIGHT,
             height: `calc(100% - ${HEADER_HEIGHT}px)`,
           },
         }}
@@ -67,9 +70,9 @@ export default function DashboardLayout() {
               onClick={() => setSelected("Dashboard")}
             >
               <ListItemIcon>
-                <DashboardIcon />
+                <MenuBookIcon />
               </ListItemIcon>
-              <ListItemText primary="Course" />
+              <ListItemText primary="Quản lý khóa học" />
             </ListItemButton>
           </ListItem>
 
@@ -79,9 +82,9 @@ export default function DashboardLayout() {
               onClick={() => setSelected("Users")}
             >
               <ListItemIcon>
-                <PeopleIcon />
+                <RateReviewIcon />
               </ListItemIcon>
-              <ListItemText primary="Review" />
+              <ListItemText primary="Đánh giá khóa học" />
             </ListItemButton>
           </ListItem>
 
@@ -91,9 +94,9 @@ export default function DashboardLayout() {
               onClick={() => setSelected("Settings")}
             >
               <ListItemIcon>
-                <SettingsIcon />
+                <QuestionAnswerIcon />
               </ListItemIcon>
-              <ListItemText primary="Q&A" />
+              <ListItemText primary="Hỏi đáp" />
             </ListItemButton>
           </ListItem>
 
@@ -103,9 +106,9 @@ export default function DashboardLayout() {
               onClick={() => setSelected("Overview")}
             >
               <ListItemIcon>
-                <SettingsIcon />
+                <BarChartIcon />
               </ListItemIcon>
-              <ListItemText primary="Overview" />
+              <ListItemText primary="Thống kê" />
             </ListItemButton>
           </ListItem>
         </List>
@@ -125,3 +128,5 @@ export default function DashboardLayout() {
     </Box>
   );
 }
+
+export default withRole(DashboardLayout, ["INSTRUCTOR"]);

@@ -1,3 +1,4 @@
+import withRole from "components/WithRole/withRole";
 import { X } from "lucide-react";
 import { PaymentType } from "types/payment";
 import { getDateFormat } from "utils/date-format";
@@ -8,7 +9,7 @@ interface PaymentDetailFormProps {
   handleClose: () => void;
 }
 
-export default function PaymentDetailModal(props: PaymentDetailFormProps) {
+function PaymentDetailModal(props: PaymentDetailFormProps) {
   const { paymentDetail } = props;
 
   return (
@@ -80,13 +81,13 @@ export default function PaymentDetailModal(props: PaymentDetailFormProps) {
         )}
         {(paymentDetail.originalPrice !== paymentDetail.totalPrice ||
           paymentDetail.code) && (
-          <>
-            <span>Tạm tính:</span>
-            <span className="text-right">
-              {formatVND(parseInt(paymentDetail.totalPrice))}
-            </span>
-          </>
-        )}
+            <>
+              <span>Tạm tính:</span>
+              <span className="text-right">
+                {formatVND(parseInt(paymentDetail.totalPrice))}
+              </span>
+            </>
+          )}
         {paymentDetail.code && (
           <>
             <span>Mã giảm giá:</span>
@@ -105,3 +106,5 @@ export default function PaymentDetailModal(props: PaymentDetailFormProps) {
     </div>
   );
 }
+
+export default withRole(PaymentDetailModal, ["ADMIN"]);

@@ -15,8 +15,9 @@ import { PostItem } from "components/AdminUtils/PostItem";
 import { Modal } from "@mui/material";
 import PostDetailModal from "components/AdminUtils/PostDetailModal";
 import { toast, ToastContainer } from "react-toastify";
+import withRole from "components/WithRole/withRole";
 
-export default function Post() {
+function Post() {
   const [page, setPage] = useState<number>(1);
   const [infors, setInfors] = useState<CourseAdminUI[]>();
   const [selectedPost, setSelectedPost] = useState<CourseAdminUI>();
@@ -141,3 +142,5 @@ export default function Post() {
     </div>
   );
 }
+
+export default withRole(Post, ["ADMIN"]);

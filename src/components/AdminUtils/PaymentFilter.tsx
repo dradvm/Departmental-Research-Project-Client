@@ -1,6 +1,7 @@
 import { PaymentFilter } from "types/payment";
 import { Box } from "@mui/material";
 import { Funnel, Search } from "lucide-react";
+import withRole from "components/WithRole/withRole";
 
 interface PaymentFilterProps {
   filter: PaymentFilter;
@@ -130,3 +131,5 @@ export function PaymentFilterUtils(props: PaymentFilterProps) {
     </Box>
   );
 }
+
+export default withRole(PaymentFilterUtils, ["ADMIN"]);

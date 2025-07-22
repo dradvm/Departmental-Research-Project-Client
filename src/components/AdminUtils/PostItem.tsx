@@ -4,6 +4,7 @@ import { CourseAdminUI } from "types/course";
 import { formatVND } from "utils/money";
 import { getHourFormSecond } from "utils/time";
 import { Button } from "../Button/Button";
+import withRole from "components/WithRole/withRole";
 
 export function PostItem({
   post,
@@ -80,3 +81,5 @@ export function PostItem({
     </div>
   );
 }
+
+export default withRole(PostItem, ["ADMIN"]);

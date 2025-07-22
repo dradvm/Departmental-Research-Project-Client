@@ -2,12 +2,13 @@
 
 import BestSellerCourseChart from "components/AdminUtils/charts/BestSellerCourseChart";
 import RevenueChart from "components/AdminUtils/charts/RevenueChart";
+import withRole from "components/WithRole/withRole";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { overviewService } from "services/overview.service";
 import { BestSellerCourse, RevenueReportByMonth } from "types/overview";
 
-export default function Chart() {
+function Chart() {
   const [revenueReport, setRevenueReport] = useState<RevenueReportByMonth[]>(
     []
   );
@@ -47,3 +48,5 @@ export default function Chart() {
     </div>
   );
 }
+
+export default withRole(Chart, ["ADMIN"]);

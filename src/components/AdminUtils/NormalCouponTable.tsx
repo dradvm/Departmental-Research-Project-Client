@@ -7,6 +7,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import withRole from "components/WithRole/withRole";
 import { NormalCouponType } from "types/coupon";
 import { getDateFormat } from "utils/date-format";
 import { formatVND } from "utils/money";
@@ -21,7 +22,7 @@ interface NormalCouponTableProps {
   deleteCouponCourse: (couponId: number, courseId: number) => void;
 }
 
-export default function NormalCouponTable(props: NormalCouponTableProps) {
+function NormalCouponTable(props: NormalCouponTableProps) {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -116,3 +117,5 @@ export default function NormalCouponTable(props: NormalCouponTableProps) {
     </TableContainer>
   );
 }
+
+export default withRole(NormalCouponTable, ["ADMIN"]);

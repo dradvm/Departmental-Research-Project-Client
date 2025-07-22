@@ -1,11 +1,12 @@
 "use client";
 
 import PromotionForm from "components/AdminUtils/PromotionForm";
+import withRole from "components/WithRole/withRole";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { CouponBody } from "types/coupon";
 
-export default function AddGlobalPromotion() {
+function AddGlobalPromotion() {
   const [promotionInfor, setPromotionInfor] = useState<CouponBody>({
     isGlobal: true,
     type: "discount",
@@ -46,3 +47,5 @@ export default function AddGlobalPromotion() {
     </div>
   );
 }
+
+export default withRole(AddGlobalPromotion, ["ADMIN"]);

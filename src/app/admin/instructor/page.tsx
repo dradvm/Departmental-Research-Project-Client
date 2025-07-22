@@ -1,3 +1,4 @@
+"use client";
 import AccountManagement from "components/AdminUtils/AccountManagement";
 
 export default function Teacher() {
@@ -7,3 +8,4 @@ export default function Teacher() {
     </div>
   );
 }
+

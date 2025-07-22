@@ -1,4 +1,5 @@
 import { Pagination as MuiPagination } from "@mui/material";
+import withRole from "components/WithRole/withRole";
 
 interface PaginationProps {
   page: number;
@@ -31,3 +32,5 @@ export function Pagination({
     />
   );
 }
+
+export default withRole(Pagination, ["ADMIN"]);

@@ -13,6 +13,7 @@ import {
   Stack,
 } from "@mui/material";
 import { Button } from "components/Button/Button";
+import withRole from "components/WithRole/withRole";
 
 interface InforListProps {
   infors: UserType[] | undefined;
@@ -22,7 +23,7 @@ interface InforListProps {
   enableAccount: (userId: number) => void;
 }
 
-export default function InforList({
+function InforList({
   infors,
   setSelectedItem,
   handleOpen,
@@ -145,3 +146,5 @@ export default function InforList({
     </>
   );
 }
+
+export default withRole(InforList, ["ADMIN"]);

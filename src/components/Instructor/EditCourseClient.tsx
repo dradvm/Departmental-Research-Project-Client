@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import InstructorCreateCourse from "components/Instructor/instructor-update-course";
 import { useUser } from "../../context/UserContext";
 import courseService from "services/course.service";
+import withRole from "components/WithRole/withRole";
 
-export default function EditCoursePage() {
+function EditCoursePage() {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
   const { user } = useUser();
@@ -22,7 +23,7 @@ export default function EditCoursePage() {
         const data = await res.data;
         setCourse(data);
       } catch (error) {
-        console.error("Error fetching course:", error);
+        console.error("Lỗi khi tải khóa học:", error);
       }
     };
 
@@ -30,12 +31,14 @@ export default function EditCoursePage() {
   }, [id, user?.access_token]);
 
   if (!user?.access_token) {
-    return <p className="p-6">Waiting for authentication...</p>;
+    return <p className="p-6">Đang xác thực, vui lòng đợi...</p>;
   }
 
   if (!course) {
-    return <p className="p-6">Loading course...</p>;
+    return <p className="p-6">Đang tải dữ liệu khóa học...</p>;
   }
 
   return <InstructorCreateCourse mode="edit" courseData={course} />;
 }
+
+export default withRole(EditCoursePage, ["INSTRUCTOR"]);

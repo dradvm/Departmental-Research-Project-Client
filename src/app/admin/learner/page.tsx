@@ -1,9 +1,13 @@
+"use client";
 import AccountManagement from "components/AdminUtils/AccountManagement";
+import withRole from "components/WithRole/withRole";
 
-export default function LearnerPage() {
+function LearnerPage() {
   return (
     <div>
       <AccountManagement type={"USERS"}></AccountManagement>
     </div>
   );
 }
+
+export default withRole(LearnerPage, ["ADMIN"]);

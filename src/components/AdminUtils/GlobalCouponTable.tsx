@@ -7,6 +7,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import withRole from "components/WithRole/withRole";
 import { GlobalCouponType } from "types/coupon";
 import { getDateFormat } from "utils/date-format";
 import { formatVND } from "utils/money";
@@ -19,7 +20,7 @@ interface GlobalCouponTableProps {
   handleOpen: () => void;
 }
 
-export default function GlobalCouponTable(props: GlobalCouponTableProps) {
+function GlobalCouponTable(props: GlobalCouponTableProps) {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -87,3 +88,5 @@ export default function GlobalCouponTable(props: GlobalCouponTableProps) {
     </TableContainer>
   );
 }
+
+export default withRole(GlobalCouponTable, ["ADMIN"]);
