@@ -1,6 +1,7 @@
+import withRole from "components/WithRole/withRole";
 import { UserType } from "types/user";
 
-export default function InforForm({ account }: { account: UserType }) {
+function InforForm({ account }: { account: UserType }) {
   return (
     <form>
       <div className="space-y-12">
@@ -93,3 +94,5 @@ export default function InforForm({ account }: { account: UserType }) {
     </form>
   );
 }
+
+export default withRole(InforForm, ["ADMIN"]);

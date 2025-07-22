@@ -1,3 +1,4 @@
+import withRole from "components/WithRole/withRole";
 import { X } from "lucide-react";
 import { NormalCouponType } from "types/coupon";
 import { getDateFormat } from "utils/date-format";
@@ -9,7 +10,7 @@ interface NormalCouponDetailModalProps {
   deleteCouponCourse: (couponId: number, courseId: number) => void;
   handleClose: () => void;
 }
-export default function NormalCouponDetailModal(
+function NormalCouponDetailModal(
   props: NormalCouponDetailModalProps
 ) {
   return (
@@ -89,3 +90,5 @@ export default function NormalCouponDetailModal(
     </div>
   );
 }
+
+export default withRole(NormalCouponDetailModal, ["ADMIN"]);

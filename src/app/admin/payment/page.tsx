@@ -10,8 +10,9 @@ import { Pagination } from "components/AdminUtils/Pagination";
 import PaymentDetailModal from "components/AdminUtils/PaymentDetailModal";
 import PaymentTable from "components/AdminUtils/PaymentTable";
 import { PaymentFilterUtils } from "components/AdminUtils/PaymentFilter";
+import withRole from "components/WithRole/withRole";
 
-export default function Payment() {
+function Payment() {
   const [selectedPayment, setSelectedPayment] = useState<PaymentType>();
   const [infors, setInfors] = useState<PaymentType[]>();
   const [page, setPage] = useState<number>(1);
@@ -115,3 +116,5 @@ export default function Payment() {
     </div>
   );
 }
+
+export default withRole(Payment, ["ADMIN"]);

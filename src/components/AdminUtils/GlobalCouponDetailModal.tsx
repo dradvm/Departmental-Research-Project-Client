@@ -1,3 +1,4 @@
+import withRole from "components/WithRole/withRole";
 import { X } from "lucide-react";
 import { GlobalCouponType } from "types/coupon";
 import { getDateFormat } from "utils/date-format";
@@ -43,3 +44,5 @@ export function GlobalCouponDetailModal(props: GlobalCouponDetailModalProps) {
     </div>
   );
 }
+
+export default withRole(GlobalCouponDetailModal, ["ADMIN"]);

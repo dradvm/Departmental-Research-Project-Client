@@ -6,6 +6,7 @@ import { GlobalCouponDetailModal } from "components/AdminUtils/GlobalCouponDetai
 import GlobalCouponTable from "components/AdminUtils/GlobalCouponTable";
 import NoDataFound from "components/AdminUtils/NoDataFound";
 import { Pagination } from "components/AdminUtils/Pagination";
+import withRole from "components/WithRole/withRole";
 import { ChangeEvent, useEffect, useState } from "react";
 import couponService from "services/coupon.service";
 import {
@@ -15,7 +16,7 @@ import {
   GlobalCouponType,
 } from "types/coupon";
 
-export default function GlobalPromotion() {
+function GlobalPromotion() {
   const [page, setPage] = useState<number>(1);
   const [globalCoupons, setglobalCoupons] = useState<GlobalCouponType[]>();
   const [dataLen, setDataLen] = useState<number>(0);
@@ -113,3 +114,5 @@ export default function GlobalPromotion() {
     </div>
   );
 }
+
+export default withRole(GlobalPromotion, ["ADMIN"]);

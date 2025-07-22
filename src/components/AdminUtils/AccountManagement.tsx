@@ -9,8 +9,9 @@ import { toast, ToastContainer } from "react-toastify";
 import InforList from "./InforList";
 import InforForm from "./InforForm";
 import { Pagination } from "./Pagination";
+import withRole from "components/WithRole/withRole";
 
-export default function AccountManagement({
+function AccountManagement({
   type,
 }: Readonly<{ type: "USERS" | "INSTRUCTOR" }>) {
   const [page, setPage] = useState<number>(1);
@@ -178,3 +179,5 @@ export default function AccountManagement({
     </Box>
   );
 }
+
+export default withRole(AccountManagement, ["ADMIN"]);

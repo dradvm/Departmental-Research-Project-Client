@@ -16,8 +16,9 @@ import { Pagination } from "components/AdminUtils/Pagination";
 import NormalCouponTable from "components/AdminUtils/NormalCouponTable";
 import { Modal } from "@mui/material";
 import NormalCouponDetailModal from "components/AdminUtils/NormalCouponDetailModal";
+import withRole from "components/WithRole/withRole";
 
-export default function NormalPromotion() {
+function NormalPromotion() {
   const [page, setPage] = useState<number>(1);
   const [normalCoupons, setNormalCoupons] = useState<NormalCouponType[]>();
   const [dataLen, setDataLen] = useState<number>(0);
@@ -161,3 +162,5 @@ export default function NormalPromotion() {
     </div>
   );
 }
+
+export default withRole(NormalPromotion, ["ADMIN"]);

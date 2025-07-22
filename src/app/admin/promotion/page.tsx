@@ -1,7 +1,10 @@
 "use client";
 
+import withRole from "components/WithRole/withRole";
 import GlobalPromotion from "./global/page";
 
-export default function Promotion() {
+function Promotion() {
   return <GlobalPromotion></GlobalPromotion>;
 }
+
+export default withRole(Promotion, ["ADMIN"]);

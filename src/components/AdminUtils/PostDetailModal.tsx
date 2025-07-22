@@ -1,4 +1,5 @@
 import { List, ListItem, ListItemText, ListSubheader } from "@mui/material";
+import withRole from "components/WithRole/withRole";
 import { X } from "lucide-react";
 import { CourseAdminUI } from "types/course";
 import { formatVND } from "utils/money";
@@ -9,7 +10,7 @@ interface PostDetailModalProps {
   acceptCourse: (courseId: number) => void;
 }
 
-export default function PostDetailModal({
+function PostDetailModal({
   postDetail,
   handleClose,
   acceptCourse,
@@ -145,3 +146,5 @@ export default function PostDetailModal({
     </div>
   );
 }
+
+export default withRole(PostDetailModal, ["ADMIN"]);

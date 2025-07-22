@@ -8,13 +8,14 @@ import ResponsiveEditor from "components/Editor/ResponsiveEditor";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import courseService from "services/course.service";
+import withRole from "components/WithRole/withRole";
 
 type CourseFormProps = {
   mode: "create" | "edit";
   courseData?: any; // dữ liệu khóa học từ backend khi chỉnh sửa
 };
 
-export default function CourseForm(props: CourseFormProps) {
+function CourseForm(props: CourseFormProps) {
   const { user } = useUser();
 
   const { mode, courseData } = props;
@@ -62,14 +63,14 @@ export default function CourseForm(props: CourseFormProps) {
             isEditing: false,
             contents: lecture.video
               ? [
-                  {
-                    type: "video",
-                    name: lecture.video.split("/").pop() || "Video",
-                    file: null, // bạn có thể để null vì không có file gốc
-                    url: lecture.video,
-                    duration: lecture.time, //
-                  },
-                ]
+                {
+                  type: "video",
+                  name: lecture.video.split("/").pop() || "Video",
+                  file: null, // bạn có thể để null vì không có file gốc
+                  url: lecture.video,
+                  duration: lecture.time, //
+                },
+              ]
               : [],
           })),
         }))
@@ -380,8 +381,8 @@ export default function CourseForm(props: CourseFormProps) {
       if (!res.data) throw new Error("Something went wrong");
       else {
         mode === "edit"
-          ? toast.success("Course updated successfully!")
-          : toast.success("Course created!");
+          ? toast.success("Cập nhật khóa học thành công!")
+          : toast.success("Tạo khóa học thành công!");
         setTimeout(() => {
           window.location.href = "/instructor";
         }, 2000); // Redirect after 2s
@@ -411,11 +412,10 @@ export default function CourseForm(props: CourseFormProps) {
           {/* Course Info */}
           <div className="border-b border-gray-200 pb-12">
             <h2 className="text-lg font-semibold text-gray-900">
-              Course Information
+              Thông tin khóa học
             </h2>
             <p className="mt-1 text-sm text-gray-600">
-              This information will be displayed publicly so be careful what you
-              share.
+              Thông tin này sẽ được hiển thị công khai, hãy cẩn trọng khi nhập.
             </p>
 
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-6 gap-6">
@@ -424,7 +424,7 @@ export default function CourseForm(props: CourseFormProps) {
                   htmlFor="title"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Title
+                  Tiêu đề
                 </label>
                 <textarea
                   id="title"
@@ -433,7 +433,7 @@ export default function CourseForm(props: CourseFormProps) {
                   onChange={(e) => setTitle(e.target.value)}
                   rows={2}
                   className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-indigo-600"
-                  placeholder="Write the course title..."
+                  placeholder="Nhập tiêu đề khóa học..."
                 />
                 {errors.title && (
                   <p className="text-sm text-red-600 mt-1">{errors.title}</p>
@@ -445,14 +445,14 @@ export default function CourseForm(props: CourseFormProps) {
                   htmlFor="subTitle"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Subtitle
+                  Mô tả ngắn
                 </label>
                 <textarea
                   id="subTitle"
                   name="subTitle"
                   rows={2}
                   className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-indigo-600"
-                  placeholder="Write the course subtitle..."
+                  placeholder="Nhập mô tả ngắn..."
                   value={subTitle}
                   onChange={(e) => setSubTitle(e.target.value)}
                 />
@@ -466,21 +466,21 @@ export default function CourseForm(props: CourseFormProps) {
                   htmlFor="description"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Description
+                  Mô tả chi tiết
                 </label>
                 <ResponsiveEditor
                   isDisplay={false}
                   value={description}
                   setValue={setDescription}
-                  handleCancel={() => {}} // Không cần dùng trong form này
-                  handleSave={() => {}} // Không cần dùng trong form này
+                  handleCancel={() => { }}
+                  handleSave={() => { }}
                   isDisabled={false}
-                  warningMessageMaxLength="Description is too long."
-                  warningMessageMinLength="Description is required."
+                  warningMessageMaxLength="Mô tả quá dài."
+                  warningMessageMinLength="Vui lòng nhập mô tả."
                   saveButtonMessage=""
                   maxLength={1000}
-                  hideActions={true} //
-                  hideWarnings={true} //
+                  hideActions={true}
+                  hideWarnings={true}
                 />
                 {errors.description && (
                   <p className="text-sm text-red-600 mt-1">
@@ -491,24 +491,24 @@ export default function CourseForm(props: CourseFormProps) {
 
               <div className="col-span-full">
                 <label
-                  htmlFor="description"
+                  htmlFor="requirement"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Requirement
+                  Yêu cầu đầu vào
                 </label>
                 <ResponsiveEditor
                   isDisplay={false}
                   value={requirement}
                   setValue={setRequirement}
-                  handleCancel={() => {}} // Không cần dùng trong form này
-                  handleSave={() => {}} // Không cần dùng trong form này
+                  handleCancel={() => { }}
+                  handleSave={() => { }}
                   isDisabled={false}
-                  warningMessageMaxLength="Description is too long."
-                  warningMessageMinLength="Description is required."
+                  warningMessageMaxLength="Yêu cầu quá dài."
+                  warningMessageMinLength="Vui lòng nhập yêu cầu."
                   saveButtonMessage=""
                   maxLength={1000}
-                  hideActions={true} //
-                  hideWarnings={true} //
+                  hideActions={true}
+                  hideWarnings={true}
                 />
                 {errors.requirement && (
                   <p className="text-sm text-red-600 mt-1">
@@ -522,17 +522,17 @@ export default function CourseForm(props: CourseFormProps) {
                   htmlFor="targetAudience"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Target Audience
+                  Đối tượng học
                 </label>
                 <ResponsiveEditor
                   isDisplay={false}
                   value={targetAudience}
                   setValue={setTargetAudience}
-                  handleCancel={() => {}}
-                  handleSave={() => {}}
+                  handleCancel={() => { }}
+                  handleSave={() => { }}
                   isDisabled={false}
-                  warningMessageMaxLength="Target audience is too long."
-                  warningMessageMinLength="Target audience is required."
+                  warningMessageMaxLength="Đối tượng học quá dài."
+                  warningMessageMinLength="Vui lòng nhập đối tượng học."
                   saveButtonMessage=""
                   maxLength={1000}
                   hideActions={true}
@@ -550,7 +550,7 @@ export default function CourseForm(props: CourseFormProps) {
                   htmlFor="price"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Price (vnđ)
+                  Giá (vnđ)
                 </label>
                 <input
                   id="price"
@@ -559,13 +559,13 @@ export default function CourseForm(props: CourseFormProps) {
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   step="1"
-                  min="1000" // ✅ Ngăn nhập dưới 1000 ngay từ UI
+                  min="1000"
                   className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-indigo-600"
-                  placeholder="Minimum 1,000 VND"
+                  placeholder="Tối thiểu 1,000 VNĐ"
                 />
                 {errors.price && (
                   <p className="text-sm text-red-600 mt-1">
-                    {errors.price || "Please enter a valid price (≥ 1,000 VND)"}
+                    {errors.price || "Vui lòng nhập giá hợp lệ (≥ 1,000 VNĐ)"}
                   </p>
                 )}
               </div>
@@ -575,7 +575,7 @@ export default function CourseForm(props: CourseFormProps) {
                   htmlFor="categories"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Categories
+                  Danh mục
                 </label>
                 <div className="mt-2 space-y-2">
                   {allCategories.map((cat) => (
@@ -616,7 +616,7 @@ export default function CourseForm(props: CourseFormProps) {
                   htmlFor="isPublic"
                   className="block text-sm font-medium text-gray-900"
                 >
-                  Visibility
+                  Trạng thái hiển thị
                 </label>
                 <select
                   id="isPublic"
@@ -625,14 +625,14 @@ export default function CourseForm(props: CourseFormProps) {
                   onChange={(e) => setIsPublic(e.target.value === "true")}
                   className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-indigo-600"
                 >
-                  <option value="true">Public</option>
-                  <option value="false">Private</option>
+                  <option value="true">Công khai</option>
+                  <option value="false">Riêng tư</option>
                 </select>
               </div>
 
               <div className="col-span-full">
                 <label className="block text-sm font-medium text-gray-900">
-                  Thumbnail
+                  Ảnh bìa khóa học
                 </label>
                 <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-300 px-6 py-10">
                   <div className="text-center">
@@ -642,7 +642,7 @@ export default function CourseForm(props: CourseFormProps) {
                         htmlFor="file-upload"
                         className="relative cursor-pointer text-indigo-600 hover:text-indigo-500 font-medium"
                       >
-                        <span>Upload a file</span>
+                        <span>Tải lên file</span>
                         <input
                           id="file-upload"
                           name="file-upload"
@@ -656,10 +656,10 @@ export default function CourseForm(props: CourseFormProps) {
                           }}
                         />
                       </label>
-                      <span>or drag and drop</span>
+                      <span>hoặc kéo & thả</span>
                     </div>
                     <p className="mt-1 text-xs text-gray-500">
-                      PNG, JPG, GIF up to 10MB
+                      PNG, JPG, GIF tối đa 10MB
                     </p>
                     {thumbnailName && (
                       <p className="mt-1 text-sm text-gray-700 font-medium">
@@ -669,25 +669,23 @@ export default function CourseForm(props: CourseFormProps) {
                   </div>
                 </div>
               </div>
+              {errors.thumbnail && (
+                <p className="text-sm text-red-600 mt-1">{errors.thumbnail}</p>
+              )}
             </div>
-            {errors.thumbnail && (
-              <p className="text-sm text-red-600 mt-1">{errors.thumbnail}</p>
-            )}
           </div>
 
-          {/* Curriculum */}
+          {/* Nội dung khóa học */}
           <div className="border-b border-gray-200 pb-12">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Course Detail Information
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900">Nội Dung Chi Tiết Khóa Học</h2>
             <p className="mt-1 text-sm text-gray-600">
-              Add lessons corresponding to the section and lecture below.
+              Thêm các bài giảng tương ứng với từng chương/phần bên dưới.
             </p>
 
             <div className="mt-6 space-y-6">
               {sections.map((section, idx) => (
                 <div key={idx} className="border rounded bg-gray-50 p-4">
-                  {/* Section Header */}
+                  {/* Tiêu đề Chương/Phần */}
                   <div className="flex justify-between items-start">
                     {section.isEditingTitle ? (
                       <div className="w-full space-y-2">
@@ -718,20 +716,20 @@ export default function CourseForm(props: CourseFormProps) {
                               setSections(updated);
                             }}
                           >
-                            Cancel
+                            Hủy
                           </button>
                           <button
                             type="button"
                             className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-500"
                             onClick={() => handleUpdateSectionTitle(idx)}
                           >
-                            Update Section
+                            Cập Nhật Chương
                           </button>
                         </div>
                       </div>
                     ) : (
                       <h3 className="font-semibold text-gray-800 text-base flex-1">
-                        Section {idx + 1}: {section.title}
+                        Chương {idx + 1}: {section.title}
                       </h3>
                     )}
                     {!section.isEditingTitle && (
@@ -757,13 +755,12 @@ export default function CourseForm(props: CourseFormProps) {
                     )}
                   </div>
 
-                  {/* Lectures */}
+                  {/* Bài giảng */}
                   {section.lectures.map((lecture, ldx) => (
                     <div
                       key={ldx}
                       className="flex flex-col bg-white border rounded px-4 py-2 mt-3 gap-2"
                     >
-                      {/* Lecture title */}
                       {lecture.isEditing ? (
                         <>
                           <input
@@ -771,8 +768,7 @@ export default function CourseForm(props: CourseFormProps) {
                             value={lecture.newTitle}
                             onChange={(e) => {
                               const updated = [...sections];
-                              updated[idx].lectures[ldx].newTitle =
-                                e.target.value;
+                              updated[idx].lectures[ldx].newTitle = e.target.value;
                               setSections(updated);
                             }}
                             className="w-full border border-purple-500 rounded px-3 py-2 text-sm"
@@ -793,13 +789,13 @@ export default function CourseForm(props: CourseFormProps) {
                               }}
                               className="text-gray-700 hover:underline"
                             >
-                              Cancel
+                              Hủy
                             </button>
                             <button
                               onClick={() => handleUpdateLecture(idx, ldx)}
                               className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-500"
                             >
-                              Update
+                              Cập Nhật
                             </button>
                           </div>
                         </>
@@ -808,7 +804,7 @@ export default function CourseForm(props: CourseFormProps) {
                           <div className="flex items-center gap-2 text-sm text-gray-800">
                             <DocumentTextIcon className="h-4 w-4 text-gray-500" />
                             <span>
-                              Lecture {ldx + 1}: {lecture.title}
+                              Bài giảng {ldx + 1}: {lecture.title}
                             </span>
                             <PencilIcon
                               className="h-4 w-4 cursor-pointer text-gray-500 hover:text-blue-500"
@@ -820,7 +816,7 @@ export default function CourseForm(props: CourseFormProps) {
                             />
                           </div>
 
-                          {/* + Content (select video) */}
+                          {/* Thêm video bài giảng */}
                           {lecture.contents.length === 0 ? (
                             <div className="relative">
                               <input
@@ -839,26 +835,25 @@ export default function CourseForm(props: CourseFormProps) {
                                 type="button"
                                 className="border border-purple-600 text-purple-600 text-sm px-3 py-1 rounded hover:bg-purple-50 font-medium"
                               >
-                                + Content
+                                + Thêm Video
                               </button>
                             </div>
                           ) : (
                             <p className="text-xs text-gray-500">
-                              🎬 Video already added
+                              🎬 Video đã được thêm
                             </p>
                           )}
                         </div>
                       )}
-                      {/* File list */}
+
+                      {/* Danh sách file đã chọn */}
                       {lecture.contents.length > 0 && (
                         <ul className="pl-6 space-y-1 text-sm text-gray-700">
                           {lecture.contents.map((c, i) => (
                             <li key={i}>
                               🎬 {c.name}{" "}
                               {c.url && (
-                                <span className="text-gray-400">
-                                  (uploaded)
-                                </span>
+                                <span className="text-gray-400">(đã tải lên)</span>
                               )}
                             </li>
                           ))}
@@ -873,16 +868,16 @@ export default function CourseForm(props: CourseFormProps) {
                     </div>
                   ))}
 
-                  {/* Add Lecture Form */}
+                  {/* Form thêm bài giảng */}
                   {section.showAddLecture && (
                     <div className="border mt-3 rounded p-4 bg-white">
                       <label className="block text-sm font-medium text-gray-900 mb-1">
-                        New Lecture:
+                        Bài Giảng Mới:
                       </label>
                       <input
                         type="text"
                         className="w-full border border-purple-500 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="Enter a Title"
+                        placeholder="Nhập tiêu đề bài giảng"
                         value={section.newLectureTitle}
                         onChange={(e) => {
                           const updated = [...sections];
@@ -893,7 +888,7 @@ export default function CourseForm(props: CourseFormProps) {
                       />
                       <div className="mt-2 flex justify-between items-center text-sm">
                         <span className="text-gray-500">
-                          {80 - section.newLectureTitle.length}
+                          {80 - section.newLectureTitle.length} ký tự còn lại
                         </span>
                         <div className="flex gap-2">
                           <button
@@ -901,23 +896,24 @@ export default function CourseForm(props: CourseFormProps) {
                             onClick={() => handleCancelAddLecture(idx)}
                             className="text-gray-700 hover:underline"
                           >
-                            Cancel
+                            Hủy
                           </button>
                           <button
                             type="button"
                             onClick={() => handleAddLecture(idx)}
                             className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-500"
                           >
-                            Add Lecture
+                            Thêm Bài Giảng
                           </button>
                         </div>
                       </div>
                     </div>
                   )}
-                  {/* Hiển thị lỗi nếu không có bài giảng */}
+
+                  {/* Thông báo lỗi nếu chưa có bài giảng */}
                   {section.lectures.length === 0 && (
                     <p className="text-sm text-red-600 mt-2">
-                      At least one lecture is required.
+                      Mỗi chương cần ít nhất 1 bài giảng.
                     </p>
                   )}
 
@@ -930,13 +926,13 @@ export default function CourseForm(props: CourseFormProps) {
                     type="button"
                     className="mt-3 text-sm text-purple-700 border border-purple-700 hover:bg-purple-50 px-3 py-1 rounded"
                   >
-                    + Curriculum Item
+                    + Thêm Bài Giảng
                   </button>
                 </div>
               ))}
               {sections.length === 0 && (
                 <p className="text-sm text-red-600 mt-1">
-                  At least one section is required.
+                  Cần tạo ít nhất một chương.
                 </p>
               )}
               <button
@@ -944,10 +940,11 @@ export default function CourseForm(props: CourseFormProps) {
                 type="button"
                 className="text-sm text-purple-700 border border-purple-700 hover:bg-purple-50 px-4 py-2 rounded"
               >
-                + Section
+                + Thêm Chương
               </button>
             </div>
           </div>
+
 
           {/* Footer */}
           <div className="mt-8 flex justify-end gap-x-4">
@@ -955,17 +952,20 @@ export default function CourseForm(props: CourseFormProps) {
               type="button"
               className="text-sm font-medium text-gray-700 hover:text-gray-900"
             >
-              Cancel
+              Hủy
             </button>
             <button
               type="submit"
               className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
             >
-              Save
+              Lưu khóa học
             </button>
           </div>
         </div>
       </form>
     </>
   );
+
 }
+
+export default withRole(CourseForm, ["INSTRUCTOR"]);
