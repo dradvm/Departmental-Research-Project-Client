@@ -25,12 +25,12 @@ function NormalCouponDetailModal(
         <h1 className="font-bold text-red-500">
           Giá trị:
           {props.normalCoupon.type === "discount"
-            ? `${props.normalCoupon.value}%`
-            : `${formatVND(parseInt(props.normalCoupon.value))}`}
+            ? ` ${props.normalCoupon.value}%`
+            : ` ${formatVND(parseInt(props.normalCoupon.value))}`}
         </h1>
         <h2>
           Giảm tối đa:
-          {formatVND(parseInt(props.normalCoupon.maxValueDiscount))}
+          {` ${formatVND(parseInt(props.normalCoupon.maxValueDiscount))}`}
         </h2>
         <h2>
           Cho đơn từ: {formatVND(parseInt(props.normalCoupon.minRequire))}
@@ -44,7 +44,7 @@ function NormalCouponDetailModal(
         <h2>Bắt đầu: {getDateFormat(props.normalCoupon.startDate)}</h2>
         <h2>Kết thúc: {getDateFormat(props.normalCoupon.endDate)}</h2>
         <h2>
-          Đã áp dụng: {props.normalCoupon.appliedAmount}
+          Đã áp dụng: {props.normalCoupon.appliedAmount} /
           {props.normalCoupon.quantity}
         </h2>
       </div>
@@ -55,12 +55,13 @@ function NormalCouponDetailModal(
           <button
             className="p-[4px] mt-4 bg-green-700 shadow-md shadow-blue-700/70 rounded-[8px] font-bold text-white"
             title="Duyệt mã khuyến mãi này và kích hoạt cho khóa học"
-            onClick={() =>
+            onClick={() => {
+              props.handleClose();
               props.acceptACouponCourse(
                 props.normalCoupon.couponId,
                 props.normalCoupon.courseId
-              )
-            }
+              );
+            }}
           >
             Duyệt ngay
           </button>
@@ -70,12 +71,13 @@ function NormalCouponDetailModal(
           <button
             className="p-[4px] mt-4 bg-red-700 shadow-md shadow-red-700 rounded-[8px] font-bold text-white"
             title="Hủy kích hoạt mã khuyến mãi cho khóa học này"
-            onClick={() =>
+            onClick={() => {
+              props.handleClose();
               props.deleteCouponCourse(
                 props.normalCoupon.couponId,
                 props.normalCoupon.courseId
-              )
-            }
+              );
+            }}
           >
             Hủy kích hoạt
           </button>
