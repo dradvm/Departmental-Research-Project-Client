@@ -9,8 +9,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import ModalReactive from "./modal.reactive";
 import ModalResetPassword from "./modal.change.password";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { Eye, EyeOff, ArrowLeft, Mail, Lock } from "lucide-react";
+import { authService } from "services/auth.service";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -23,19 +24,46 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await authenticate(email, password);
-    console.log(res);
-    if (res?.error) {
-      if (res?.code === 2) {
-        setIsModalOpen(true);
-        setEmail(email);
-        return;
-      }
-      toast.error(`${res?.error}`);
-    } else {
-      update();
-      router.push("/");
-    }
+    authService
+      .login({
+        email,
+        password,
+      })
+      .then((res) => {
+        console.log(res);
+        if (res.statusCode === 201) {
+          signIn("credentials", {
+            email: email,
+            password: password,
+            // callbackUrl: "/",
+            redirect: false,
+          }).then(() => update());
+          router.push("/");
+        }
+        if (res.statusCode === 400) {
+          setIsModalOpen(true);
+          setEmail(email);
+          return;
+        }
+        if (res.statusCode === 401 || res.statusCode === 404) {
+          toast.error(`${res.message}`);
+          return;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    // if (res?.error) {
+    //   if (res?.code === 2) {
+    //     setIsModalOpen(true);
+    //     setEmail(email);
+    //     return;
+    //   }
+    //   toast.error(`${res?.error}`);
+    // } else {
+    //   update();
+    //   router.push("/");
+    // }
   };
 
   return (
