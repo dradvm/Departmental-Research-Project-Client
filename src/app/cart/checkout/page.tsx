@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Stack } from "@mui/material";
 
 const stripePromise = loadStripe(
-  "pk_test_51Radd5FhlEqryiyTfKpB4E1P80AuQ176rt4oEb8wZy8Wp5IcMuEuyec6vwKIxd7GIPWyTQJDazedcEkdw77V11L600WkzhOu96"
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
 
 type StripeTheme = "stripe" | "flat" | "night";
