@@ -280,7 +280,7 @@ export default function Header() {
                   <Link href="/auth/login" passHref>
                     <Button variant="primary">Đăng nhập</Button>
                   </Link>
-                  <Link href="/auth/login" passHref>
+                  <Link href="/auth/register" passHref>
                     <Button variant="filled">Đăng ký</Button>
                   </Link>
                 </div>

@@ -9,7 +9,7 @@ interface PaymentDetailFormProps {
   handleClose: () => void;
 }
 
-function TransactionDetailModal(props: PaymentDetailFormProps) {
+export default function TransactionDetailModal(props: PaymentDetailFormProps) {
   const { paymentDetail } = props;
 
   return (
@@ -103,5 +103,3 @@ function TransactionDetailModal(props: PaymentDetailFormProps) {
     </div>
   );
 }
-
-export default withRole(TransactionDetailModal, ["ADMIN"]);

@@ -32,5 +32,3 @@ export function Pagination({
     />
   );
 }
-
-export default withRole(Pagination, ["ADMIN"]);
