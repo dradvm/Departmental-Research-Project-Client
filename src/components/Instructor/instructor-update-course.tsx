@@ -9,6 +9,7 @@ import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import courseService from "services/course.service";
 import withRole from "components/WithRole/withRole";
+import categoryService from "services/category.service";
 
 type CourseFormProps = {
   mode: "create" | "edit";
@@ -78,8 +79,8 @@ function CourseForm(props: CourseFormProps) {
     }
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/categories");
-        const data = await res.json();
+        const res = await categoryService.getAllCategories();
+        const data = res.data;
         setAllCategories(data);
       } catch (err) {
         console.error("Failed to fetch categories:", err);
@@ -87,6 +88,7 @@ function CourseForm(props: CourseFormProps) {
     };
 
     fetchCategories();
+
     if (mode === "edit" && courseData?.CourseCategory) {
       setCategoryIds(courseData.CourseCategory.map((cc: any) => cc.categoryId));
     }
