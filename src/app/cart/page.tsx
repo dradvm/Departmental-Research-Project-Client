@@ -89,15 +89,12 @@ export default function Cart() {
         localStorage.setItem("cartInfor", JSON.stringify(reqBody));
 
         // check if the previous clientSecret is existing
-        const preClientSecret = localStorage.getItem("clientSecret");
-        if (!preClientSecret) {
-          const data: { clientSecret: string } = (
-            await paymentService.createPaymentIntent({
-              amount: parseInt(cart.finalPrice),
-            })
-          ).data;
-          localStorage.setItem("clientSecret", data.clientSecret);
-        }
+        const data: { clientSecret: string } = (
+          await paymentService.createPaymentIntent({
+            amount: parseInt(cart.finalPrice),
+          })
+        ).data;
+        localStorage.setItem("clientSecret", data.clientSecret);
         router.push("/cart/checkout");
       } catch (e) {
         console.log(`Có lỗi xảy ra khi tạo paymentIntent: ${e}`);
