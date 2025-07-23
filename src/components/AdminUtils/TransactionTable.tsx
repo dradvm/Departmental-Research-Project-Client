@@ -21,7 +21,7 @@ interface TransactionTableProps {
   handleOpen: () => void;
 }
 
-function TransactionTable(props: TransactionTableProps) {
+export default function TransactionTable(props: TransactionTableProps) {
   return (
     <TableContainer component={Paper} sx={{ boxShadow: 1 }}>
       <Table>
@@ -77,5 +77,3 @@ function TransactionTable(props: TransactionTableProps) {
     </TableContainer>
   );
 }
-
-export default withRole(TransactionTable, ["ADMIN"]);
