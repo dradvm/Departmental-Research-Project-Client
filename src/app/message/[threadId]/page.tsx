@@ -176,8 +176,6 @@ export default function ThreadPage() {
     });
   }, [socket]);
 
-  useEffect(() => console.log(messages), [messages]);
-
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Enter" && !e.shiftKey) {

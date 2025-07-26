@@ -11,7 +11,7 @@ import courseService from "services/course.service";
 import { Category } from "types/category";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "../../../context/UserContext";
 import Loading from "components/Main/Loading/Loading";
 export default function CourseSearchPage() {
@@ -27,6 +27,7 @@ export default function CourseSearchPage() {
   const search = searchParams.get("search") || "";
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { user } = useUser();
+  const router = useRouter();
   const handlePriceRange = (event: Event, newValue: number[]) => {
     setPriceRange(newValue);
   };
@@ -35,11 +36,13 @@ export default function CourseSearchPage() {
     setDurationRange(newValue);
   };
   const clearFilters = () => {
-    window.location.href = "/course/search";
+    // window.location.href = "/course/search";
+    router.push("/course/search");
   };
 
   const handleFilter = useCallback(() => {
     setIsLoading(true);
+    console.log(user);
     if (user) {
       courseService
         .searchCoursePrivate(

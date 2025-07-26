@@ -41,7 +41,6 @@ export default function QuestionForm({
       if (image instanceof File) {
         formData.append("images", image);
       } else {
-        console.log(image);
         formData.append("oldImages", image.publicId);
       }
     });

@@ -264,7 +264,6 @@ export default function VideoPlayer({
     const start = searchParams.get("start");
     if (start !== null) {
       const startNum: number = parseInt(start);
-      console.log(startNum);
       playerRef.current?.seekTo(startNum);
       setProgress((startNum / duration) * 100);
       setCurrentTime(startNum);

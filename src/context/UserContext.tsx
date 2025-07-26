@@ -25,7 +25,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User>(null);
 
   useEffect(() => {
-    console.log("A");
     if (status === "authenticated" && session?.user) {
       setUser({
         userId: (session.user as any).userId ?? "",

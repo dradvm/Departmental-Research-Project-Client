@@ -1,32 +1,35 @@
+import { Course } from "./course";
+
 export interface UserType {
-    userId: number;
-    name?: string;
-    gender?: string;
-    biography?: string;
-    role?: string;
-    email?: string;
-    isActive?: boolean;
-    isDeleted?: boolean;
-    img?: string;
+  userId: number;
+  name?: string;
+  gender?: string;
+  biography?: string;
+  role?: string;
+  email?: string;
+  isActive?: boolean;
+  isDeleted?: boolean;
+  img?: string;
+  Course?: Course[];
 }
 
 export interface UserDB {
-    users: UserType[];
-    length: number;
+  users: UserType[];
+  length: number;
 }
 
 // use for get all user (admin function)
 export interface UserReq {
-    limit: number;
-    skip: number;
-    role: "USERS" | "INSTRUCTOR";
-    searchText?: string;
+  limit: number;
+  skip: number;
+  role: "USERS" | "INSTRUCTOR";
+  searchText?: string;
 }
 
 // use for patch method: admin's update function
 export interface UserUpdateBody {
-    id: number;
-    name?: string;
-    biography?: string;
-    img?: string;
+  id: number;
+  name?: string;
+  biography?: string;
+  img?: string;
 }
