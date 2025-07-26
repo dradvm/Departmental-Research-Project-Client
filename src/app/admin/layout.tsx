@@ -5,9 +5,11 @@ import {
   FileText,
   GraduationCap,
   LayoutDashboardIcon,
+  LogOut,
   Tag,
   User,
 } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 export default function AdminLayout({
   children,
@@ -48,6 +50,11 @@ export default function AdminLayout({
         "/admin/promotion/global",
         "/admin/promotion/normal",
       ],
+    },
+    {
+      text: "Logout",
+      icon: <LogOut />,
+      onClick: () => signOut({ callbackUrl: "/" }),
     },
   ];
 

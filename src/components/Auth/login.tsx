@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import ModalReactive from "./modal.reactive";
 import ModalResetPassword from "./modal.change.password";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { Eye, EyeOff, ArrowLeft, Mail, Lock } from "lucide-react";
 
 const LoginPage = () => {
@@ -33,8 +33,14 @@ const LoginPage = () => {
       }
       toast.error(`${res?.error}`);
     } else {
-      update();
-      router.push("/");
+      await update();
+      const session = await getSession();
+      if (session?.user?.role === "ADMIN") {
+        router.push("/admin/dashboard");
+      }
+      else {
+        router.push("/");
+      }
     }
   };
 

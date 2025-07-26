@@ -17,7 +17,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 export interface NavItemSideBar {
   text: string;
   icon: React.ReactNode;
-  path: string | string[];
+  path?: string | string[];
+  onClick?: () => void;
 }
 
 function SidebarItem({
@@ -35,7 +36,13 @@ function SidebarItem({
     <Tooltip title={open ? "" : item.text} placement="right" arrow>
       <ListItemButton
         selected={isActive}
-        onClick={onClick}
+        onClick={() => {
+          if (item.onClick) {
+            item.onClick();
+          } else {
+            onClick();
+          }
+        }}
         sx={{
           justifyContent: open ? "initial" : "center",
           px: open ? 2.5 : 1.5,
@@ -130,15 +137,21 @@ export default function Sidebar({
             item={item}
             open={open}
             isActive={
-              typeof item.path === "string"
-                ? pathname === item.path
-                : item.path.includes(pathname)
+              item.path
+                ? typeof item.path === "string"
+                  ? pathname === item.path
+                  : item.path.includes(pathname)
+                : false // nếu không có path, không active
             }
-            onClick={() =>
-              router.push(
-                typeof item.path === "string" ? item.path : item.path[0]
-              )
-            }
+            onClick={() => {
+              if (item.path) {
+                const targetPath =
+                  typeof item.path === "string" ? item.path : item.path[0];
+                router.push(targetPath);
+              } else if (item.onClick) {
+                item.onClick(); // fallback nếu là nút như Logout
+              }
+            }}
           />
         ))}
       </List>
