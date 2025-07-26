@@ -3,7 +3,6 @@ import { useState } from "react";
 import type React from "react";
 
 import Link from "next/link";
-import { authenticate } from "utils/action";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
@@ -30,15 +29,16 @@ const LoginPage = () => {
         password,
       })
       .then((res) => {
-        console.log(res);
         if (res.statusCode === 201) {
           signIn("credentials", {
             email: email,
             password: password,
             // callbackUrl: "/",
             redirect: false,
-          }).then(() => update());
-          router.push("/");
+          }).then(() => {
+            update();
+            router.push("/");
+          });
         }
         if (res.statusCode === 400) {
           setIsModalOpen(true);

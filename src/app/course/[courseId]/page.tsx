@@ -261,13 +261,12 @@ export default function CoursePage() {
           <div className="w-[70%]">
             <div className="flex flex-wrap space-x-3">
               {(course?.CourseCategory ?? []).map((courseCategory) => (
-                <Link
+                <div
                   key={courseCategory.Category?.categoryId}
-                  href={"/"}
                   className="bg-indigo-700 text-gray-100 font-medium rounded-full px-4 py-1"
                 >
                   {courseCategory.Category?.categoryName}
-                </Link>
+                </div>
               ))}
             </div>
 
@@ -297,7 +296,10 @@ export default function CoursePage() {
               </div>
               <div>
                 Được tạo bởi{" "}
-                <Link href="/" className="text-indigo-200 underline">
+                <Link
+                  href={`/user/${course?.userId}`}
+                  className="text-indigo-200 underline"
+                >
                   {course?.User?.name}
                 </Link>
               </div>
@@ -446,7 +448,7 @@ export default function CoursePage() {
               <div className="flex flex-wrap space-x-3">
                 {(course?.CourseCategory ?? []).map((courseCategory) => (
                   <Link
-                    href={"/"}
+                    href={`/course/search?category=${courseCategory.Category?.categoryId}`}
                     key={courseCategory.Category?.categoryId}
                     className="px-4 py-2 rounded-sm border hover:bg-gray-100 font-medium border-gray-800"
                   >

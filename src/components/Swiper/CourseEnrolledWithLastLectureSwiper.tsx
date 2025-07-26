@@ -63,10 +63,6 @@ export default function CourseEnrolledWithLastLectureSwiper() {
       .catch((err) => console.log(err));
   }, []);
 
-  useEffect(() => {
-    console.log(isBeginning);
-    console.log(isEnd);
-  }, [isBeginning, isEnd]);
   return (
     <Box position="relative">
       <Swiper

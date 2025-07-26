@@ -25,7 +25,6 @@ const ThreadItem = ({
   thread: Thread;
   userId: number | undefined;
 }) => {
-  console.log(thread);
   const message: Message = useMemo(() => {
     const sender: Message = thread.Message_Message_userSenderIdToUser[0];
     const receiver: Message | null =
