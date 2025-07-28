@@ -47,7 +47,6 @@ export default function AnswerForm({
       if (image instanceof File) {
         formData.append("images", image);
       } else {
-        console.log(image);
         formData.append("oldImages", image.publicId);
       }
     });
@@ -57,9 +56,6 @@ export default function AnswerForm({
       formData.append("answerId", answerId);
     }
     formData.append("answerContent", answerContent);
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
     handleSave(formData, handleAfterSave, isUpdate);
   };
 

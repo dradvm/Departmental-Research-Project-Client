@@ -32,7 +32,7 @@ export default function Header() {
   const [search, setSearch] = useState(searchParams.get("search") || "");
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && search.trim()) {
+    if (e.key === "Enter") {
       router.push(`/course/search?search=${encodeURIComponent(search.trim())}`);
     }
   };
@@ -77,6 +77,10 @@ export default function Header() {
       });
     }
   }, [user]);
+
+  useEffect(() => {
+    setSearch(searchParams.get("search") ?? "");
+  }, [searchParams]);
   return (
     <>
       <div className="flex items-center px-8 py-4 space-x-3">

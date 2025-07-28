@@ -4,7 +4,7 @@ let socket: Socket;
 
 export const getSocket = (): Socket => {
   if (!socket) {
-    socket = io("http://localhost:3001", {
+    socket = io(`${process.env.NEXT_PUBLIC_BACKEND_URL}`, {
       withCredentials: true,
     });
   }

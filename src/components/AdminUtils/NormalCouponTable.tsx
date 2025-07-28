@@ -45,7 +45,9 @@ function NormalCouponTable(props: NormalCouponTableProps) {
             <TableCell align="right" sx={{ fontWeight: "bold" }}>
               Xem chi tiết
             </TableCell>
-            <TableCell>Thao tác</TableCell>
+            <TableCell align="center" sx={{ fontWeight: "bold" }}>
+              Thao tác
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

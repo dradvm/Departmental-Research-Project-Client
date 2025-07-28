@@ -18,32 +18,32 @@ export default function AdminLayout({
 }) {
   const navItems: NavItemSideBar[] = [
     {
-      text: "Dashboard",
+      text: "Thống kê",
       icon: <LayoutDashboardIcon />,
       path: "/admin/dashboard",
     },
     {
-      text: "Learner",
+      text: "Học viên",
       icon: <User />,
       path: "/admin/learner",
     },
     {
-      text: "Instructor",
+      text: "Giảng viên",
       icon: <GraduationCap />,
       path: "/admin/instructor",
     },
     {
-      text: "Payment",
+      text: "Đơn hàng",
       icon: <CreditCard />,
       path: "/admin/payment",
     },
     {
-      text: "Post",
+      text: "Bài đăng",
       icon: <FileText />,
       path: "/admin/post",
     },
     {
-      text: "Promotion",
+      text: "Khuyến mãi",
       icon: <Tag />,
       path: [
         "/admin/promotion",
@@ -60,7 +60,7 @@ export default function AdminLayout({
 
   return (
     <div className="flex">
-      <Sidebar navItems={navItems} title="Admin Panel" />
+      <Sidebar navItems={navItems} title="Quản trị viên" />
       <div className="duration-300 ease-linear grow px-2 py-4">{children}</div>
     </div>
   );

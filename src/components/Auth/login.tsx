@@ -3,14 +3,14 @@ import { useState } from "react";
 import type React from "react";
 
 import Link from "next/link";
-import { authenticate } from "utils/action";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import ModalReactive from "./modal.reactive";
 import ModalResetPassword from "./modal.change.password";
-import { getSession, useSession } from "next-auth/react";
+import {signIn, getSession, useSession } from "next-auth/react";
 import { Eye, EyeOff, ArrowLeft, Mail, Lock } from "lucide-react";
+import { authService } from "services/auth.service";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -23,25 +23,36 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await authenticate(email, password);
-    console.log(res);
-    if (res?.error) {
-      if (res?.code === 2) {
-        setIsModalOpen(true);
-        setEmail(email);
-        return;
-      }
-      toast.error(`${res?.error}`);
-    } else {
-      await update();
-      const session = await getSession();
-      if (session?.user?.role === "ADMIN") {
-        router.push("/admin/dashboard");
-      }
-      else {
-        router.push("/");
-      }
-    }
+    authService
+      .login({
+        email,
+        password,
+      })
+      .then((res) => {
+        if (res.statusCode === 201) {
+          signIn("credentials", {
+            email: email,
+            password: password,
+            // callbackUrl: "/",
+            redirect: false,
+          }).then(() => {
+            update();
+            router.push("/");
+          });
+        }
+        if (res.statusCode === 400) {
+          setIsModalOpen(true);
+          setEmail(email);
+          return;
+        }
+        if (res.statusCode === 401 || res.statusCode === 404) {
+          toast.error(`${res.message}`);
+          return;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (

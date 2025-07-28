@@ -2,7 +2,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { authService } from "services/auth.service";
 import { IUser } from "types/next-auth";
-import { InactiveAccoounError, InvalidEmailPasswordError } from "utils/errors";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -38,15 +37,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
         //Sai pass: 401
         //Chưa active: 400
-        else if (+res.statusCode === 401) {
-          throw new InvalidEmailPasswordError();
-        } else if (+res.statusCode === 404) {
-          throw new InvalidEmailPasswordError();
-        } else if (+res.statusCode === 400) {
-          throw new InactiveAccoounError();
-        } else {
-          throw new Error("Internal server error");
-        }
+        return null;
       },
     }),
   ],
