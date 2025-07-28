@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import ModalReactive from "./modal.reactive";
 import ModalResetPassword from "./modal.change.password";
-import { signIn, useSession } from "next-auth/react";
+import {signIn, getSession, useSession } from "next-auth/react";
 import { Eye, EyeOff, ArrowLeft, Mail, Lock } from "lucide-react";
 import { authService } from "services/auth.service";
 
@@ -53,17 +53,6 @@ const LoginPage = () => {
       .catch((err) => {
         console.log(err);
       });
-    // if (res?.error) {
-    //   if (res?.code === 2) {
-    //     setIsModalOpen(true);
-    //     setEmail(email);
-    //     return;
-    //   }
-    //   toast.error(`${res?.error}`);
-    // } else {
-    //   update();
-    //   router.push("/");
-    // }
   };
 
   return (
