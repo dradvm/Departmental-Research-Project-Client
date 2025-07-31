@@ -1,32 +1,31 @@
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 const footerLinks = [
   {
-    title: "Udemy Business",
+    title: "Về EduMarket",
     links: [
-      { label: "Teach on Udemy", href: "#" },
-      { label: "Get the app", href: "#" },
-      { label: "About us", href: "#" },
-      { label: "Contact us", href: "#" },
+      { label: "Giảng dạy trên EduMarket", href: "#" },
+      { label: "Tải ứng dụng", href: "#" },
+      { label: "Giới thiệu", href: "#" },
+      { label: "Liên hệ", href: "#" },
     ],
   },
   {
-    title: "Careers",
+    title: "Hỗ trợ",
     links: [
       { label: "Blog", href: "#" },
-      { label: "Help and Support", href: "#" },
-      { label: "Affiliate", href: "#" },
-      { label: "Investors", href: "#" },
+      { label: "Trợ giúp", href: "#" },
+      { label: "Cộng tác viên", href: "#" },
+      { label: "Nhà đầu tư", href: "#" },
     ],
   },
   {
-    title: "Terms",
+    title: "Pháp lý",
     links: [
-      { label: "Privacy policy", href: "#" },
-      { label: "Sitemap", href: "#" },
-      { label: "Accessibility statement", href: "#" },
+      { label: "Chính sách bảo mật", href: "#" },
+      { label: "Sơ đồ trang", href: "#" },
+      { label: "Tuyên bố truy cập", href: "#" },
     ],
   },
 ];
@@ -48,13 +47,9 @@ export default function Footer() {
         }}
       >
         <div style={{ flex: "1 1 200px", marginBottom: 24 }}>
-          <Image
-            src="/logo.svg"
-            alt="Logo"
-            width={120}
-            height={34}
-            style={{ marginBottom: 16 }}
-          />
+          <div style={{ fontSize: 24, fontWeight: "bold", color: "#fff" }}>
+            EduMarket
+          </div>
         </div>
         <div
           style={{
@@ -99,7 +94,7 @@ export default function Footer() {
           color: "#b2b2b2",
         }}
       >
-        © {new Date().getFullYear()} Udemy, Inc.
+        © {new Date().getFullYear()} EduMarket. Đã đăng ký bản quyền.
       </div>
     </footer>
   );
