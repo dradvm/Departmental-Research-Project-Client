@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import type React from "react";
 
 import Link from "next/link";
@@ -8,9 +8,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import ModalReactive from "./modal.reactive";
 import ModalResetPassword from "./modal.change.password";
-import {signIn, getSession, useSession } from "next-auth/react";
+import { signIn, getSession, useSession } from "next-auth/react";
 import { Eye, EyeOff, ArrowLeft, Mail, Lock } from "lucide-react";
 import { authService } from "services/auth.service";
+import { useUser } from "context/UserContext";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -20,7 +21,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const { user } = useUser();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     authService
@@ -35,9 +36,14 @@ const LoginPage = () => {
             password: password,
             // callbackUrl: "/",
             redirect: false,
-          }).then(() => {
+          }).then(async () => {
             update();
-            router.push("/");
+            const session = await getSession();
+            if (session?.user?.role === "ADMIN") {
+              router.push("/admin/dashboard");
+            } else {
+              router.push("/");
+            }
           });
         }
         if (res.statusCode === 400) {
